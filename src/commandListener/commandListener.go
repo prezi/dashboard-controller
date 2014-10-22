@@ -4,11 +4,14 @@ import(
     "bufio"
     "fmt"
     "os"
+	"log"
+	"net"
 )
 
+const listenAddress = "localhost:4000"
+
 func main() {
-	link_to_display := ReadMessage()
-	fmt.Println(link_to_display)
+	ListenOnPortAndReply()
 }
 
 func ReadMessage() string {
@@ -17,4 +20,25 @@ func ReadMessage() string {
     link, _ := reader.ReadString('\n')
 
     return link
+}
+
+func ListenOnPortAndReply() {
+	l, err := net.Listen("tcp", listenAddress)
+
+	CheckError(err)
+
+	for {
+		c, err :=l.Accept()
+
+		CheckError(err)
+
+		fmt.Fprintln(c, "Hello!")
+		c.Close()
+	}
+}
+
+func CheckError(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
 }
