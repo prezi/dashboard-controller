@@ -6,10 +6,13 @@ import(
 	"net"
 )
 
-const listenAddress = "localhost:4000"
+const (
+	DEFAULT_ADDRESS = "localhost:4000"
+	DEFAULT_LOG = "/log/commandListener.log"
+)
 
 func ListenOnPortAndReply() {
-	l, err := net.Listen("tcp", listenAddress)
+	l, err := net.Listen("tcp", DEFAULT_ADDRESS)
 
 	CheckError(err)
 
