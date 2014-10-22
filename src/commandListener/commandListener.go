@@ -18,7 +18,7 @@ const (
 	LINUX_DEFAULT_BROWSER_ARGS = "--kiosk"
 
 	OSX_DEFAULT_BROWSER_CMD = "open"
-	OSX_DEFAULT_BROWSER_ARGS = "-a /Applications/Google Chrome.app/ --args --kiosk"
+	OSX_DEFAULT_BROWSER_ARGS = "-a 'Google Chrome' --args --kiosk"
 )
 
 var port int
@@ -84,7 +84,8 @@ func getOs() string {
 func handleRequest(writer http.ResponseWriter, request *http.Request) {
 	url := request.PostFormValue("url")
 	fmt.Printf("executing: %v %v %v\n", browser_cmd, browser_args, url)
-	err := exec.Command(browser_cmd, browser_args, url).Run()
+//	err := exec.Command(browser_cmd, browser_args, url).Run()
+	err := exec.Command("open", url).Run()
 	if err != nil {
 		fmt.Printf("error opening URL: %v\n", err)
 	}
