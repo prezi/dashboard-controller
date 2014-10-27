@@ -40,23 +40,16 @@ func jsonInit(){
 	protocol = jsontype.Protocol
 	host = jsontype.Host
 	port = jsontype.Port
-
-
-
 }
 
 // create url that sends command to the designated Raspberry Pi
 func formatUrl (rasPiNum string) (string) {
-
 	finalUrl := protocol + rasPiNum + port
 
 	return finalUrl
-
-
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-
 	rasPiNum := r.PostFormValue("RPID")
 
 	formattedUrl := formatUrl(rasPiNum)
@@ -64,8 +57,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(formattedUrl, "Sending", r.PostFormValue("command"), "request.")
 
 	http.PostForm(formattedUrl, r.Form)
-
-
 }
 
 
