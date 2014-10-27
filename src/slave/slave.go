@@ -8,6 +8,7 @@ import(
 	"os/exec"
 	"strconv"
 	"strings"
+	"path/filepath"
 )
 
 const (
@@ -24,6 +25,7 @@ const (
 var port int
 var browser_cmd string
 var browser_args string
+var current_dir string
 
 func main() {
 	setUp()
@@ -56,6 +58,10 @@ func setUp() {
 	if err != nil {
 		fmt.Printf("error setting env variable: %v\n", err)
 	}
+	current_dir, err = filepath.Abs(filepath.Dir(os.Args[0]))
+    if err != nil {
+        fmt.Printf(err)
+    }
 }
 
 func getOs() string {
@@ -84,7 +90,7 @@ func handleRequest(writer http.ResponseWriter, request *http.Request) {
 	url := request.PostFormValue("url")
 	fmt.Printf("executing: %v %v %v\n", browser_cmd, browser_args, url)
 	//err := exec.Command(browser_cmd, browser_args, url).Run()
-	err := exec.Command("/home/pi/dashboard-controller/scripts/open_browser.sh", url).Run()
+	err := exec.Command(current_dir+"../scripts/open_browser.sh", url).Run()
 //	err := exec.Command(browser_cmd, url).Run()
 	if err != nil {
 		fmt.Printf("error opening URL: %v\n", err)
