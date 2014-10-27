@@ -60,7 +60,7 @@ func setUp() {
 	}
 	current_dir, err = filepath.Abs(filepath.Dir(os.Args[0]))
     if err != nil {
-        fmt.Printf(err)
+        fmt.Printf("error getting the current directory %v\n", err)
     }
 }
 
