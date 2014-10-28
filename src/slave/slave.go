@@ -12,7 +12,7 @@ import(
 
 const (
 	DEFAULT_LOCALHOST_PORT = 4000
-	DEFAULT_LOG_FILE = "/log/commandListener.log"
+	// DEFAULT_LOG_FILE = "/log/slave.log" 
 
 	LINUX_DEFAULT_BROWSER_CMD = "chromium"
 	LINUX_DEFAULT_BROWSER_ARGS = "--kiosk"
@@ -29,12 +29,17 @@ var current_dir string
 func main() {
 	setUp()
 	http.HandleFunc("/", handleRequest)
+
 	fmt.Printf("Listening on port: %v\n", port)
 	fmt.Printf("You can send HTTP POST requests with a 'url' parameter to open it in a browser.\n")
 	fmt.Printf("e.g.: curl localhost:4000 -X POST -d \"url=http://www.google.com\"\n")
+
+	// start HTTP server with given address and handler
+	// handler=nil will default handler to DefaultServeMux
 	err := http.ListenAndServe(":" + strconv.Itoa(port), nil)
 	if err != nil {
 		fmt.Printf("Error starting HTTP server: %v\n", err)
+		fmt.Println("Aborting process.")
 	}
 }
 
@@ -45,7 +50,7 @@ func setUp() {
 	} else {
 		fmt.Printf("Detected operating system: %v\n", OS)
 	}
-	
+
 	switch OS {
 	case "Linux":
 		browser_cmd = LINUX_DEFAULT_BROWSER_CMD
