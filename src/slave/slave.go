@@ -65,7 +65,7 @@ func setOS() {
 		kernel = strings.Split(operatingSystemName, " ")[0]
 	}
 	fmt.Println("Kernal detected: ", kernel)
-	
+
 	switch kernel {
 	case "Linux":
 		OS = "Linux"
@@ -77,8 +77,15 @@ func setOS() {
 }
 
 func killBrowser() {
-	fmt.Printf("Executing command: killall 'Google Chrome'\n")
-	err := exec.Command("killall", "Google Chrome").Run()
+	switch OS {
+	case "Linux":
+		fmt.Printf("Executing command: kill -SIGTERM $(pidof chromium)")
+		err = exec.Command("kill -SIGTERM $(pidof chromium)").Run() // TODO: this needs testing
+	case "OS X":
+		fmt.Printf("Executing command: killall 'Google Chrome'\n")
+		err = exec.Command("killall", "Google Chrome").Run()
+	}
+
 	if err != nil {
 		fmt.Printf("Error killing current browser: %v\n", err)
 	} else {
@@ -91,7 +98,7 @@ func openBrowser(url string){
 	switch OS {
 	case "Linux":
 		fmt.Printf("Executing command: chromium --kiosk %v\n", url)
-		err = exec.Command("chromium", "--kiosk", url).Run()		
+		err = exec.Command("nohup", "chromium", "--kiosk", url).Run()		
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
 		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()
