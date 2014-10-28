@@ -4,6 +4,7 @@ import(
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -25,6 +26,7 @@ var port int
 var browser_cmd string
 var browser_args string
 var current_dir string
+var err error
 
 func main() {
 	setUp()
@@ -66,6 +68,10 @@ func setUp() {
 	// can pass flag argument: $ ./slave -port=8080
 	// if flag not specified, will set DEFAULT_LOCALHOST_PORT
 	flag.Parse()
+	current_dir, err = filepath.Abs(filepath.Dir(os.Args[0]))
+    if err != nil {
+        fmt.Printf("error getting the current directory %v\n", err)
+    }
 }
 
 func getOs() string {
