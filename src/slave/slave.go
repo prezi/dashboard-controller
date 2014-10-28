@@ -45,6 +45,7 @@ func setUp() {
 	} else {
 		fmt.Printf("Detected operating system: %v\n", OS)
 	}
+	
 	switch OS {
 	case "Linux":
 		browser_cmd = LINUX_DEFAULT_BROWSER_CMD
@@ -55,7 +56,10 @@ func setUp() {
 	default:
 		print("ERROR: Unknown operating system. \n")
 	}
+
 	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
+	// can pass flag argument: $ ./slave -port=8080
+	// if flag not specified, will set DEFAULT_LOCALHOST_PORT
 	flag.Parse()
 }
 
