@@ -1,26 +1,31 @@
 <!DOCTYPE html>
 <html>
+<head>
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="code.js"></script>
+</head>
 <body>
+<h1 class='title'>Dashing-Pi</h1>
+<div class='form-box'>
 
-<form action="/my-handling-form-page" method="post">
-    <div>
-        <label for="name">Name:</label>
-        <input type="text" id="name" />
+<form action="/form-submit" method="post">
+    <div class='inputfield'>
+        <label for="Raspberry ID">Raspberry ID:</label>
+        <input type="text" id="rb-id" />
     </div>
-    <div>
-        <label for="mail">E-mail:</label>
-        <input type="email" id="mail" />
+    <div class='inputfield'>
+        <label for="URL" >URL:</label>
+        <input type="text" id="url" onChange="websitePreview(this.value)"/>
     </div>
-    <div>
-        <label for="msg">Message:</label>
-        <textarea id="msg"></textarea>
-    </div>
-    <div>
-   <input type='submit' name='Submit' value='Submit' />
+
+    <div class='inputbutton'>
+   <input type='submit' name='Send URL!' value='Submit' />
+   <iframe src="about:blank" width="200" height="200" id="webpagepreview"></iframe>
     </div>
 </form>
 
-<p><b>Note:</b> The characters in a password field are masked (shown as asterisks or circles).</p>
+</div>
 
 </body>
 </html>
