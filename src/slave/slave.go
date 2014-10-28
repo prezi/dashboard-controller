@@ -4,7 +4,7 @@ import(
 	"flag"
 	"fmt"
 	"net/http"
-	"os"
+	// "os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -54,20 +54,12 @@ func setUp() {
 	}
 	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
 	flag.Parse()
-	err := os.Setenv("DISPLAY",":0.0")
-	if err != nil {
-		fmt.Printf("error setting env variable: %v\n", err)
-	}
-	current_dir, err = filepath.Abs(filepath.Dir(os.Args[0]))
-    if err != nil {
-        fmt.Printf("error getting the current directory %v\n", err)
-    }
 }
 
 func getOs() string {
-	cmd := exec.Command( "uname", "-a" )
+	operatingSystemName := exec.Command( "uname", "-a" ) // display operating system name
 	var kernel string
-	output, err := cmd.Output()
+	output, err := operatingSystemName.Output()
 	if( err != nil ) {
 		fmt.Printf("getting kernel: %v\n", err)
 		kernel = "unknown"
@@ -89,9 +81,14 @@ func getOs() string {
 func handleRequest(writer http.ResponseWriter, request *http.Request) {
 	url := request.PostFormValue("url")
 	fmt.Printf("executing: %v %v %v\n", browser_cmd, browser_args, url)
+<<<<<<< HEAD
 	//err := exec.Command(browser_cmd, browser_args, url).Run()
 	err := exec.Command(current_dir+"/../scripts/open_browser.sh", url).Run()
 //	err := exec.Command(browser_cmd, url).Run()
+=======
+	// err := exec.Command(browser_cmd, browser_args, url).Run()
+	err := exec.Command(browser_cmd, url).Run()
+>>>>>>> removed code for setting env var DISPLAY, renamed vars in getOs
 	if err != nil {
 		fmt.Printf("error opening URL: %v\n", err)
 	}
