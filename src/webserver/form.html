@@ -2,29 +2,28 @@
 <html>
 <head>
 <link rel="stylesheet" type="text/css" href="style.css">
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="code.js"></script>
 </head>
 <body>
+<div class='big-frame'>
 <h1 class='title'>Dashing-Pi</h1>
 <div class='form-box'>
 
 <form action="/form-submit" method="post">
     <div class='inputfield'>
         <label for="Raspberry ID">Raspberry ID:</label>
-        <input type="text" id="rb-id" />
+        <input type="text" name="rb-id" />
     </div>
     <div class='inputfield'>
         <label for="URL" >URL:</label>
-        <input type="text" id="url" onChange="websitePreview(this.value)"/>
+        <input type="text" name="url"/>
     </div>
 
     <div class='inputbutton'>
-   <input type='submit' name='Send URL!' value='Submit' />
-   <iframe src="about:blank" width="200" height="200" id="webpagepreview"></iframe>
+   <input class='button' type='submit' name='Send URL!' value='Submit' />
     </div>
 </form>
 
+</div>
 </div>
 
 </body>

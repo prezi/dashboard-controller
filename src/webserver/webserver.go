@@ -3,8 +3,11 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"html"
+	//"html"
 	"io/ioutil"
+	"log"
+	"mime"
+	"path/filepath"
 )
 
 type String string
@@ -27,30 +30,29 @@ func (t Struct) ServeHTTP(
 	fmt.Fprint(w, t.Greeting, t.Punct, t.Who)
 }
 
-// func ()ServeHTTP(
-// 	w http.ResponseWriter,
-// 	r *http.Request){
-
-// 	fmt.Fprint(w,"Hi!")
-// }
-
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
-		 
-		//fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
-		html_file,err:=ioutil.ReadFile("form.html")
-		if (err==nil){
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if (r.URL.Path=="/"){
+			http.Redirect(w,r,"/form.html",301)
+		}
+
+		mimetype:=mime.TypeByExtension(filepath.Ext(r.URL.Path[1:]))
+		w.Header().Set("Content-type", mimetype)
+		html_file,err:=ioutil.ReadFile(r.URL.Path[1:])
+
+		if (err!=nil){
+			log.Fatal(err)
+		}else{
 			fmt.Fprint(w, String(html_file))
 		}		
 	})
 		http.HandleFunc("/form-submit", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
+		URL:=r.FormValue("url")
+		rb_ID:=r.FormValue("rb-id")
+		fmt.Println(URL,rb_ID)
+		http.Redirect(w,r,"/form.html",301)
 	})
-	//http.Handle("/")
-	//http.Handle("/",String("what"))
-	//http.Handle("/string", String("I'm a frayed knot."))
-	//http.Handle("/struct", &Struct{"Hello", ":", "Gophers!"})
 
 	http.ListenAndServe("localhost:4000", nil)
 }
