@@ -50,21 +50,21 @@ func setUp() {
 		browser_cmd = OSX_DEFAULT_BROWSER_CMD
 		browser_args = OSX_DEFAULT_BROWSER_ARGS
 	default:
-		print("error: unknown operating system")
+		print("ERROR: unknown operating system \n")
 	}
 	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
 	flag.Parse()
 }
 
 func getOs() string {
-	operatingSystemName := exec.Command( "uname", "-a" ) // display operating system name
+	operatingSystemName := exec.Command( "uname", "-a") // display operating system name...why do we need the -a?
 	var kernel string
-	output, err := operatingSystemName.Output()
+	kernalName, err := operatingSystemName.Output()
 	if( err != nil ) {
-		fmt.Printf("getting kernel: %v\n", err)
+		fmt.Printf("Error encountered while reading kernal: %v\n", err)
 		kernel = "unknown"
 	} else {
-		kernel = strings.Split( string(output), " " )[0]
+		kernel = strings.Split( string(kernalName), " " )[0]
 	}
 	var OS string
 	switch kernel {
