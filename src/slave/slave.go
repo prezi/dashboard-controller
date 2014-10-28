@@ -4,34 +4,39 @@ import(
 	"flag"
 	"fmt"
 	"net/http"
-	// "os"
 	"os/exec"
 	"strconv"
 	"strings"
 	"time"
-	// "path/filepath"
 )
 
 const (
 	DEFAULT_LOCALHOST_PORT = 4000
 	// DEFAULT_LOG_FILE = "/log/slave.log" 
 
-	LINUX_DEFAULT_BROWSER_CMD = "chromium"
+	LINUX_DEFAULT_BROWSER_OPEN = "chromium"
 	LINUX_DEFAULT_BROWSER_ARGS = "--kiosk"
 
-	OSX_DEFAULT_BROWSER_CMD = "open"
-	OSX_DEFAULT_BROWSER_ARGS = "-a 'Google Chrome' --args --kiosk"
-	OSX_DEFAULT_BROWSER_KILL = "killall"
-	OSX_DEFAULT_BROWSER_APP_NAME = "Google Chrome"
+
+	// OSX_DEFAULT_BROWSER_KILL = "killall"
+	// OSX_DEFAULT_BROWSER_APP_NAME = "Google Chrome"
+	// OSX_DEFAULT_BROWSER_OPEN = "open"
+	// OSX_DEFAULT_BROWSER_OPEN_ARGS = "-a"
+	// // OSX_DEFAULT_BROWSER_ARGS_DUMMY = "" // this is not going to work...
+	// // ...gotta add more logic for execution for particular OS, different number of args to give command-line
+	// OSX_DEFAULT_BROWSER_ARGS1 = "--args" 
+	// OSX_DEFAULT_BROWSER_ARGS2 = "--kiosk"
+
+
+	// // OSX_DEFAULT_BROWSER_ARGS = "-a 'Google Chrome' --args --kiosk" 
+	// // the embedded '' will close the string on the command-line
+
+
 )
 
 var port int
-var browser_cmd string
-var browser_args string
-var browser_kill string
-var browser_app_name string
+var OS string
 
-var current_dir string
 var err error
 
 func main() {
@@ -41,9 +46,6 @@ func main() {
 	fmt.Printf("Listening on port: %v\n", port)
 	fmt.Printf("You can send HTTP POST requests with a 'url' parameter to open it in a browser.\n")
 	fmt.Printf("e.g.: curl localhost:%v -X POST -d \"url=http://www.google.com\"\n", port)
-
-
-	// fmt.Println("CURRENT DIRECTORY IS: ", current_dir)
 
 	// start HTTP server with given address and handler
 	// handler=nil will default handler to DefaultServeMux
@@ -55,7 +57,7 @@ func main() {
 }
 
 func setUp() {
-	OS := getOs()
+	OS = getOS()
 	if (OS=="unknown") {
 		fmt.Printf("Failed to detect operating system.\n")
 	} else {
@@ -64,13 +66,7 @@ func setUp() {
 
 	switch OS {
 	case "Linux":
-		browser_cmd = LINUX_DEFAULT_BROWSER_CMD
-		browser_args = LINUX_DEFAULT_BROWSER_ARGS
 	case "OS X":
-		browser_cmd = OSX_DEFAULT_BROWSER_CMD
-		browser_args = OSX_DEFAULT_BROWSER_ARGS
-		browser_kill = OSX_DEFAULT_BROWSER_KILL
-		browser_app_name = OSX_DEFAULT_BROWSER_APP_NAME
 	default:
 		print("ERROR: Unknown operating system. \n")
 	}
@@ -79,16 +75,9 @@ func setUp() {
 	// can pass flag argument: $ ./slave -port=8080
 	// if flag not specified, will set DEFAULT_LOCALHOST_PORT
 	flag.Parse()
-
-	// fmt.Println(os.Args)
-	// fmt.Println(filepath.Dir(os.Args[0]))
-	// current_dir, err = filepath.Abs(filepath.Dir(os.Args[0]))
- //    if err != nil {
- //        fmt.Printf("Error getting the current directory %v\n", err)
- //    }
 }
 
-func getOs() string {
+func getOS() string {
 	operatingSystemName := exec.Command( "uname", "-a") // display operating system name...why do we need the -a?
 	var kernel string
 	kernalName, err := operatingSystemName.Output()
@@ -110,32 +99,34 @@ func getOs() string {
 	return OS
 }
 
-func handleRequest(writer http.ResponseWriter, request *http.Request) {
-	url := request.PostFormValue("url")
-	// fmt.Printf("Executing: %v %v %v\n", browser_cmd, browser_args, url)
-	// fmt.Println("CURRENT DIRECTORY IS: ", current_dir)
-	// command := "open " + url
-	// fmt.Printf("%T", command)
-
-	fmt.Printf("Executing command: %v %v\n", browser_kill, browser_app_name)
-	// app := "Google Chrome"
-	err := exec.Command(browser_kill, browser_app_name).Run()
-
+func killBrowser() {
+	fmt.Printf("Executing command: killall 'Google Chrome'\n")
+	err := exec.Command("killall", "Google Chrome").Run()
 	if err != nil {
 		fmt.Printf("Error killing current browser: %v\n", err)
+	} else {
+	// sleep the code so that the browser can finish closing 
+	time.Sleep(1 * time.Second)		
+	}
+}
+
+
+func openBrowser(url string){
+	switch OS {
+	case "OS X":
+		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
+		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()	
+
+
 	}
 
-	// sleep the code so that the browser can finish closing 
-	time.Sleep(1 * time.Second)
-
-	fmt.Printf("Executing command: %v %v\n", browser_cmd, url)
-	// for some reason the following doesn't work if I pass in "command" ... should be the same string
-	
-	err = exec.Command(browser_cmd, url).Run()
-	// err :=exec.Command(browser_cmd, browser_args, url).Run()
-	// err := exec.Command(current_dir+"/../scripts/OS_X_open_browser.sh", url).Run()
-	
 	if err != nil {
 		fmt.Printf("Error opening URL: %v\n", err)
-	}
+	}	
+}
+
+func handleRequest(writer http.ResponseWriter, request *http.Request) {
+	url := request.PostFormValue("url")
+	killBrowser()
+	openBrowser(url)
 }
