@@ -22,8 +22,8 @@ func main() {
 	http.HandleFunc("/", handleRequest)
 
 	fmt.Printf("Listening on port: %v\n", port)
-	fmt.Printf("You can send HTTP POST requests with a 'url' parameter to open it in a browser.\n")
-	fmt.Printf("e.g.: curl localhost:%v -X POST -d \"url=http://www.google.com\"\n", port)
+	fmt.Println("You can send HTTP POST requests with a 'url' parameter to open it in a browser.")
+	fmt.Println("e.g.: curl localhost:%v -X POST -d \"url=http://www.google.com\"", port)
 
 	// start HTTP server with given address and handler
 	// handler=nil will default handler to DefaultServeMux
@@ -45,11 +45,16 @@ func setUp() {
 	} else {
 		fmt.Printf("Operating system detected: %v\n", OS)
 	}
-
-	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
 	// can pass flag argument: $ ./slave -port=8080
 	// if flag not specified, will set port=DEFAULT_LOCALHOST_PORT
+	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
 	flag.Parse()
+
+	// :0.0 indicates the first screen attached to the first display in localhost
+	err = os.Setenv("DISPLAY",":0.0")
+	if err != nil {
+		fmt.Printf("Error setting DISPLAY environment variable: %v\n", err)
+	}
 }
 
 func setOS() {
