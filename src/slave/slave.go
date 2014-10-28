@@ -8,6 +8,7 @@ import(
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
 	// "path/filepath"
 )
 
@@ -20,13 +21,15 @@ const (
 
 	OSX_DEFAULT_BROWSER_CMD = "open"
 	OSX_DEFAULT_BROWSER_ARGS = "-a 'Google Chrome' --args --kiosk"
-	OSX_DEFAULT_BROWSER_KILL = "killall 'Google Chrome'"
+	OSX_DEFAULT_BROWSER_KILL = "killall"
+	OSX_DEFAULT_BROWSER_APP_NAME = "Google Chrome"
 )
 
 var port int
 var browser_cmd string
 var browser_args string
 var browser_kill string
+var browser_app_name string
 
 var current_dir string
 var err error
@@ -67,6 +70,7 @@ func setUp() {
 		browser_cmd = OSX_DEFAULT_BROWSER_CMD
 		browser_args = OSX_DEFAULT_BROWSER_ARGS
 		browser_kill = OSX_DEFAULT_BROWSER_KILL
+		browser_app_name = OSX_DEFAULT_BROWSER_APP_NAME
 	default:
 		print("ERROR: Unknown operating system. \n")
 	}
@@ -113,13 +117,16 @@ func handleRequest(writer http.ResponseWriter, request *http.Request) {
 	// command := "open " + url
 	// fmt.Printf("%T", command)
 
-	fmt.Printf("Executing command: %v\n", browser_kill)
-	app := "Google Chrome"
-	err := exec.Command("killall", app).Run()
+	fmt.Printf("Executing command: %v %v\n", browser_kill, browser_app_name)
+	// app := "Google Chrome"
+	err := exec.Command(browser_kill, browser_app_name).Run()
 
 	if err != nil {
 		fmt.Printf("Error killing current browser: %v\n", err)
 	}
+
+	// sleep the code so that the browser can finish closing 
+	time.Sleep(1 * time.Second)
 
 	fmt.Printf("Executing command: %v %v\n", browser_cmd, url)
 	// for some reason the following doesn't work if I pass in "command" ... should be the same string
