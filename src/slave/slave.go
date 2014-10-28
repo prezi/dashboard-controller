@@ -92,16 +92,10 @@ func getOs() string {
 
 func handleRequest(writer http.ResponseWriter, request *http.Request) {
 	url := request.PostFormValue("url")
-	fmt.Printf("executing: %v %v %v\n", browser_cmd, browser_args, url)
-<<<<<<< HEAD
-	//err := exec.Command(browser_cmd, browser_args, url).Run()
-	err := exec.Command(current_dir+"/../scripts/open_browser.sh", url).Run()
-//	err := exec.Command(browser_cmd, url).Run()
-=======
-	// err := exec.Command(browser_cmd, browser_args, url).Run()
+	fmt.Printf("Executing: %v %v %v\n", browser_cmd, browser_args, url)
+	// err := exec.Command(current_dir+"/../scripts/open_browser.sh", url).Run()
 	err := exec.Command(browser_cmd, url).Run()
->>>>>>> removed code for setting env var DISPLAY, renamed vars in getOs
 	if err != nil {
-		fmt.Printf("error opening URL: %v\n", err)
+		fmt.Printf("Error opening URL: %v\n", err)
 	}
 }
