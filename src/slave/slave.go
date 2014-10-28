@@ -4,11 +4,11 @@ import(
 	"flag"
 	"fmt"
 	"net/http"
-	"os"
+	// "os"
 	"os/exec"
 	"strconv"
 	"strings"
-	"path/filepath"
+	// "path/filepath"
 )
 
 const (
@@ -36,6 +36,9 @@ func main() {
 	fmt.Printf("You can send HTTP POST requests with a 'url' parameter to open it in a browser.\n")
 	fmt.Printf("e.g.: curl localhost:%v -X POST -d \"url=http://www.google.com\"\n", port)
 
+
+	// fmt.Println("CURRENT DIRECTORY IS: ", current_dir)
+	
 	// start HTTP server with given address and handler
 	// handler=nil will default handler to DefaultServeMux
 	err := http.ListenAndServe(":" + strconv.Itoa(port), nil)
@@ -68,10 +71,13 @@ func setUp() {
 	// can pass flag argument: $ ./slave -port=8080
 	// if flag not specified, will set DEFAULT_LOCALHOST_PORT
 	flag.Parse()
-	current_dir, err = filepath.Abs(filepath.Dir(os.Args[0]))
-    if err != nil {
-        fmt.Printf("error getting the current directory %v\n", err)
-    }
+
+	// fmt.Println(os.Args)
+	// fmt.Println(filepath.Dir(os.Args[0]))
+	// current_dir, err = filepath.Abs(filepath.Dir(os.Args[0]))
+ //    if err != nil {
+ //        fmt.Printf("Error getting the current directory %v\n", err)
+ //    }
 }
 
 func getOs() string {
@@ -98,9 +104,17 @@ func getOs() string {
 
 func handleRequest(writer http.ResponseWriter, request *http.Request) {
 	url := request.PostFormValue("url")
-	fmt.Printf("Executing: %v %v %v\n", browser_cmd, browser_args, url)
-	// err := exec.Command(current_dir+"/../scripts/open_browser.sh", url).Run()
-	err := exec.Command(browser_cmd, url).Run()
+	// fmt.Printf("Executing: %v %v %v\n", browser_cmd, browser_args, url)
+	// fmt.Println("CURRENT DIRECTORY IS: ", current_dir)
+	// command := "open " + url
+	// fmt.Printf("%T", command)
+
+	browser_cmd = "open"
+	fmt.Printf("Executing command: %v %v", browser_cmd, url)
+	// for some reason the following doesn't work if I pass in "command" ... should be the same string
+	err :=exec.Command(browser_cmd, url).Run()
+	// err := exec.Command(current_dir+"/../scripts/OS_X_open_browser.sh", url).Run()
+	// err := exec.Command(browser_cmd, url).Run()
 	if err != nil {
 		fmt.Printf("Error opening URL: %v\n", err)
 	}
