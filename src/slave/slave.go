@@ -12,31 +12,10 @@ import(
 
 const (
 	DEFAULT_LOCALHOST_PORT = 4000
-	// DEFAULT_LOG_FILE = "/log/slave.log" 
-
-	LINUX_DEFAULT_BROWSER_OPEN = "chromium"
-	LINUX_DEFAULT_BROWSER_ARGS = "--kiosk"
-
-
-	// OSX_DEFAULT_BROWSER_KILL = "killall"
-	// OSX_DEFAULT_BROWSER_APP_NAME = "Google Chrome"
-	// OSX_DEFAULT_BROWSER_OPEN = "open"
-	// OSX_DEFAULT_BROWSER_OPEN_ARGS = "-a"
-	// // OSX_DEFAULT_BROWSER_ARGS_DUMMY = "" // this is not going to work...
-	// // ...gotta add more logic for execution for particular OS, different number of args to give command-line
-	// OSX_DEFAULT_BROWSER_ARGS1 = "--args" 
-	// OSX_DEFAULT_BROWSER_ARGS2 = "--kiosk"
-
-
-	// // OSX_DEFAULT_BROWSER_ARGS = "-a 'Google Chrome' --args --kiosk" 
-	// // the embedded '' will close the string on the command-line
-
-
 )
 
 var port int
 var OS string
-
 var err error
 
 func main() {
@@ -49,35 +28,29 @@ func main() {
 
 	// start HTTP server with given address and handler
 	// handler=nil will default handler to DefaultServeMux
-	err := http.ListenAndServe(":" + strconv.Itoa(port), nil)
+	err = http.ListenAndServe(":" + strconv.Itoa(port), nil)
 	if err != nil {
 		fmt.Printf("Error starting HTTP server: %v\n", err)
-		fmt.Println("Aborting process.")
+		fmt.Println("Abort process.")
 	}
 }
 
 func setUp() {
-	OS = getOS()
+	setOS()
 	if (OS=="unknown") {
-		fmt.Printf("Failed to detect operating system.\n")
+		fmt.Printf("ERROR: Failed to detect operating system.\n")
+		fmt.Println("Abort process.")
 	} else {
 		fmt.Printf("Detected operating system: %v\n", OS)
 	}
 
-	switch OS {
-	case "Linux":
-	case "OS X":
-	default:
-		print("ERROR: Unknown operating system. \n")
-	}
-
 	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
 	// can pass flag argument: $ ./slave -port=8080
-	// if flag not specified, will set DEFAULT_LOCALHOST_PORT
+	// if flag not specified, will set port=DEFAULT_LOCALHOST_PORT
 	flag.Parse()
 }
 
-func getOS() string {
+func setOS() {
 	operatingSystemName := exec.Command( "uname", "-a") // display operating system name...why do we need the -a?
 	var kernel string
 	kernalName, err := operatingSystemName.Output()
@@ -87,7 +60,6 @@ func getOS() string {
 	} else {
 		kernel = strings.Split( string(kernalName), " " )[0]
 	}
-	var OS string
 	switch kernel {
 	case "Linux":
 		OS = "Linux"
@@ -96,7 +68,6 @@ func getOS() string {
 	default:
 		OS = "unknown"
 	}
-	return OS
 }
 
 func killBrowser() {
@@ -110,14 +81,14 @@ func killBrowser() {
 	}
 }
 
-
 func openBrowser(url string){
 	switch OS {
+	case "Linux":
+		fmt.Printf("Executing command: chromium --kiosk %v\n", url)
+		err = exec.Command("chromium", "--kiosk", url).Run()		
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
-		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()	
-
-
+		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()
 	}
 
 	if err != nil {
