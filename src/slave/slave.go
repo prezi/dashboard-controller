@@ -4,15 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 	"time"
 )
 
-const (
-	DEFAULT_LOCALHOST_PORT = 4000
-)
+const DEFAULT_LOCALHOST_PORT = 4000
 
 var port int
 var OS string
@@ -31,15 +30,18 @@ func main() {
 	err = http.ListenAndServe(":" + strconv.Itoa(port), nil)
 	if err != nil {
 		fmt.Printf("Error starting HTTP server: %v\n", err)
-		fmt.Println("Abort process.")
+		fmt.Println("ERROR: Failed to start HTTP server.")
+		fmt.Println("Aborting program.")
+		os.Exit(1)
 	}
 }
 
 func setUp() {
 	setOS()
 	if (OS == "Unknown") {
-		fmt.Printf("ERROR: Failed to detect operating system.\n")
-		fmt.Println("Abort process.")
+		fmt.Println("ERROR: Failed to detect operating system.")
+		fmt.Println("Aborting program.")
+		os.Exit(1)
 	} else {
 		fmt.Printf("Operating system detected: %v\n", OS)
 	}
