@@ -4,7 +4,6 @@ import(
 	"flag"
 	"fmt"
 	"net/http"
-	// "os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -30,18 +29,22 @@ var current_dir string
 func main() {
 	setUp()
 	http.HandleFunc("/", handleRequest)
-	fmt.Printf("listening on port: %v\n", port)
-	fmt.Printf("you can send HTTP POST requests with an 'url' parameter to open it in a browser\n")
+	fmt.Printf("Listening on port: %v\n", port)
+	fmt.Printf("You can send HTTP POST requests with a 'url' parameter to open it in a browser.\n")
 	fmt.Printf("e.g.: curl localhost:4000 -X POST -d \"url=http://www.google.com\"\n")
 	err := http.ListenAndServe(":" + strconv.Itoa(port), nil)
 	if err != nil {
-		fmt.Printf("error starting HTTP server: %v\n", err)
+		fmt.Printf("Error starting HTTP server: %v\n", err)
 	}
 }
 
 func setUp() {
 	OS := getOs()
-	fmt.Printf("detected operating system: %v\n", OS)
+	if (OS=="unknown") {
+		fmt.Printf("Failed to detect operating system.\n")
+	} else {
+		fmt.Printf("Detected operating system: %v\n", OS)
+	}
 	switch OS {
 	case "Linux":
 		browser_cmd = LINUX_DEFAULT_BROWSER_CMD
@@ -50,7 +53,7 @@ func setUp() {
 		browser_cmd = OSX_DEFAULT_BROWSER_CMD
 		browser_args = OSX_DEFAULT_BROWSER_ARGS
 	default:
-		print("ERROR: unknown operating system \n")
+		print("ERROR: Unknown operating system. \n")
 	}
 	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
 	flag.Parse()
