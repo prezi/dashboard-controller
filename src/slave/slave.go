@@ -32,7 +32,7 @@ func main() {
 
 	fmt.Printf("Listening on port: %v\n", port)
 	fmt.Printf("You can send HTTP POST requests with a 'url' parameter to open it in a browser.\n")
-	fmt.Printf("e.g.: curl localhost:4000 -X POST -d \"url=http://www.google.com\"\n")
+	fmt.Printf("e.g.: curl localhost:%v -X POST -d \"url=http://www.google.com\"\n", port)
 
 	// start HTTP server with given address and handler
 	// handler=nil will default handler to DefaultServeMux
