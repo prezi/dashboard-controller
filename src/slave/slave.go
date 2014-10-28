@@ -20,11 +20,14 @@ const (
 
 	OSX_DEFAULT_BROWSER_CMD = "open"
 	OSX_DEFAULT_BROWSER_ARGS = "-a 'Google Chrome' --args --kiosk"
+	OSX_DEFAULT_BROWSER_KILL = "killall 'Google Chrome'"
 )
 
 var port int
 var browser_cmd string
 var browser_args string
+var browser_kill string
+
 var current_dir string
 var err error
 
@@ -38,7 +41,7 @@ func main() {
 
 
 	// fmt.Println("CURRENT DIRECTORY IS: ", current_dir)
-	
+
 	// start HTTP server with given address and handler
 	// handler=nil will default handler to DefaultServeMux
 	err := http.ListenAndServe(":" + strconv.Itoa(port), nil)
@@ -60,9 +63,10 @@ func setUp() {
 	case "Linux":
 		browser_cmd = LINUX_DEFAULT_BROWSER_CMD
 		browser_args = LINUX_DEFAULT_BROWSER_ARGS
-	case "OSX":
+	case "OS X":
 		browser_cmd = OSX_DEFAULT_BROWSER_CMD
 		browser_args = OSX_DEFAULT_BROWSER_ARGS
+		browser_kill = OSX_DEFAULT_BROWSER_KILL
 	default:
 		print("ERROR: Unknown operating system. \n")
 	}
@@ -95,7 +99,7 @@ func getOs() string {
 	case "Linux":
 		OS = "Linux"
 	case "Darwin":
-		OS = "OSX"
+		OS = "OS X"
 	default:
 		OS = "unknown"
 	}
@@ -109,12 +113,21 @@ func handleRequest(writer http.ResponseWriter, request *http.Request) {
 	// command := "open " + url
 	// fmt.Printf("%T", command)
 
-	browser_cmd = "open"
-	fmt.Printf("Executing command: %v %v", browser_cmd, url)
+	fmt.Printf("Executing command: %v\n", browser_kill)
+	app := "Google Chrome"
+	err := exec.Command("killall", app).Run()
+
+	if err != nil {
+		fmt.Printf("Error killing current browser: %v\n", err)
+	}
+
+	fmt.Printf("Executing command: %v %v\n", browser_cmd, url)
 	// for some reason the following doesn't work if I pass in "command" ... should be the same string
-	err :=exec.Command(browser_cmd, url).Run()
+	
+	err = exec.Command(browser_cmd, url).Run()
+	// err :=exec.Command(browser_cmd, browser_args, url).Run()
 	// err := exec.Command(current_dir+"/../scripts/OS_X_open_browser.sh", url).Run()
-	// err := exec.Command(browser_cmd, url).Run()
+	
 	if err != nil {
 		fmt.Printf("Error opening URL: %v\n", err)
 	}
