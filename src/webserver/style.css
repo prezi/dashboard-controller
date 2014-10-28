@@ -1,0 +1,48 @@
+body{
+	 /*font-family: "Georgia, serif";*/
+	 font-family:verdana;
+    background-image: url('http://a1star.com/images/star--background-seamless-repeating8.jpg');
+    background-color: #cccccc;
+
+
+}
+h1 {
+	width: 400px;
+	background-color: yellow;
+	opacity: 0.6;
+	margin:auto;
+}
+iframe {
+
+	display:none;
+}
+.form-box {
+	/*
+			background-color: grey; 
+			filter:alpha(opacity=70);
+			opacity: 0.7;
+			-moz-opacity: 0.7;
+			-khtml-opacity:0.7;*/
+
+    width: 400px;
+    margin: auto;
+    /*margin: 30px 50px auto;*/
+    background-color: yellow;
+    border: 1px solid black;
+    opacity: 0.6;
+
+}
+.title{
+    text-align: center;
+    color: black;
+
+}
+
+.inputfield {
+    text-align: center;
+    color: red;
+}
+.inputbutton {
+    text-align: center;
+
+}
