@@ -37,11 +37,11 @@ func main() {
 
 func setUp() {
 	setOS()
-	if (OS=="unknown") {
+	if (OS == "Unknown") {
 		fmt.Printf("ERROR: Failed to detect operating system.\n")
 		fmt.Println("Abort process.")
 	} else {
-		fmt.Printf("Detected operating system: %v\n", OS)
+		fmt.Printf("Operating system detected: %v\n", OS)
 	}
 
 	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
@@ -51,22 +51,28 @@ func setUp() {
 }
 
 func setOS() {
-	operatingSystemName := exec.Command( "uname", "-a") // display operating system name...why do we need the -a?
+	// func (c *Cmd) Output() ([]byte, error)
+	operatingSystemBytes, err := exec.Command("uname", "-a").Output() // display operating system name...why do we need the -a?
+	operatingSystemName := string(operatingSystemBytes)
+
 	var kernel string
-	kernalName, err := operatingSystemName.Output()
-	if( err != nil ) {
+	// fmt.Println("cmd", operatingSystemName)
+
+	if err != nil {
 		fmt.Printf("Error encountered while reading kernal: %v\n", err)
-		kernel = "unknown"
+		kernel = "Unknown"
 	} else {
-		kernel = strings.Split( string(kernalName), " " )[0]
+		kernel = strings.Split(operatingSystemName, " ")[0]
 	}
+	fmt.Println("Kernal detected: ", kernel)
+	
 	switch kernel {
 	case "Linux":
 		OS = "Linux"
 	case "Darwin":
 		OS = "OS X"
 	default:
-		OS = "unknown"
+		OS = "Unknown"
 	}
 }
 
