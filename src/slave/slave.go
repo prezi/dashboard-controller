@@ -92,6 +92,7 @@ func blockProgramWhileBrowserCloses() {
 	emptyByteArray := make([]byte, 0)
 	
 	for {
+
 		switch OS {
 		case "Linux":
 			existingProcess, err = exec.Command("pgrep", "chromium").CombinedOutput()		
@@ -99,6 +100,7 @@ func blockProgramWhileBrowserCloses() {
 			existingProcess, err = exec.Command("pgrep", "Google Chrome").CombinedOutput()
 		}
 
+		// fmt.Println(existingProcess)
 		if bytes.Equal(existingProcess, emptyByteArray) { 
 			break
 		}
@@ -125,11 +127,11 @@ func killBrowser() {
 func openBrowser(url string){
 	switch OS {
 	case "Linux":
-		fmt.Printf("Executing command: nohup chromium --kiosk %v\n", url)
-		err = exec.Command("nohup", "chromium", "--kiosk", url).Start()		
+		fmt.Printf("Executing command: chromium --kiosk %v\n", url)
+		err = exec.Command("chromium", "--kiosk", url).Run()		
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
-		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Start()
+		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()
 	}
 
 	if err != nil {
@@ -139,7 +141,8 @@ func openBrowser(url string){
 
 func handleRequest(writer http.ResponseWriter, request *http.Request) {
 	url := request.PostFormValue("url")
-	fmt.Fprintf(writer, "Request Received. Posting \"%v\" on display \"%v\".\n", url, "Raspberry Pi")
+	fmt.Fprintf(writer, "REQUEST RECEIVED. Posting \"%v\" on display \"%v\".\n", url, "Raspberry Pi")
 	killBrowser()
 	openBrowser(url)
+	fmt.Fprintf(writer, "SUCCESS. \"%v\" has been posted on display \"%v\".\n", url, "Raspberry Pi")
 }
