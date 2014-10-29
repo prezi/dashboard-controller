@@ -25,6 +25,23 @@ func statusCode(link string) (int) {
 	}
 }
 
+func sendMaster(url, id string) {
+
+		m := Message{id, url}
+		jsonMessage, err := json.Marshal(m)
+		if (err!=nil) {
+			log.Fatal(err)
+		}
+		fmt.Println(string(jsonMessage))
+
+    	client := &http.Client{}
+    	resp, err := client.Post("http://localhost:4005", "application/json", strings.NewReader(string(jsonMessage)))
+    	if err != nil {
+       		panic(err)
+    	}
+    	defer resp.Body.Close()
+}
+
 func formHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		if (r.URL.Path=="/"){
@@ -73,9 +90,21 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 	
 }
 
+func submitHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method=="POST" {
+		fmt.Println("Form submitted!!")
+		URL:=r.FormValue("url")
+		rb_ID:=r.FormValue("rb-id")
+		fmt.Println(URL,rb_ID)
+		fmt.Println(statusCode(URL))
+		sendMaster(URL,rb_ID)
+	}
+}
+
 func main() {
 
 	http.HandleFunc("/",formHandler)
+	http.HandleFunc("/form-submit",submitHandler)
 
 	http.ListenAndServe("localhost:4003", nil)
 }
