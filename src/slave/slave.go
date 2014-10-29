@@ -126,10 +126,10 @@ func openBrowser(url string){
 	switch OS {
 	case "Linux":
 		fmt.Printf("Executing command: nohup chromium --kiosk %v\n", url)
-		err = exec.Command("nohup", "chromium", "--kiosk", url).Run()		
+		err = exec.Command("nohup", "chromium", "--kiosk", url).Start()		
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
-		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()
+		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Start()
 	}
 
 	if err != nil {
@@ -139,6 +139,7 @@ func openBrowser(url string){
 
 func handleRequest(writer http.ResponseWriter, request *http.Request) {
 	url := request.PostFormValue("url")
+	fmt.Fprintf(writer, "Request Received. Posting \"%v\" on display \"%v\".\n", url, "Raspberry Pi")
 	killBrowser()
 	openBrowser(url)
 }
