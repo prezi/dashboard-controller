@@ -100,7 +100,7 @@ func blockProgramWhileBrowserCloses() {
 		}
 
 		if bytes.Equal(existingProcess, emptyByteArray) { 
-				break
+			break
 		}
 	}
 }
@@ -125,8 +125,8 @@ func killBrowser() {
 func openBrowser(url string){
 	switch OS {
 	case "Linux":
-		fmt.Printf("Executing command: chromium --kiosk %v &\n", url)
-		err = exec.Command("chromium", "--kiosk", url, "&").Run()		
+		fmt.Printf("Executing command: chromium --kiosk %v\n", url)
+		err = exec.Command("chromium", "--kiosk", url).Run()		
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
 		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()
