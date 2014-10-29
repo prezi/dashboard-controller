@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"fmt"
 	"net/http"
 	"log"
@@ -45,11 +46,28 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(statusCode(URL))
 
 		m := Message{rb_ID, URL}
-		b, err := json.Marshal(m)
+		jsonMessage, err := json.Marshal(m)
 		if (err!=nil) {
 			log.Fatal(err)
 		}
-		fmt.Println(string(b))
+		fmt.Println(string(jsonMessage))
+
+		//req, err := http.NewRequest("POST", "http://10.0.0.114:5000", bytes.NewBuffer(jsonMessage))
+		// req, err := http.NewRequest("POST", "http://localhost:4005", bytes.NewBuffer(jsonMessage))
+		// if err != nil {
+  //      		panic(err)
+  //   	}
+  //   	// req.Header.Set("X-Custom-Header", "myvalue")
+  //   	req.Header.Set("Content-Type", "application/json")
+
+    	client := &http.Client{}
+    	resp, err := client.Post("http://localhost:4005", "application/json", strings.NewReader(string(jsonMessage)))
+    	if err != nil {
+       		panic(err)
+    	}
+    	defer resp.Body.Close()
+
+		//http.Post("http://10.0.0.114:5000", string(b))
 		http.Redirect(w,r,"/form.html",301)
 	}
 	
