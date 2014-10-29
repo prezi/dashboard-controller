@@ -86,8 +86,8 @@ func setOS() {
 func killBrowser() {
 	switch OS {
 	case "Linux":
-		fmt.Printf("Executing command: kill -SIGTERM $(pidof chromium)")
-		err = exec.Command("kill -SIGTERM $(pidof chromium)").Run() // TODO: this needs testing
+		fmt.Printf("Executing command: killall chromium")
+		err = exec.Command("killall", "chromium").Run() // TODO: this needs testing
 	case "OS X":
 		fmt.Printf("Executing command: killall 'Google Chrome'\n")
 		err = exec.Command("killall", "Google Chrome").Run()
@@ -97,6 +97,8 @@ func killBrowser() {
 		fmt.Printf("Error killing current browser: %v\n", err)
 	} else {
 	// sleep the code so that the browser can finish closing 
+	// use a while loop to check if there is a Google Chrome process running, 
+	// do not exit the loop until Google Chrome has closed
 	time.Sleep(1 * time.Second)		
 	}
 }
@@ -104,8 +106,8 @@ func killBrowser() {
 func openBrowser(url string){
 	switch OS {
 	case "Linux":
-		fmt.Printf("Executing command: chromium --kiosk %v\n", url)
-		err = exec.Command("nohup", "chromium", "--kiosk", url).Run()		
+		fmt.Printf("Executing command: chromium --kiosk %v &\n", url)
+		err = exec.Command("chromium", "--kiosk", url, "&").Run()		
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
 		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()
