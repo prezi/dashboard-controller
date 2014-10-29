@@ -5,18 +5,25 @@ import (
 	"fmt"
 )
 
-func formatUrl () (string) {
-	return "http://10.0.0.42:4000"
+type RaspberryPiIP struct {
+	IP string
 }
 
+var rapsberryPiIP = RaspberryPiIP{"http://10.0.0.231:8080"}
+
 func handler(w http.ResponseWriter, r *http.Request) {
-	formattedUrl := formatUrl()
-	fmt.Println(formattedUrl, "Sending", r.PostFormValue("command"), "request.")
+	fmt.Println("Sending POST request to", rapsberryPiIP.IP, "with url", r.Form)
 	// curl localhost:5000 -X POST -d "RPID=32423&url=http://9gag.com/"
-	http.PostForm(formattedUrl, r.Form)
+
+	fmt.Println(r)
+	http.PostForm(rapsberryPiIP.IP, r.Form)
 }
 
 func main() {
+	raspberryPiIP := make(map[string]string)
+	raspberryPiIP["1"] = "http://10.0.0.42:8080"
+	raspberryPiIP["2"] = "http://10.0.0.231:8080"
+
 	http.HandleFunc("/", handler)
 	http.ListenAndServe("localhost:5000", nil)
 }
