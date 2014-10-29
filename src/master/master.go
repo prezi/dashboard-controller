@@ -3,12 +3,12 @@ package main
 import (
 	"net/http"
 	"fmt"
-	"encoding/json"
-	"io/ioutil"
-	"os"
+//	"encoding/json"
+//	"io/ioutil"
+//	"os"
 )
 
-var protocol string
+//var protocol string
 var host string
 var port string
 
@@ -18,50 +18,23 @@ type initVars struct {
 	Port string
 }
 
-
-func jsonInit(){
-	// read the config file, report any errors
-	file, e := ioutil.ReadFile("./serverConfig.json")
-	if e != nil {
-		fmt.Printf("File error: %v\n", e)
-		os.Exit(1)
-	}
-
-	var jsontype initVars
-
-	// Decode the JSON
-	err := json.Unmarshal(file, &jsontype)
-	if err != nil {
-		fmt.Printf("Unmarshal error: %v\n", e)
-		os.Exit(1)
-	}
-
-	// set variables from JSON file
-	protocol = jsontype.Protocol
-	host = jsontype.Host
-	port = jsontype.Port
-}
-
-// create url that sends command to the designated Raspberry Pi
 func formatUrl (rasPiNum string) (string) {
-	finalUrl := protocol + rasPiNum + port
-
-	return finalUrl
+//	finalUrl := protocol + rasPiNum + port
+	return "http://10.0.0.42:4000"
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	rasPiNum := r.PostFormValue("RPID")
-
+//	urlToPOSTToSlave := r.PostFormValue("url")
 	formattedUrl := formatUrl(rasPiNum)
-
-	fmt.Println(formattedUrl, "Sending", r.PostFormValue("command"), "request.")
-
+	fmt.Println(formattedUrl, "Sending", r.PostFormValue("command"), "request.") //send requests by
+	// curl localhost:4001 -X POST -d "RPID=32423&url=http://9gag.com/"
 	http.PostForm(formattedUrl, r.Form)
 }
 
 
 func main() {
-	jsonInit()
+//	jsonInit()
 	http.HandleFunc("/", handler) // redirect all commands to the handler function
-	http.ListenAndServe(host + port, nil) // listen for connections at port 9999 on the local machine
+	http.ListenAndServe("localhost:4001", nil) // listen for connections at port 9999 on the local machine
 }
