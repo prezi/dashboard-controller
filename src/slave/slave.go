@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"time"
+	"bytes"
 )
 
 const DEFAULT_LOCALHOST_PORT = 8080
@@ -83,31 +83,50 @@ func setOS() {
 	}
 }
 
+func blockProgramWhileBrowserCloses() {
+	// block the code so that the browser can finish closing 
+	// use a while-loop to check if there is a browser process running, 
+	// exit the loop once all browser processes have closed
+
+	var existingProcess []byte
+	emptyByteArray := make([]byte, 0)
+	
+	for {
+		switch OS {
+		case "Linux":
+			existingProcess, err = exec.Command("pgrep", "chromium").CombinedOutput()		
+		case "OS X":
+			existingProcess, err = exec.Command("pgrep", "Google Chrome").CombinedOutput()
+		}
+
+		if bytes.Equal(existingProcess, emptyByteArray) { 
+			break
+		}
+	}
+}
+
 func killBrowser() {
 	switch OS {
 	case "Linux":
-		fmt.Printf("Executing command: killall chromium")
-		err = exec.Command("killall", "chromium").Run() // TODO: this needs testing
+		fmt.Println("Executing command: killall chromium")
+		err = exec.Command("killall", "chromium").Run() 
 	case "OS X":
-		fmt.Printf("Executing command: killall 'Google Chrome'\n")
+		fmt.Println("Executing command: killall 'Google Chrome'")
 		err = exec.Command("killall", "Google Chrome").Run()
 	}
 
 	if err != nil {
 		fmt.Printf("Error killing current browser: %v\n", err)
 	} else {
-	// sleep the code so that the browser can finish closing 
-	// use a while loop to check if there is a Google Chrome process running, 
-	// do not exit the loop until Google Chrome has closed
-	time.Sleep(1 * time.Second)		
+		blockProgramWhileBrowserCloses()	
 	}
 }
 
 func openBrowser(url string){
 	switch OS {
 	case "Linux":
-		fmt.Printf("Executing command: chromium --kiosk %v &\n", url)
-		err = exec.Command("chromium", "--kiosk", url, "&").Run()		
+		fmt.Printf("Executing command: nohup chromium --kiosk %v\n", url)
+		err = exec.Command("nohup", "chromium", "--kiosk", url).Run()		
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
 		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()
