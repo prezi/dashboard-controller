@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const DEFAULT_LOCALHOST_PORT = 4000
+const DEFAULT_LOCALHOST_PORT = 8080
 
 var port int
 var OS string
