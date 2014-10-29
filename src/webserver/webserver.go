@@ -7,7 +7,13 @@ import (
 	"mime"
 	"path/filepath"
 	"html/template"
+	"encoding/json"
 )
+
+type Message struct { // this will be the json: { "ID": "1", "URL": "http://google.com"}
+	ID string
+	URL string
+}
 
 func statusCode(link string) (int) {
 	response, err := http.Head(link)
@@ -37,6 +43,13 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 		rb_ID:=r.FormValue("rb-id")
 		fmt.Println(URL,rb_ID)
 		fmt.Println(statusCode(URL))
+
+		m := Message{rb_ID, URL}
+		b, err := json.Marshal(m)
+		if (err!=nil) {
+			log.Fatal(err)
+		}
+		fmt.Println(string(b))
 		http.Redirect(w,r,"/form.html",301)
 	}
 	
