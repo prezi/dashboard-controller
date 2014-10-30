@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
+<title>Dashing Pi!</title>
 <link rel="stylesheet" type="text/css" href="style.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<script type="text/javascript" src="code.js"></script>
 </head>
 <body>
 <div class='big-frame'>
 <h1 class='title'>Dashing-Pi</h1>
 <div class='form-box'>
 
-<form action="/" method="post">
+<form action="/form-submit" id="mainform" method="post" >
     <div class='inputfield'>
         <label for="Raspberry ID">Raspberry ID:</label>
         <input type="text" name="rb-id" />
@@ -19,10 +23,26 @@
     </div>
 
     <div class='inputbutton'>
-   <input class='button' type='submit' name='Send URL!' value='Submit' />
+   <input class='button' type='submit' name='Send URL!' value='Send' />
+   <div id='manual-example' class='example'>
+		<a rel='tipsy' title='Well hello there'></a>
+		</div>
     </div>
 </form>
-
+<div class="info">
+	<div id="rb_id">
+		<span id="key">Status:</span>
+		<span id="value"></span>
+	</div>
+	<div id="url">
+		<span id="key">Raspberry ID:</span>
+		<span id="value"></span>
+	</div>
+	<div id="statuscode">
+		<span id="key">Status code:</span>
+		<span id="value"></span>
+	</div>
+</div>
 </div>
 </div>
 

@@ -65,3 +65,6 @@ label {
 .big-frame{
 	margin-top: 2cm;
 }
+.info {
+  display:none;
+}
