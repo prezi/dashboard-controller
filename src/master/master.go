@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"fmt"
+	"net/url"
 )
 
 type Slave struct {
@@ -30,8 +31,18 @@ func handler(responseWriter http.ResponseWriter, request *http.Request) {
 		slaveAddress = raspberryPiIP["2"]
 	}
 
-	fmt.Println(slaveAddress)
-//	http.PostForm(slaveAddress, request.Form)
+	slaveAddress = "http://localhost:8080"
+	// fmt.Println(slaveAddress)
+	fmt.Println(request.Form)
+
+	form := url.Values{}
+	form.Set("url", "http://www.placekitten.com")
+
+	// form := make(map[string] []string)
+	// form_map := []string,{"http://www.placekitten.com"}
+	// form ["url"] = form_map
+	// form = make(url.Values{"url": {"http://www.placekitten.com"}})
+	http.PostForm(slaveAddress, form)
 }
 
 func main() {
