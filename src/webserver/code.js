@@ -33,24 +33,18 @@ $( document ).ready(function() {
 	        data : postData,
 	        success:function(data, textStatus, jqXHR) 
 	        {
-	            alert("Success");
-	            //alert(data.Code);
-	            //alert(data.URL);
+	            //alert("Success");
 	            $( "#rb_id" ).find( "#value" ).html(data.ID);
 	            $( "#url" ).find( "#value" ).html(data.URL);
 	            $( "#statuscode" ).find( "#value" ).html(data.Code);
-	            $( ".info" ).show();   
+	            $( ".info" ).show("slow");
+	            setTimeout(function() {
+						$( ".info" ).hide("slow");
+					}, 5000);
 	        },
 	        error: function(jqXHR, textStatus, errorThrown) 
 	        {
-	        	//alert(postData);
-	            alert("Fail"); 
-	           	/*var rb_holder = $( "#rb_id" );
-	            var rb_value = rb_holder.find( "#value" );
-	            rb_value.val("bar");*/
-	            $( "#rvalue" ).html("foooo");
-	            $( "#url" ).find( "#value" ).val("foo");
-	            $( ".info" ).show();   
+	            //alert("Fail"); 
 	        }
 	    });
 	    e.preventDefault(); //STOP default action
