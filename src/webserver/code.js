@@ -36,8 +36,9 @@ $( document ).ready(function() {
 	            alert("Success");
 	            //alert(data.Code);
 	            //alert(data.URL);
-	            $( "#rb_id" ).find( "#value" ).html(data.Code);
+	            $( "#rb_id" ).find( "#value" ).html(data.ID);
 	            $( "#url" ).find( "#value" ).html(data.URL);
+	            $( "#statuscode" ).find( "#value" ).html(data.Code);
 	            $( ".info" ).show();   
 	        },
 	        error: function(jqXHR, textStatus, errorThrown) 

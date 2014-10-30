@@ -20,6 +20,7 @@ type Message struct { // this will be the json: { "ID": "1", "URL": "http://goog
 type Reply struct { // this will be the json: { "ID": "1", "URL": "http://google.com"}
 	Code string
 	URL string
+	ID string
 }
 
 func statusCode(link string) (int) {
@@ -47,15 +48,23 @@ func sendMaster(url, id string) {
     	}
     	defer resp.Body.Close()
 }
-func reply(URL,status_code string) ([]byte) {
 
-	r:=Reply{status_code,URL}
+func reply(URL,status_code, rb_ID string) ([]byte) {
+
+	r:=Reply{status_code,URL,rb_ID}
 	jsonMessage, err := json.Marshal(r)
 	if err!=nil {
 		log.Fatal(err)
 	}
 	return jsonMessage
 }
+
+func sendInfo(w http.ResponseWriter,status_code string,URL string,rb_ID string) {
+	replyMessage:=reply(URL,status_code,rb_ID)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(replyMessage)	
+}
+
 func formHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "GET" {
@@ -98,18 +107,14 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 
 func submitHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method=="POST" {
-		fmt.Println("Form submitted!!")
 		URL:=r.FormValue("url")
 		rb_ID:=r.FormValue("rb-id")
-		fmt.Println(URL,rb_ID)
 		status_code:=statusCode(URL)
-		fmt.Println(status_code)
 		//sendMaster(URL,rb_ID)
-		string_status_code:=strconv.Itoa(status_code)
-		fmt.Println(string_status_code)
-		replyMessage:=reply(URL,string_status_code)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(replyMessage)
+		sendInfo(w,strconv.Itoa(status_code),URL,rb_ID)
+		//string_status_code:=strconv.Itoa(status_code)
+		//fmt.Println(string_status_code)
+
 	}
 }
 
