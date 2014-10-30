@@ -31,7 +31,7 @@ func handler(responseWriter http.ResponseWriter, request *http.Request) {
 		slaveAddress = raspberryPiIP["2"]
 	}
 
-	slaveAddress = "http://localhost:8080"
+	// slaveAddress = "http://localhost:8080"
 
 	form := url.Values{}
 	form.Set("url", slave.URL)
