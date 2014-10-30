@@ -42,7 +42,7 @@ func sendMaster(url, id string) {
 		fmt.Println(string(jsonMessage))
 
     	client := &http.Client{}
-    	resp, err := client.Post("http://localhost:4005", "application/json", strings.NewReader(string(jsonMessage)))
+    	resp, err := client.Post("http://localhost:5000", "application/json", strings.NewReader(string(jsonMessage)))
     	if err != nil {
        		panic(err)
     	}
@@ -110,7 +110,7 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 		URL:=r.FormValue("url")
 		rb_ID:=r.FormValue("rb-id")
 		status_code:=statusCode(URL)
-		//sendMaster(URL,rb_ID)
+		sendMaster(URL,rb_ID)
 		sendInfo(w,strconv.Itoa(status_code),URL,rb_ID)
 		//string_status_code:=strconv.Itoa(status_code)
 		//fmt.Println(string_status_code)
