@@ -4,6 +4,7 @@
 <title>Dashing Pi!</title>
 <link rel="stylesheet" type="text/css" href="style.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
 <script type="text/javascript" src="code.js"></script>
 </head>
 <body>
@@ -23,9 +24,21 @@
 
     <div class='inputbutton'>
    <input class='button' type='submit' name='Send URL!' value='Send' />
+   <div id='manual-example' class='example'>
+		<a rel='tipsy' title='Well hello there'></a>
+		</div>
     </div>
 </form>
-
+<div class="info">
+	<div id="rb_id">
+		<span id="key">Status:</span>
+		<span id="value"></span>
+	</div>
+	<div id="url">
+		<span id="key">Raspberry ID:</span>
+		<span id="value"></span>
+	</div>
+</div>
 </div>
 </div>
 

@@ -13,13 +13,15 @@ function submitForm() {
 */
 
 $( document ).ready(function() {
-    alert("Loaded");
+    //alert("Loaded");
     /*	
     $('#mainform').submit(function () {
 	 alert("WATWAT");
 	 return false;
 	});
 	*/
+	//$("#manual-example a[rel=tipsy]").tipsy("show");
+	$("#manual-example a[rel=tipsy]").show();
 	$("#mainform").submit(function(e)
 	{
 	    var postData = $(this).serializeArray();
@@ -32,15 +34,26 @@ $( document ).ready(function() {
 	        success:function(data, textStatus, jqXHR) 
 	        {
 	            alert("Success");
+	            //alert(data.Code);
+	            //alert(data.URL);
+	            $( "#rb_id" ).find( "#value" ).html(data.Code);
+	            $( "#url" ).find( "#value" ).html(data.URL);
+	            $( ".info" ).show();   
 	        },
 	        error: function(jqXHR, textStatus, errorThrown) 
 	        {
-	        	alert(postData);
-	            alert("Fail");    
+	        	//alert(postData);
+	            alert("Fail"); 
+	           	/*var rb_holder = $( "#rb_id" );
+	            var rb_value = rb_holder.find( "#value" );
+	            rb_value.val("bar");*/
+	            $( "#rvalue" ).html("foooo");
+	            $( "#url" ).find( "#value" ).val("foo");
+	            $( ".info" ).show();   
 	        }
 	    });
 	    e.preventDefault(); //STOP default action
-	    e.unbind(); //unbind. to stop multiple form submit.
+	    //e.unbind(); //unbind. to stop multiple form submit.
 	});
 
 });
