@@ -8,7 +8,9 @@ Introduction
 Use the Dashboard Controller program to remotely open urls on browser windows.
 
 Our implemented system runs slave code on Raspberry Pis connected to monitors. 
-The webserver and master both run on one Mac Mini. 
+The webserver and master both run on one Apple Mac Mini. 
+
+Together, they make a delicious Apple-Raspberry-Pi system. 
 
 
 File Architecture
