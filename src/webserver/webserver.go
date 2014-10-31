@@ -12,12 +12,12 @@ import (
 	"strconv"
 )
 
-type Message struct { // this will be the json: { "ID": "1", "URL": "http://google.com"}
+type Message struct {
 	ID string
 	URL string
 }
 
-type Reply struct { // this will be the json: { "ID": "1", "URL": "http://google.com"}
+type Reply struct {
 	Code string
 	URL string
 	ID string
@@ -112,16 +112,11 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 		status_code:=statusCode(URL)
 		sendMaster(URL,rb_ID)
 		sendInfo(w,strconv.Itoa(status_code),URL,rb_ID)
-		//string_status_code:=strconv.Itoa(status_code)
-		//fmt.Println(string_status_code)
-
 	}
 }
 
 func main() {
-
 	http.HandleFunc("/",formHandler)
 	http.HandleFunc("/form-submit",submitHandler)
-
 	http.ListenAndServe("localhost:4003", nil)
 }

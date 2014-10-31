@@ -1,11 +1,9 @@
 body{
-	 /*font-family: "Georgia, serif";*/
-	 font-family:verdana;
+	font-family:verdana;
     background-image: url('http://a1star.com/images/star--background-seamless-repeating8.jpg');
     background-color: #cccccc;
-
-
 }
+
 h1 {
 	width: 400px;
 	background-color: yellow;
@@ -19,7 +17,6 @@ label {
 	float: left;
 	width: 50%;
 }
-
 
 .button {
 	margin: 0.5cm auto;
@@ -48,6 +45,7 @@ label {
     padding: 1cm;
 
 }
+
 .title{
     text-align: center;
     color: black;
@@ -58,13 +56,16 @@ label {
     text-align: center;
     color: red;
 }
+
 .inputbutton {
     text-align: center;
 
 }
+
 .big-frame{
 	margin-top: 2cm;
 }
+
 .info {
   display:none;
 }
