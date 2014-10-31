@@ -41,7 +41,7 @@ To run the code from the cloned repository directory,
 ####Slave
 ------------------
 
-Again, you will need [Go](https://golang.org/) installed to run and/or compile the source code. We recommend that you compile the slave.go file to produce a binary file executable on one slave machine, then copy the slave binary file to all your slaves. A slave does not need Go installed to run the binary file, so you can save yourself the 70-100 minutes of installation time for each slave (assuming that you're using Raspberry Pis as slaves). 
+Again, you will need [Go](https://golang.org/) installed to run and/or compile the source code. We recommend that you compile the slave.go file to produce a binary file executable on one slave machine, then copy the slave binary file to all your slaves. A slave does not need Go installed to run the binary file, so you can save yourself the Go installation time for each slave. (We used Raspberry Pis as slaves, and each Go installation took 70-100 minutes.)
 
 From the repository directory, compile slave code with the command, 
  
@@ -50,6 +50,10 @@ From the repository directory, compile slave code with the command,
 Then run the executable with,
  
     dashboard-controller$ $GOPATH/bin/slave
+
+The slave will begin listening on a [default port number](https://github.com/prezi/dashboard-controller/blob/master/src/slave/slave.go#L14). Optionally, you can specify a port number with the [-port flag](https://github.com/prezi/dashboard-controller/blob/master/src/slave/slave.go#L50), 
+ 
+    dashboard-controller$ $GOPATH/bin/slave -port=9999
 
 ####Posting a URL
 ------------------
