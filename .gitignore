@@ -2,3 +2,4 @@
 bin
 setenv.txt
 src/playground
+.DS_Store

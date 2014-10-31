@@ -1,6 +1,8 @@
 Dashboard Controller 
 ====================
 
+![intro_image](https://raw.githubusercontent.com/lolilo/VisuaLisPy/master/README_images/webpage.png)
+
 Introduction
 ------------------
 Use the Dashboard Controller program to remotely open urls on browser windows.
@@ -31,12 +33,17 @@ If you are not familiar with Go and run into trouble with the following instruct
 ------------------
 
 You will need [Go](https://golang.org/) installed to run and/or compile the source code. 
-Clone this repository to the machine that will run master/webserver. 
+Clone this repository to the machine(s) that will run the master and/or webserver. 
 
 To run the code from the cloned repository directory, 
 
     dashboard-controller$ go run src/master/master.go
 
+And for the webserver, 
+
+    dashboard-controller$ go run webserver.go
+
+(There is currently a bug where the webserver must be run from the webserver directory to ensure the correct path to "form.html".)
 
 ####Slave
 ------------------
