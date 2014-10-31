@@ -1,7 +1,7 @@
 Dashboard Controller 
 ====================
 
-![intro_image](https://raw.githubusercontent.com/lolilo/VisuaLisPy/master/README_images/webpage.png)
+![intro_image](https://raw.githubusercontent.com/prezi/dashboard-controller/master/README_images/webpage.png)
 
 Introduction
 ------------------
