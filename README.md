@@ -3,6 +3,12 @@ Dashboard Controller
 
 ![intro_image](https://raw.githubusercontent.com/prezi/dashboard-controller/master/README_images/webpage.png)
 
+Contents
+ - [Introduction](https://github.com/prezi/dashboard-controller#introduction)
+ - [Architecture](https://github.com/prezi/dashboard-controller#architecture)
+ - [Set Up](https://github.com/prezi/dashboard-controller#getting-started)
+ - [Posting a URL](https://github.com/prezi/dashboard-controller#posting-a-url)
+
 Introduction
 ------------------
 Use the Dashboard Controller program to remotely open urls on browser windows.
@@ -12,8 +18,7 @@ The webserver and master both run on one Apple Mac Mini.
 
 Together, they make a delicious Apple-Raspberry-Pi system. 
 
-
-File Architecture
+Architecture
 ------------------
  - slave 
   - Receives url from master and loads url in a browser. 
@@ -26,7 +31,7 @@ File Architecture
   - Compatible with OS X. 
 
 
-Getting Started
+Set Up
 ------------------
 
 If you are not familiar with Go and run into trouble with the following instructions, please visit  ["How to Write Go Code"](https://golang.org/doc/code.html) for more details. 
@@ -64,6 +69,6 @@ The slave will begin listening on a [default port number](https://github.com/pre
  
     dashboard-controller$ $GOPATH/bin/slave -port=9999
 
-####Posting a URL
+Posting a URL
 ------------------
 Access the website running on your [localhost](https://github.com/prezi/dashboard-controller/blob/master/src/webserver/webserver.go#L126). Fill in the text fields, submit, and see your url post on the indicated slave. :) 
