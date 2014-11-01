@@ -1,5 +1,7 @@
 .idea
 bin
+pkg
 setenv.txt
 src/playground
+src/github.com
 .DS_Store
