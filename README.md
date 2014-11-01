@@ -13,7 +13,8 @@ Introduction
 ------------------
 Use the Dashboard Controller program to remotely open urls on browser windows.
 
-Our implemented system runs slave code on Raspberry Pis connected to monitors. 
+Our implemented system uses [Google Chrome](http://www.google.com/chrome/) web browser. 
+Slave runs on Raspberry Pis connected to monitors. 
 The webserver and master both run on one Apple Mac Mini. 
 
 Together, they make a delicious Apple-Raspberry-Pi system. 
@@ -22,7 +23,7 @@ Architecture
 ------------------
  - slave 
   - Receives url from master and loads url in a browser. 
-  - Compatible with OS X and Linux operating systems. 
+  - Compatible with OS X and Linux operating systems with Google Chrome installed. 
  - master
   - Receives JSON from the webserver and passes JSON to proper slave. 
   - Compatible with OS X. 
