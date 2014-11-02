@@ -13,8 +13,29 @@ type Slave struct {
 	URL string
 }
 
-func handler(responseWriter http.ResponseWriter, request *http.Request) {
+func ParseGreeting(input []byte) Greeting {
+	var data Greeting
+	err := json.Unmarshal(input, &data)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	return data
+}
+
+func ReadRequestBody(_ http.ResponseWriter, request *http.Request)  {
+//	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
+//	defer request.Body.Close()
+//	var greeting Greeting
+//	_ = json.Unmarshal(POSTrequestBody, &greeting)
+//	return greeting.text
+}
+
+func handler(_ http.ResponseWriter, request *http.Request) {
 	POSTrequestBody, _ := ioutil.ReadAll(request.Body)
+	fmt.Printf("%T\n", POSTrequestBody)
+	fmt.Printf("%T\n", request.Body)
+//	defer request.Body.Close()
+
 	var slave Slave
 	_ = json.Unmarshal(POSTrequestBody, &slave)
 	fmt.Println("SLAVE ID: ", slave.ID)
@@ -31,16 +52,12 @@ func handler(responseWriter http.ResponseWriter, request *http.Request) {
 		slaveAddress = raspberryPiIP["2"]
 	}
 
-	// slaveAddress = "http://localhost:8080"
-
 	form := url.Values{}
 	form.Set("url", slave.URL)
 	http.PostForm(slaveAddress, form)
 }
 
 func main() {
-
-
 	http.HandleFunc("/", handler)
 	http.ListenAndServe("localhost:5000", nil)
 }
