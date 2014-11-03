@@ -30,3 +30,17 @@ func TestUrlValueMessageIsSent(t *testing.T) {
 	assert.Equal(t, 1, numberOfMessagesSent)
 	assert.Equal(t, "http://index.hu", url)
 }
+
+func TestSlaveIpMapIsInitialized(t *testing.T) {
+	slaveIPMap := initializeSlaveIPs()
+
+	assert.Equal(t, "http://10.0.0.42:8080", slaveIPMap["1"])
+	assert.Equal(t, "http://10.0.0.231:8080", slaveIPMap["2"])
+}
+
+func TestDestinationUrl(t *testing.T) {
+	slaveIPMap := initializeSlaveIPs()
+	destinationURL := destinationUrl("1", slaveIPMap)
+
+	assert.Equal(t, "http://10.0.0.42:8080", destinationURL)
+}

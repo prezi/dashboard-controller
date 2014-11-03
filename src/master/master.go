@@ -20,22 +20,11 @@ func main() {
 
 func handler(_ http.ResponseWriter, request *http.Request) {
 	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
-	//	defer request.Body.Close()
+	defer request.Body.Close()
 
-	var slave Slave
-	slave = parseJson(POSTRequestBody)
-
-	raspberryPiIP := make(map[string]string)
-	raspberryPiIP["1"] = "http://10.0.0.42:8080"
-	raspberryPiIP["2"] = "http://10.0.0.231:8080"
-
-	var destinationURL string
-	if slave.ID == "1" {
-		destinationURL = raspberryPiIP["1"]
-	}  else if slave.ID == "2" {
-		destinationURL = raspberryPiIP["2"]
-	}
-
+	slave := parseJson(POSTRequestBody)
+	slaveIPMap := initializeSlaveIPs()
+	destinationURL := destinationUrl(slave.ID, slaveIPMap)
 	sendUrlValueMessageToServer(destinationURL, slave.URL)
 }
 
@@ -54,4 +43,23 @@ func sendUrlValueMessageToServer( slaveURL string, urlToDisplay string) {
 	form.Set("url", urlToDisplay)
 
 	_,_ = client.PostForm(slaveURL, form)
+}
+
+func initializeSlaveIPs() (slaveIPMap map[string]string) {
+	raspberryPiIP := make(map[string]string)
+	raspberryPiIP["1"] = "http://10.0.0.42:8080"
+	raspberryPiIP["2"] = "http://10.0.0.231:8080"
+
+	return raspberryPiIP
+}
+
+func destinationUrl(slaveID string, slaveIPMap map[string]string) (url string) {
+	destination := url
+	if slaveID == "1" {
+		destination = slaveIPMap["1"]
+	}  else if slaveID == "2" {
+		destination = slaveIPMap["2"]
+	}
+
+	return destination
 }
