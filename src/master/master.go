@@ -13,28 +13,31 @@ type Slave struct {
 	URL string
 }
 
+var slaveIPMap = make(map[string]string)
+
 func main() {
 	http.HandleFunc("/", handler)
+	http.HandleFunc("/receive_slave", receiveAndMapSlaveAddress)
 	http.ListenAndServe("localhost:5000", nil)
 }
 
 func handler(_ http.ResponseWriter, request *http.Request) {
 
-	receiveAndMapSlaveAddress(request)
-
-
 	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
 	defer request.Body.Close()
 
+	// TODO: need error handling if there are no slaves mapped
 	slave := parseJson(POSTRequestBody)
-	slaveIPMap := initializeSlaveIPs()
+	// slaveIPMap := initializeSlaveIPs() // this is creating the map each time a request is received
 	destinationURL := destinationUrl(slave.ID, slaveIPMap)
 	sendUrlValueMessageToSlave(destinationURL, slave.URL)
 }
 
-func receiveAndMapSlaveAddress(request *http.Request) {
+func receiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 	slaveIPAddress := request.PostFormValue("slaveIPAddress")
-	fmt.Println("slaveIPAddress: ", slaveIPAddress)
+	fmt.Println("In receiveAndMapSlaveAddress, slaveIPAddress: ", slaveIPAddress)
+	slaveIPMap["1"] = slaveIPAddress
+	fmt.Println("MAPPED: ", slaveIPAddress)
 }
 
 func parseJson(input []byte) (slave Slave) {

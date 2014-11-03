@@ -96,9 +96,16 @@ func sendIPAddressToMaster() {
 	form.Set("slaveIPAddress", slaveIPAddress)
 	fmt.Println("slaveIPAddress: ", slaveIPAddress)
 
-	response, err := client.PostForm(DEFAULT_MASTER_IP_ADDRESS, form)
-	fmt.Println("RESPONSE: ", response)
-	fmt.Println("ERROR: ", err)
+	masterIPAddressAndExtentionArray := []string{DEFAULT_MASTER_IP_ADDRESS, "/receive_slave"} 
+	masterReceiveSlaveAddress := strings.Join(masterIPAddressAndExtentionArray, "")
+
+	_, err := client.PostForm(masterReceiveSlaveAddress, form)
+
+	if err != nil {
+		fmt.Printf("Error communicating with master: %v\n", err)
+	}	
+	// fmt.Println("RESPONSE: ", response)
+	// fmt.Println("ERROR: ", err)
 
 	fmt.Printf("Slave mapped to master at %v.\n", DEFAULT_MASTER_IP_ADDRESS)
 	fmt.Printf("Slave ID: %v.\n\n", DEFAULT_SLAVE_ID)
