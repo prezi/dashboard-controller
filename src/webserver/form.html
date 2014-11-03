@@ -16,15 +16,10 @@
         <form action="/form-submit" id="mainform" method="post">
             <div class='inputfield'>
                 <label for="Raspberry ID">Raspberry ID:</label>
-                <!-- <input type="text" name="rb-id"/> -->
                 <select name="rb-id">
                 {{range .Id}}
                     <option value="{{.}}">{{.}}</option>
                 {{end}}   
-                <!--
-                <option value="1">1</option>
-                <option value="2">2</option>
-                -->
                 </select>
             </div>
             <div class='inputfield'>
@@ -34,14 +29,10 @@
 
             <div class='inputbutton'>
                 <input class='button' type='submit' name='Send URL!' value='Send'/>
-
-                <div id='manual-example' class='example'>
-                    <a rel='tipsy' title='Well hello there'></a>
-                </div>
             </div>
         </form>
         <div class="info">
-            <div id="slave_id">
+            <!-- <div id="slave_id">
                 <span id="key">Status:</span>
                 <span id="value"></span>
             </div>
@@ -52,7 +43,7 @@
             <div id="statuscode">
                 <span id="key">Status code:</span>
                 <span id="value"></span>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>

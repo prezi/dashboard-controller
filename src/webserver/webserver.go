@@ -9,6 +9,8 @@ import (
 	"html/template"
 	"encoding/json"
 	"strconv"
+	"bytes"
+	"fmt"
 )
 
 type Message struct {
@@ -16,10 +18,14 @@ type Message struct {
 	URL string
 }
 
-type Reply struct {
+type StatusMessage struct {
 	Code string
 	URL  string
 	ID   string
+}
+
+type Reply struct {
+	HTML string
 }
 
 type IdList struct {
@@ -55,8 +61,17 @@ func sendMaster(url, id string) {
 }
 
 func reply(URL, status_code, slave_ID string) ([]byte) {
-	reply := Reply{status_code, URL, slave_ID}
-	json_message, err := json.Marshal(reply)
+	// reply := Reply{status_code, URL, slave_ID}
+	
+	t, err := template.ParseFiles("infobox.html")
+	if (err != nil) {
+			log.Fatal(err)
+	} 
+
+	buf := new(bytes.Buffer)
+	t.ExecuteTemplate(buf, "T", StatusMessage{status_code, URL, slave_ID})
+	
+	json_message, err := json.Marshal(Reply{HTML:buf.String()})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -90,7 +105,7 @@ func submitHandler(response_writer http.ResponseWriter, request *http.Request) {
 		URL := request.FormValue("url")
 		slave_ID := request.FormValue("rb-id")
 		status_code := statusCode(URL)
-		sendMaster(URL, slave_ID)
+	    sendMaster(URL, slave_ID)
 		sendInfo(response_writer, strconv.Itoa(status_code), URL, slave_ID)
 	}
 }

@@ -12,9 +12,10 @@ $( document ).ready(function() {
 	        success:function(data, textStatus, jqXHR) 
 	        {
 	        	//TO DO: Change it to universal info box!
-	            $( "#slave_id" ).find( "#value" ).html(data.ID);
-	            $( "#url" ).find( "#value" ).html(data.URL);
-	            $( "#statuscode" ).find( "#value" ).html(data.Code);
+	            // $( "#slave_id" ).find( "#value" ).html(data.ID);
+	            // $( "#url" ).find( "#value" ).html(data.URL);
+	            // $( "#statuscode" ).find( "#value" ).html(data.Code);
+	            $( ".info" ).html(data.HTML);
 	            $( ".info" ).show("slow");
 	            setTimeout(function() {
 						$( ".info" ).hide("slow");
