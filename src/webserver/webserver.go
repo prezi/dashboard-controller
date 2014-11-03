@@ -33,7 +33,7 @@ type IdList struct {
 }
 
 var id_list=IdList{
-	Id: []string{"aaa","bbb","ccc"},
+	Id: []string{"1","2"},
 }
 
 func statusCode(link string) (int) {
