@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"bytes"
+	"time"
 )
 
 const DEFAULT_LOCALHOST_PORT = 8080
@@ -89,19 +89,18 @@ func blockProgramWhileBrowserCloses() {
 	// exit the loop once all browser processes have closed
 
 	var existingProcess []byte
-	emptyByteArray := make([]byte, 0)
 	
 	for {
-
 		switch OS {
 		case "Linux":
+			time.Sleep(1 * time.Second)
 			existingProcess, err = exec.Command("pgrep", "chromium").CombinedOutput()		
 		case "OS X":
+			time.Sleep(50 * time.Millisecond)
 			existingProcess, err = exec.Command("pgrep", "Google Chrome").CombinedOutput()
 		}
-
-		// fmt.Println(existingProcess)
-		if bytes.Equal(existingProcess, emptyByteArray) { 
+		fmt.Println(existingProcess)
+		if len(existingProcess) == 0 {
 			break
 		}
 	}
