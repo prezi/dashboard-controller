@@ -19,13 +19,22 @@ func main() {
 }
 
 func handler(_ http.ResponseWriter, request *http.Request) {
+
+	receiveAndMapSlaveAddress(request)
+
+
 	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
 	defer request.Body.Close()
 
 	slave := parseJson(POSTRequestBody)
 	slaveIPMap := initializeSlaveIPs()
 	destinationURL := destinationUrl(slave.ID, slaveIPMap)
-	sendUrlValueMessageToServer(destinationURL, slave.URL)
+	sendUrlValueMessageToSlave(destinationURL, slave.URL)
+}
+
+func receiveAndMapSlaveAddress(request *http.Request) {
+	slaveIPAddress := request.PostFormValue("slaveIPAddress")
+	fmt.Println("slaveIPAddress: ", slaveIPAddress)
 }
 
 func parseJson(input []byte) (slave Slave) {
@@ -36,13 +45,14 @@ func parseJson(input []byte) (slave Slave) {
 	return
 }
 
-func sendUrlValueMessageToServer( slaveURL string, urlToDisplay string) {
+func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string) {
 	client := &http.Client{}
 
 	form := url.Values{}
 	form.Set("url", urlToDisplay)
+	fmt.Println("slaveIPAddress: ", slaveIPAddress)
 
-	_,_ = client.PostForm(slaveURL, form)
+	_,_ = client.PostForm(slaveIPAddress, form)
 }
 
 func initializeSlaveIPs() (slaveIPMap map[string]string) {

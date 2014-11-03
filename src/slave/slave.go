@@ -9,9 +9,12 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"net/url"
 )
 
 const DEFAULT_LOCALHOST_PORT = 8080
+const DEFAULT_MASTER_IP_ADDRESS = "http://localhost:5000" // can also receive this from user input
+const DEFAULT_SLAVE_ID = "1" // will need to receive this back from the master, or can be user-specified name
 
 var port int
 var OS string
@@ -55,6 +58,8 @@ func setUp() {
 	if err != nil {
 		fmt.Printf("Error setting DISPLAY environment variable: %v\n", err)
 	}
+
+	sendIPAddressToMaster()
 }
 
 func setOS() {
@@ -81,6 +86,22 @@ func setOS() {
 	default:
 		OS = "Unknown"
 	}
+}
+
+func sendIPAddressToMaster() {
+	client := &http.Client{}
+	slaveIPAddress := "http://10.0.0.42:8080" // TODO: change this later, get IP address from command-line
+
+	form := url.Values{}
+	form.Set("slaveIPAddress", slaveIPAddress)
+	fmt.Println("slaveIPAddress: ", slaveIPAddress)
+
+	response, err := client.PostForm(DEFAULT_MASTER_IP_ADDRESS, form)
+	fmt.Println("RESPONSE: ", response)
+	fmt.Println("ERROR: ", err)
+
+	fmt.Printf("Slave mapped to master at %v.\n", DEFAULT_MASTER_IP_ADDRESS)
+	fmt.Printf("Slave ID: %v.\n\n", DEFAULT_SLAVE_ID)
 }
 
 func blockProgramWhileBrowserCloses() {
