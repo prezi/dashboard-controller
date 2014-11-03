@@ -18,24 +18,36 @@ func TestJsonCanBeParsed(t *testing.T) {
 	assert.Equal(t, "http://google.com", parsedJson.URL)
 }
 
-func TestMessageIsSent(t *testing.T) {
+func TestJsonMessageIsSent(t *testing.T) {
 	var numberOfMessagesSent = 0
-	var messageID = ""
-	var messageURL = ""
+	var message = ""
 
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		numberOfMessagesSent++
-		requestBody, _ := ioutil.ReadAll(r.Body)
-		var requestMessage Slave
+		requestBody, _ := ioutil.ReadAll(request.Body)
+		var requestMessage Message
 		_ = json.Unmarshal(requestBody, &requestMessage)
 
-		messageID = requestMessage.ID
-		messageURL = requestMessage.URL
+		message = requestMessage.Text
 	}))
 
-	sendMessageToServer(testServer.URL)
+	sendJsonMessageToServer(testServer.URL, "http://index.hu")
 
 	assert.Equal(t, 1, numberOfMessagesSent)
-	assert.Equal(t, "LeftScreen", messageID)
-	assert.Equal(t, "http://index.hu", messageURL)
+	assert.Equal(t, "http://index.hu", message)
+}
+
+func TestUrlValueMessageIsSent(t *testing.T) {
+	var numberOfMessagesSent = 0
+	var url = ""
+
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		numberOfMessagesSent++
+		url = request.PostFormValue("url")
+	}))
+
+	sendUrlValueMessageToServer(testServer.URL, "http://index.hu")
+
+	assert.Equal(t, 1, numberOfMessagesSent)
+	assert.Equal(t, "http://index.hu", url)
 }
