@@ -18,8 +18,13 @@
                 <label for="Raspberry ID">Raspberry ID:</label>
                 <!-- <input type="text" name="rb-id"/> -->
                 <select name="rb-id">
+                {{range .Id}}
+                    <option value="{{.}}">{{.}}</option>
+                {{end}}   
+                <!--
                 <option value="1">1</option>
                 <option value="2">2</option>
+                -->
                 </select>
             </div>
             <div class='inputfield'>

@@ -22,6 +22,14 @@ type Reply struct {
 	ID   string
 }
 
+type IdList struct {
+	Id []string
+}
+
+var id_list=IdList{
+	Id: []string{"aaa","bbb","ccc"},
+}
+
 func statusCode(link string) (int) {
 	response, err := http.Head(link)
 	if (err != nil) {
@@ -72,7 +80,7 @@ func formHandler(response_writer http.ResponseWriter, request *http.Request) {
 		if (err != nil) {
 			log.Fatal(err)
 		} else {
-			template.Execute(response_writer, nil)
+			template.Execute(response_writer, id_list)
 		}
 	}
 }
