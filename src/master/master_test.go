@@ -1,7 +1,6 @@
 package main
 
 import (
-//	"fmt"
 	"io/ioutil"
 	"encoding/json"
 	"net/http"
@@ -10,10 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"strings"
 )
-
-type Greeting struct {
-	Text string
-}
 
 func TestJsonCanBeParsed(t *testing.T) {
 	var jsonBlob = []byte(`{"Text":"Platypus"}`)

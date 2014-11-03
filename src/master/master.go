@@ -13,6 +13,10 @@ type Slave struct {
 	URL string
 }
 
+type Greeting struct {
+	Text string
+}
+
 func ParseGreeting(input []byte) Greeting {
 	var data Greeting
 	err := json.Unmarshal(input, &data)
