@@ -7,39 +7,35 @@ import (
 	"net/http/httptest"
 	"testing"
 	"github.com/stretchr/testify/assert"
-	"strings"
 )
 
 func TestJsonCanBeParsed(t *testing.T) {
-	var jsonBlob = []byte(`{"Text":"Platypus"}`)
+	var inputJson = []byte(`{"ID":"LeftScreen","URL":"http://google.com"}`)
 
-	data := ParseGreeting(jsonBlob)
+	parsedJson := parseJson(inputJson)
 
-	assert.Equal(t, "Platypus", data.Text)
+	assert.Equal(t, "LeftScreen", parsedJson.ID)
+	assert.Equal(t, "http://google.com", parsedJson.URL)
 }
 
 func TestMessageIsSent(t *testing.T) {
 	var numberOfMessagesSent = 0
-	var message = ""
+	var messageID = ""
+	var messageURL = ""
+
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		numberOfMessagesSent++
 		requestBody, _ := ioutil.ReadAll(r.Body)
-		var requestMessage Greeting
+		var requestMessage Slave
 		_ = json.Unmarshal(requestBody, &requestMessage)
 
-		message = requestMessage.Text
+		messageID = requestMessage.ID
+		messageURL = requestMessage.URL
 	}))
 
 	sendMessageToServer(testServer.URL)
 
 	assert.Equal(t, 1, numberOfMessagesSent)
-	assert.Equal(t, "hello", message)
-}
-
-func sendMessageToServer(url string) {
-	client := &http.Client{}
-	var greeting Greeting
-	greeting.Text = "hello"
-	json_message, _ := json.Marshal(greeting)
-	_, _ = client.Post(url, "application/json", strings.NewReader(string(json_message)))
+	assert.Equal(t, "LeftScreen", messageID)
+	assert.Equal(t, "http://index.hu", messageURL)
 }

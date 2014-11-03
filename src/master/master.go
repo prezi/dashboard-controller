@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 type Slave struct {
@@ -13,31 +14,26 @@ type Slave struct {
 	URL string
 }
 
-type Greeting struct {
-	Text string
-}
-
-func ParseGreeting(input []byte) Greeting {
-	var data Greeting
-	err := json.Unmarshal(input, &data)
+func parseJson(input []byte) (slave Slave) {
+	err := json.Unmarshal(input, &slave)
 	if err != nil {
 		fmt.Println("error:", err)
 	}
-	return data
+	return
 }
 
-func ReadRequestBody(_ http.ResponseWriter, request *http.Request)  {
-//	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
-//	defer request.Body.Close()
-//	var greeting Greeting
-//	_ = json.Unmarshal(POSTrequestBody, &greeting)
-//	return greeting.text
+func sendMessageToServer(url string) {
+	client := &http.Client{}
+
+	var slave Slave
+	slave.ID = "LeftScreen"
+	slave.URL = "http://index.hu"
+	json_message, _ := json.Marshal(slave)
+	_, _ = client.Post(url, "application/json", strings.NewReader(string(json_message)))
 }
 
 func handler(_ http.ResponseWriter, request *http.Request) {
 	POSTrequestBody, _ := ioutil.ReadAll(request.Body)
-	fmt.Printf("%T\n", POSTrequestBody)
-	fmt.Printf("%T\n", request.Body)
 //	defer request.Body.Close()
 
 	var slave Slave
