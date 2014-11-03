@@ -103,9 +103,7 @@ func sendIPAddressToMaster() {
 
 	if err != nil {
 		fmt.Printf("Error communicating with master: %v\n", err)
-	}	
-	// fmt.Println("RESPONSE: ", response)
-	// fmt.Println("ERROR: ", err)
+	}
 
 	fmt.Printf("Slave mapped to master at %v.\n", DEFAULT_MASTER_IP_ADDRESS)
 	fmt.Printf("Slave ID: %v.\n\n", DEFAULT_SLAVE_ID)
