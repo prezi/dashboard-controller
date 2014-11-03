@@ -12,7 +12,7 @@ $( document ).ready(function() {
 	        success:function(data, textStatus, jqXHR) 
 	        {
 	        	//TO DO: Change it to universal info box!
-	            $( "#rb_id" ).find( "#value" ).html(data.ID);
+	            $( "#slave_id" ).find( "#value" ).html(data.ID);
 	            $( "#url" ).find( "#value" ).html(data.URL);
 	            $( "#statuscode" ).find( "#value" ).html(data.Code);
 	            $( ".info" ).show("slow");
@@ -25,8 +25,7 @@ $( document ).ready(function() {
 	            //TO DO: As above, change it to universal info box
 	        }
 	    });
-	    e.preventDefault(); 
-	    //e.unbind(); //unbind. to stop multiple form submit.
+	    e.preventDefault();
 	});
 
 });

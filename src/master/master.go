@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 type Slave struct {
@@ -13,8 +14,28 @@ type Slave struct {
 	URL string
 }
 
-func handler(responseWriter http.ResponseWriter, request *http.Request) {
+func parseJson(input []byte) (slave Slave) {
+	err := json.Unmarshal(input, &slave)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	return
+}
+
+func sendMessageToServer(url string) {
+	client := &http.Client{}
+
+	var slave Slave
+	slave.ID = "LeftScreen"
+	slave.URL = "http://index.hu"
+	json_message, _ := json.Marshal(slave)
+	_, _ = client.Post(url, "application/json", strings.NewReader(string(json_message)))
+}
+
+func handler(_ http.ResponseWriter, request *http.Request) {
 	POSTrequestBody, _ := ioutil.ReadAll(request.Body)
+//	defer request.Body.Close()
+
 	var slave Slave
 	_ = json.Unmarshal(POSTrequestBody, &slave)
 	fmt.Println("SLAVE ID: ", slave.ID)
@@ -31,16 +52,12 @@ func handler(responseWriter http.ResponseWriter, request *http.Request) {
 		slaveAddress = raspberryPiIP["2"]
 	}
 
-	// slaveAddress = "http://localhost:8080"
-
 	form := url.Values{}
 	form.Set("url", slave.URL)
 	http.PostForm(slaveAddress, form)
 }
 
 func main() {
-
-
 	http.HandleFunc("/", handler)
 	http.ListenAndServe("localhost:5000", nil)
 }
