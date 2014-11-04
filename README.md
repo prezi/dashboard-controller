@@ -78,7 +78,7 @@ In order to run the tests, first you need to install [Go](https://golang.org/)'s
 
     dashboard-controller$ go get github.com/stretchr/testify
 
-Then navigate into the folder where the test file is located, and run the tests with the 'go test testFileNameWithoutExtension'. Here is an example,
+Then navigate into the folder where the test file is located, and run the tests with the 'go test test\_file\_name\_without\_extension'. Here is an example,
 
     dashboard-controller/src/master$ go test master
     
