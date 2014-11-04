@@ -83,13 +83,19 @@ func sendInfo(response_writer http.ResponseWriter, status_code string, URL strin
 	response_writer.Write(reply_Message)
 }
 
+func setMimeType(responseWriter http.ResponseWriter, path string) {
+	mime_type := mime.TypeByExtension(filepath.Ext(path))
+	responseWriter.Header().Set("Content-type", mime_type)
+}
+
 func formHandler(response_writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "GET" {
 		if (request.URL.Path == "/") {
 			request.URL.Path+="form.html"
 		}
-		mime_type := mime.TypeByExtension(filepath.Ext(request.URL.Path[1:]))
-		response_writer.Header().Set("Content-type", mime_type)
+		// mime_type := mime.TypeByExtension(filepath.Ext(request.URL.Path[1:]))
+		// response_writer.Header().Set("Content-type", mime_type)
+		setMimeType(response_writer,request.URL.Path)
 		template, err := template.ParseFiles(request.URL.Path[1:])
 		if (err != nil) {
 			log.Fatal(err)
