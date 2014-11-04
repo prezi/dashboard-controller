@@ -12,6 +12,8 @@ import (
 	"bytes"
 )
 
+var MASTER_URL ="http://localhost:5000"
+
 type Message struct {
 	ID  string
 	URL string
@@ -44,15 +46,15 @@ func statusCode(link string) (int) {
 	}
 }
 
-func sendMaster(url, id string) {
-	m := Message{id, url}
+func sendMaster(masterUrl,urlToDisplay, id string) {
+	m := Message{id, urlToDisplay}
 	json_message, err := json.Marshal(m)
 	if (err != nil) {
 		log.Fatal(err)
 	}
 
 	client := &http.Client{}
-	response, err := client.Post("http://localhost:5000", "application/json", strings.NewReader(string(json_message)))
+	response, err := client.Post(masterUrl, "application/json", strings.NewReader(string(json_message)))
 	if err != nil {
 		panic(err)
 	}
@@ -102,11 +104,11 @@ func formHandler(response_writer http.ResponseWriter, request *http.Request) {
 
 func submitHandler(response_writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
-		URL := request.FormValue("url")
+		urlToDisplay := request.FormValue("url")
 		slave_ID := request.FormValue("rb-id")
-		status_code := statusCode(URL)
-	    sendMaster(URL, slave_ID)
-		sendInfo(response_writer, strconv.Itoa(status_code), URL, slave_ID)
+		status_code := statusCode(urlToDisplay)
+	    sendMaster(MASTER_URL,urlToDisplay, slave_ID)
+		sendInfo(response_writer, strconv.Itoa(status_code), urlToDisplay, slave_ID)
 	}
 }
 
