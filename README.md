@@ -69,6 +69,19 @@ Then run the executable with,
 The slave will begin listening on a [default port number](https://github.com/prezi/dashboard-controller/blob/master/src/slave/slave.go#L14). Optionally, you can specify a port number with the [-port flag](https://github.com/prezi/dashboard-controller/blob/master/src/slave/slave.go#L50), 
  
     dashboard-controller$ $GOPATH/bin/slave -port=9999
+    
+    
+####Running the tests
+------------------
+
+In order to run the tests, first you need to install [Go](https://golang.org/)'s [testify](https://godoc.org/github.com/stretchr/testify) package by running the command,
+
+    dashboard-controller$ go get github.com/stretchr/testify
+
+Then navigate into the folder where the test file is located, and run the tests with the 'go test testFileNameWithoutExtension'. Here is an example,
+
+    dashboard-controller/src/master$ go test master
+    
 
 Posting a URL
 ------------------
