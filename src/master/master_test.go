@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestJsonCanBeParsed(t *testing.T) {
+func TestParseJson(t *testing.T) {
 	var inputJson = []byte(`{"ID":"LeftScreen","URL":"http://google.com"}`)
 
 	parsedJson := parseJson(inputJson)
@@ -16,7 +16,7 @@ func TestJsonCanBeParsed(t *testing.T) {
 	assert.Equal(t, "http://google.com", parsedJson.URL)
 }
 
-func TestUrlValueMessageIsSent(t *testing.T) {
+func TestSendUrlValueMessageToServer(t *testing.T) {
 	var numberOfMessagesSent = 0
 	var url = ""
 
@@ -31,7 +31,7 @@ func TestUrlValueMessageIsSent(t *testing.T) {
 	assert.Equal(t, "http://index.hu", url)
 }
 
-func TestSlaveIpMapIsInitialized(t *testing.T) {
+func TestInitializeSlaveIPs(t *testing.T) {
 	slaveIPMap := initializeSlaveIPs()
 
 	assert.Equal(t, "http://10.0.0.42:8080", slaveIPMap["1"])

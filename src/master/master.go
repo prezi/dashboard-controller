@@ -46,19 +46,19 @@ func sendUrlValueMessageToServer( slaveURL string, urlToDisplay string) {
 }
 
 func initializeSlaveIPs() (slaveIPMap map[string]string) {
-	raspberryPiIP := make(map[string]string)
-	raspberryPiIP["1"] = "http://10.0.0.42:8080"
-	raspberryPiIP["2"] = "http://10.0.0.231:8080"
+	slaveIPs := make(map[string]string)
+	slaveIPs["1"] = "http://10.0.0.42:8080"
+	slaveIPs["2"] = "http://10.0.0.231:8080"
 
-	return raspberryPiIP
+	return slaveIPs
 }
 
-func destinationUrl(slaveID string, slaveIPMap map[string]string) (url string) {
+func destinationUrl(slaveID string, slaveIPs map[string]string) (url string) {
 	destination := url
 	if slaveID == "1" {
-		destination = slaveIPMap["1"]
+		destination = slaveIPs["1"]
 	}  else if slaveID == "2" {
-		destination = slaveIPMap["2"]
+		destination = slaveIPs["2"]
 	}
 
 	return destination
