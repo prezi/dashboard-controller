@@ -45,3 +45,18 @@ func TestSetJsMimeType(t *testing.T) {
 	assert.Equal(t, "application/javascript", setUpTestServerWithPath(path))
 }
 
+// func TestSendUrlValueMessageToServer(t *testing.T) {
+// 	var numberOfMessagesSent = 0
+// 	var url = ""
+
+// 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+// 		numberOfMessagesSent++
+// 		url = request.PostFormValue("url")
+// 	}))
+
+// 	sendUrlValueMessageToServer(testServer.URL, "http://index.hu")
+
+// 	assert.Equal(t, 1, numberOfMessagesSent)
+// 	assert.Equal(t, "http://index.hu", url)
+// }
+
