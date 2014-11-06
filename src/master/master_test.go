@@ -38,9 +38,16 @@ func TestInitializeSlaveIPs(t *testing.T) {
 	assert.Equal(t, "http://10.0.0.231:8080", slaveIPMap["2"])
 }
 
-func TestDestinationUrl(t *testing.T) {
+func TestDestinationUrlSlave1(t *testing.T) {
 	slaveIPMap := initializeSlaveIPs()
 	destinationURL := destinationUrl("1", slaveIPMap)
 
 	assert.Equal(t, "http://10.0.0.42:8080", destinationURL)
+}
+
+func TestDestinationUrlSlave2(t *testing.T) {
+	slaveIPMap := initializeSlaveIPs()
+	destinationURL := destinationUrl("2", slaveIPMap)
+
+	assert.Equal(t, "http://10.0.0.231:8080", destinationURL)
 }
