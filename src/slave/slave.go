@@ -135,11 +135,11 @@ func blockProgramWhileBrowserCloses() {
 func killBrowser() {
 	switch OS {
 	case "Linux":
-		fmt.Println("Executing command: killall -9 chromium")
-		err = exec.Command("killall", "-9", "chromium").Run() 
+		fmt.Println("Executing command: killall chromium")
+		err = exec.Command("killall", "chromium").Run() 
 	case "OS X":
-		fmt.Println("Executing command: killall -9 'Google Chrome'")
-		err = exec.Command("killall", "-9", "Google Chrome").Run()
+		fmt.Println("Executing command: killall'Google Chrome'")
+		err = exec.Command("killall", "Google Chrome").Run()
 	}
 
 	if err != nil {
@@ -154,7 +154,7 @@ func openBrowser(url string){
 	case "Linux":
 		fmt.Printf("Executing command: chromium --kiosk %v\n", url)
 		// sed -i ‘s/”exited_cleanly”: false/”exited_cleanly”: true/’ ~/.config/chromium/Default/Preferences
-		err = exec.Command("sed", "-i", "s/”exited_cleanly”: false/”exited_cleanly”: true/", "~/.config/chromium/Default/Preferences").Run()
+		// err = exec.Command("sed", "-i", "s/”exited_cleanly”: false/”exited_cleanly”: true/", "~/.config/chromium/Default/Preferences").Run()
 		err = exec.Command("chromium", "--kiosk", url).Run()		
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
