@@ -27,14 +27,18 @@ func handler(_ http.ResponseWriter, request *http.Request) {
 	defer request.Body.Close()
 
 	slave := parseJson(POSTRequestBody)
-	// slaveIPMap := initializeSlaveIPs() // this is creating the map each time a request is received
 	destinationSlaveAddress := destinationSlaveAddress(slave.ID)
+	if destinationSlaveAddress == "" {
+		fmt.Println("Abandoning request.")
+		return
+	}
+
 	sendUrlValueMessageToSlave(destinationSlaveAddress, slave.URL)
 }
 
 func receiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 	slaveIPAddress := request.PostFormValue("slaveIPAddress")
-	fmt.Println("In receiveAndMapSlaveAddress, slaveIPAddress: ", slaveIPAddress)
+	fmt.Println("Slave IP address received: ", slaveIPAddress)
 	slaveIPMap["1"] = slaveIPAddress
 	fmt.Println("MAPPED: ", slaveIPAddress)
 }
@@ -58,18 +62,16 @@ func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string) {
 }
 
 func destinationSlaveAddress(slaveID string) (slaveAddress string) {
-	// TODO: need error handling if there are no slaves mapped, or if indicated slave is not mapped.
 	if len(slaveIPMap) == 0 {
 		fmt.Println("ERROR: No slaves available.")
 		return 
 	}
 
 	slaveAddress = slaveIPMap[slaveID]
-	// fmt.Printf("%T is the type of slaveAddress", slaveAddress)
 	if slaveAddress ==  "" {
-		fmt.Println("ERROR: Invalid slave ID.")
+		fmt.Printf("ERROR: \"%v\" is not a valid slave ID.\n", slaveID)
 		fmt.Println("Valid slave IDs are: ", slaveIPMap)
-		return
+		return 
 	}
 	fmt.Println("slaveAddress in destinationSlaveAddress: ", slaveAddress)
 	return slaveAddress
