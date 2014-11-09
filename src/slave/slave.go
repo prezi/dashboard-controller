@@ -15,10 +15,11 @@ import (
 
 const DEFAULT_LOCALHOST_PORT = 8080
 const DEFAULT_MASTER_IP_ADDRESS = "http://localhost:5000" // can also receive this from user input
-const DEFAULT_SLAVE_ID = "1" // will need to receive this back from the master, or can be user-specified name
+const DEFAULT_SLAVE_NAME = "SLAVE NAME UNSPECIFIED" // will need to receive this back from the master, or can be user-specified name
 
 var port int
 var OS string
+var slaveName string
 var err error
 
 func main() {
@@ -26,7 +27,7 @@ func main() {
 	http.HandleFunc("/", handleRequest)
 
 	fmt.Printf("Listening on port: %v\n", port)
-	fmt.Println("You can send HTTP POST requests with a 'url' parameter to open it in a browser.")
+	fmt.Println("You can send HTTP POST requests through the command-line with a 'url' parameter to open the url in a browser.")
 	fmt.Printf("e.g.: curl localhost:%v -X POST -d \"url=http://www.google.com\"\n", port)
 
 	// start HTTP server with given address and handler
@@ -52,6 +53,9 @@ func setUp() {
 	// can pass flag argument: $ ./slave -port=8080
 	// if flag not specified, will set port=DEFAULT_LOCALHOST_PORT
 	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
+	// can pass flag argument: $ ./slave -slaveName="Slave Name"
+	// if flag not specified, will set port=DEFAULT_SLAVE_NAME
+	flag.StringVar(&slaveName, "slaveName", DEFAULT_SLAVE_NAME, "slave name")
 	flag.Parse()
 
 	// :0.0 indicates the first screen attached to the first display in localhost
@@ -104,6 +108,7 @@ func sendIPAddressToMaster() {
 	client := &http.Client{}
 	slaveIPAddress := getIPAddressFromCmdLine()
 	form := url.Values{}
+	form.Set("slaveName", slaveName)
 	form.Set("slaveIPAddress", slaveIPAddress)
 	fmt.Println("slaveIPAddress: ", slaveIPAddress)
 
@@ -119,7 +124,12 @@ func sendIPAddressToMaster() {
 	}
 
 	fmt.Printf("Slave mapped to master at %v.\n", DEFAULT_MASTER_IP_ADDRESS)
-	fmt.Printf("Slave ID: %v.\n\n", DEFAULT_SLAVE_ID)
+	fmt.Printf("Slave Name: %v.", slaveName)
+	if slaveName == DEFAULT_SLAVE_NAME {
+		fmt.Println("TIP: Specify slave name at startup with the flag '-slaveName'") 
+		fmt.Println("eg. -slaveName=\"Main Lobby\"")
+	}
+	fmt.Printf("\n\n")
 }
 
 func blockProgramWhileBrowserCloses() {

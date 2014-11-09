@@ -37,12 +37,16 @@ func handler(_ http.ResponseWriter, request *http.Request) {
 }
 
 func receiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
+	slaveName := request.PostFormValue("slaveName")
 	slaveIPAddress := request.PostFormValue("slaveIPAddress")
-	fmt.Println("Slave IP address received: ", slaveIPAddress)
-	slaveIPMap["1"] = slaveIPAddress
-	fmt.Println("MAPPED: ", slaveIPAddress)
+	fmt.Println("NEW SLAVE RECEIVED.")
+	fmt.Println("Slave Name: ", slaveName)
+	fmt.Println("Slave IP address: ", slaveIPAddress)
+	slaveIPMap[slaveName] = slaveIPAddress
+	fmt.Printf("Mapped \"%v\" to %v.\n", slaveName, slaveIPAddress)
 }
 
+// TODO: this doesn't return anything...?
 func parseJson(input []byte) (slave Slave) {
 	err := json.Unmarshal(input, &slave)
 	if err != nil {
