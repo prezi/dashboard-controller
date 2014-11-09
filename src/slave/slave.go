@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 	"net/url"
+	"regexp"
 )
 
 const DEFAULT_LOCALHOST_PORT = 8080
@@ -88,10 +89,20 @@ func setOS() {
 	}
 }
 
+func getIPAddressFromCmdLine() (IPAddress string){
+	cmd := exec.Command("ifconfig")
+	IPAddressBytes, _ := cmd.Output()
+	IPAddress = string(IPAddressBytes)
+	inetAddressRegexpPattern := "inet (addr:)?([0-9]*\\.){3}[0-9]*"
+	re := regexp.MustCompile(inetAddressRegexpPattern)
+	IPAddress = re.FindAllString(IPAddress, -1)[1]
+	IPAddress = strings.Split(IPAddress, " ")[1]
+
+	return IPAddress
+}
 func sendIPAddressToMaster() {
 	client := &http.Client{}
-	slaveIPAddress := "http://10.0.0.42:8080" // TODO: change this later, get IP address from command-line
-
+	slaveIPAddress := getIPAddressFromCmdLine()
 	form := url.Values{}
 	form.Set("slaveIPAddress", slaveIPAddress)
 	fmt.Println("slaveIPAddress: ", slaveIPAddress)
@@ -103,6 +114,8 @@ func sendIPAddressToMaster() {
 
 	if err != nil {
 		fmt.Printf("Error communicating with master: %v\n", err)
+		fmt.Println("Aborting program.")
+		// os.Exit(1)
 	}
 
 	fmt.Printf("Slave mapped to master at %v.\n", DEFAULT_MASTER_IP_ADDRESS)
@@ -138,7 +151,7 @@ func killBrowser() {
 		fmt.Println("Executing command: killall chromium")
 		err = exec.Command("killall", "chromium").Run() 
 	case "OS X":
-		fmt.Println("Executing command: killall'Google Chrome'")
+		fmt.Println("Executing command: killall 'Google Chrome'")
 		err = exec.Command("killall", "Google Chrome").Run()
 	}
 
