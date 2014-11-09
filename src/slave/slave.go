@@ -104,10 +104,13 @@ func getIPAddressFromCmdLine() (IPAddress string){
 
 	return IPAddress
 }
+
 func sendIPAddressToMaster() {
 	client := &http.Client{}
 	slaveIPAddress := getIPAddressFromCmdLine()
 	form := url.Values{}
+	slaveAddressArray := []string{"http://", slaveIPAddress,":", strconv.Itoa(port)}
+	slaveIPAddress = strings.Join(slaveAddressArray, "")
 	form.Set("slaveName", slaveName)
 	form.Set("slaveIPAddress", slaveIPAddress)
 	fmt.Println("slaveIPAddress: ", slaveIPAddress)
@@ -124,7 +127,7 @@ func sendIPAddressToMaster() {
 	}
 
 	fmt.Printf("Slave mapped to master at %v.\n", DEFAULT_MASTER_IP_ADDRESS)
-	fmt.Printf("Slave Name: %v.", slaveName)
+	fmt.Printf("Slave Name: %v.\n", slaveName)
 	if slaveName == DEFAULT_SLAVE_NAME {
 		fmt.Println("TIP: Specify slave name at startup with the flag '-slaveName'") 
 		fmt.Println("eg. -slaveName=\"Main Lobby\"")

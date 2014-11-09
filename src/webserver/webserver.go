@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"strconv"
 	"bytes"
+	"fmt"
 )
 
 var MASTER_URL ="http://localhost:5000"
@@ -33,9 +34,12 @@ type IdList struct {
 	Id []string
 }
 
-var id_list=IdList{
-	Id: []string{"1","2"},
+var id_list = IdList{
+	Id: []string{"1", "2"},
 }
+
+// why? 
+// var id_list = []string{"1", "2"}
 
 func statusCode(link string) (int) {
 	response, err := http.Head(link)
@@ -94,11 +98,17 @@ func formHandler(response_writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "GET" {
 		if (request.URL.Path == "/") {
 			request.URL.Path+="form.html"
-		} 
+		}
 		setMimeType(response_writer,request.URL.Path)
 		template, err := template.ParseFiles(request.URL.Path[1:])
-		if (err != nil) {log.Fatal(err)}
-		template.Execute(response_writer, id_list)
+		if (err != nil) {
+			log.Fatal(err)
+		} else {
+			// fmt.Printf("\nYOYOYOYO")
+			// fmt.Println(id_list.Id)
+			// this is running four times with each refresh...
+			template.Execute(response_writer, id_list)
+		}
 	}
 }
 
@@ -112,8 +122,16 @@ func submitHandler(response_writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+func receiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
+	slaveName := request.PostFormValue("slaveName")
+	fmt.Printf("\nNEW SLAVE RECEIVED.\n")
+	fmt.Println("Slave Name: ", slaveName)
+	id_list.Id = append(id_list.Id, slaveName)
+}
+
 func main() {
 	http.HandleFunc("/", formHandler)
 	http.HandleFunc("/form-submit", submitHandler)
+	http.HandleFunc("/receive_slave", receiveAndMapSlaveAddress)
 	http.ListenAndServe("localhost:4003", nil)
 }
