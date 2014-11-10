@@ -85,7 +85,6 @@ func receiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 	fmt.Println("Slave Name: ", slaveName)
 	fmt.Println("Slave IP address: ", slaveIPAddress)
 
-
 	if returnedIPAddress, existsInMap := slaveIPMap[slaveName]; existsInMap == false {
 		webserverIPAddressAndExtentionArray := []string{"http://localhost:4003", "/receive_slave"}
 
@@ -107,12 +106,7 @@ func sendSlaveToWebserver(webserverIPAddressAndExtentionArray []string, slaveNam
 	form.Set("slaveName", slaveName)
 	_, err = client.PostForm(webserverReceiveSlaveAddress, form)
 
-	if err != nil {
-		fmt.Printf("Error communicating with webserver: %v\n", err)
-		fmt.Printf("%v not updated on webserver.\n", slaveName)
-	} else {
-		fmt.Printf("Added \"%v\" to webserver slave list.\n", slaveName)
-	}
+	printServerResponse(err, slaveName)
 
 	return
 }
