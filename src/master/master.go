@@ -28,7 +28,7 @@ func handler(_ http.ResponseWriter, request *http.Request) {
 	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
 	defer request.Body.Close()
 
-	slave := parseJson(POSTRequestBody)
+	slave, _ := parseJson(POSTRequestBody)
 	destinationSlaveAddress := destinationSlaveAddress(slave.ID)
 	if destinationSlaveAddress == "" {
 		fmt.Println("Abandoning request.")
@@ -79,13 +79,12 @@ func receiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 	fmt.Println("Valid slave IDs are: ", slaveIPMap)
 }
 
-// TODO: this doesn't return anything...?
-func parseJson(input []byte) (slave Slave) {
-	err := json.Unmarshal(input, &slave)
+func parseJson(input []byte) (slave Slave, err error) {
+	err = json.Unmarshal(input, &slave)
 	if err != nil {
 		fmt.Println("error:", err)
 	}
-	return
+	return slave, err
 }
 
 func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string) {

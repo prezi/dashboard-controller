@@ -10,10 +10,21 @@ import (
 func TestParseJson(t *testing.T) {
 	var inputJson = []byte(`{"ID":"LeftScreen","URL":"http://google.com"}`)
 
-	parsedJson := parseJson(inputJson)
+	parsedJson, err := parseJson(inputJson)
 
 	assert.Equal(t, "LeftScreen", parsedJson.ID)
 	assert.Equal(t, "http://google.com", parsedJson.URL)
+	assert.Nil(t, err)
+}
+
+func TestParseJsonForEmptyInput(t *testing.T) {
+	var inputJson = []byte(`{}`)
+
+	parsedJson, err := parseJson(inputJson)
+
+	assert.Equal(t, "", parsedJson.ID)
+	assert.Equal(t, "", parsedJson.URL)
+	assert.Nil(t, err)
 }
 
 func TestSendUrlValueMessageToServer(t *testing.T) {
@@ -25,7 +36,7 @@ func TestSendUrlValueMessageToServer(t *testing.T) {
 		url = request.PostFormValue("url")
 	}))
 
-	sendUrlValueMessageToServer(testServer.URL, "http://index.hu")
+	sendUrlValueMessageToSlave(testServer.URL, "http://index.hu")
 
 	assert.Equal(t, 1, numberOfMessagesSent)
 	assert.Equal(t, "http://index.hu", url)
@@ -39,15 +50,15 @@ func TestInitializeSlaveIPs(t *testing.T) {
 }
 
 func TestDestinationUrlSlave1(t *testing.T) {
-	slaveIPMap := initializeSlaveIPs()
-	destinationURL := destinationUrl("1", slaveIPMap)
+	slaveIPMap = initializeSlaveIPs()
+	destinationURL := destinationSlaveAddress("1")
 
 	assert.Equal(t, "http://10.0.0.42:8080", destinationURL)
 }
 
 func TestDestinationUrlSlave2(t *testing.T) {
-	slaveIPMap := initializeSlaveIPs()
-	destinationURL := destinationUrl("2", slaveIPMap)
+	slaveIPMap = initializeSlaveIPs()
+	destinationURL := destinationSlaveAddress("2")
 
 	assert.Equal(t, "http://10.0.0.231:8080", destinationURL)
 }
