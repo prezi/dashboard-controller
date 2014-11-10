@@ -8,15 +8,16 @@ import (
 	"strconv"
 )
 
-var err error
+var OS string
 
 func main() {
 	port := slaveModule.SetUp()
+	OS = slaveModule.GetOS()
 	http.HandleFunc("/", handleRequest)
 
 	// start HTTP server with given address and handler
 	// handler=nil will default handler to DefaultServeMux
-	err = http.ListenAndServe(":" + strconv.Itoa(port), nil)
+	err := http.ListenAndServe(":" + strconv.Itoa(port), nil)
 	if err != nil {
 		fmt.Printf("Error starting HTTP server: %v\n", err)
 		fmt.Println("ERROR: Failed to start HTTP server.")
@@ -27,8 +28,7 @@ func main() {
 
 func handleRequest(writer http.ResponseWriter, request *http.Request) {
 	url := request.PostFormValue("url")
-	fmt.Fprintf(writer, "REQUEST RECEIVED. Posting \"%v\" on display \"%v\".\n", url, "Raspberry Pi")
-	slaveModule.KillBrowser()
-	slaveModule.OpenBrowser(url)
-	fmt.Fprintf(writer, "SUCCESS. \"%v\" has been posted on display \"%v\".\n", url, "Raspberry Pi")
+	slaveModule.KillBrowser(OS)
+	slaveModule.OpenBrowser(OS, url)
+	fmt.Fprintf(writer, "SUCCESS. \"%v\" has been posted.\n", url)
 }

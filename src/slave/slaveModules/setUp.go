@@ -13,28 +13,14 @@ import (
 )
 
 const DEFAULT_LOCALHOST_PORT = 8080
-const DEFAULT_MASTER_IP_ADDRESS = "http://localhost:5000" // can also receive this from user input
-const DEFAULT_SLAVE_NAME = "SLAVE NAME UNSPECIFIED" // will need to receive this back from the master, or can be user-specified name
+const DEFAULT_MASTER_IP_ADDRESS = "http://localhost:5000" // TODO: allow user to specify with flag
+const DEFAULT_SLAVE_NAME = "SLAVE NAME UNSPECIFIED"
 
-var port int
-var OS string
-var slaveName string
 var err error
 
-func SetUp() (port int){
-	setOS()
-	if (OS == "Unknown") {
-		fmt.Println("ERROR: Failed to detect operating system.")
-		fmt.Println("Aborting program.")
-		os.Exit(1)
-	} else {
-		fmt.Printf("Operating system detected: %v\n", OS)
-	}
-	// can pass flag argument: $ ./slave -port=8080
-	// if flag not specified, will set port=DEFAULT_LOCALHOST_PORT
+func SetUp() (port int) {
+	var slaveName string
 	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
-	// can pass flag argument: $ ./slave -slaveName="Slave Name"
-	// if flag not specified, will set port=DEFAULT_SLAVE_NAME
 	flag.StringVar(&slaveName, "slaveName", DEFAULT_SLAVE_NAME, "slave name")
 	flag.Parse()
 
@@ -43,7 +29,10 @@ func SetUp() (port int){
 	if err != nil {
 		fmt.Printf("Error setting DISPLAY environment variable: %v\n", err)
 	}
-	sendIPAddressToMaster()
+
+	slaveIPAddress := getIPAddressFromCmdLine(port)
+	masterIPAddress := getMasterReceiveSlaveAddress(DEFAULT_MASTER_IP_ADDRESS) // TODO: make this dynamic
+	sendIPAddressToMaster(slaveName, slaveIPAddress, masterIPAddress)
 
 	fmt.Printf("Listening on port: %v\n", port)
 	fmt.Println("You can send HTTP POST requests through the command-line with a 'url' parameter to open the url in a browser.")
@@ -52,8 +41,7 @@ func SetUp() (port int){
 	return port
 }
 
-func setOS() {
-	// func (c *Cmd) Output() ([]byte, error)
+func GetOS() (OS string) {
 	operatingSystemBytes, err := exec.Command("uname", "-a").Output() // display operating system name...why do we need the -a?
 	operatingSystemName := string(operatingSystemBytes)
 
@@ -76,9 +64,18 @@ func setOS() {
 	default:
 		OS = "Unknown"
 	}
+
+	if (OS == "Unknown") {
+		fmt.Println("ERROR: Failed to detect operating system.")
+		fmt.Println("Aborting program.")
+		os.Exit(1)
+	} else {
+		fmt.Printf("Operating system detected: %v\n", OS)
+	}
+	return OS
 }
 
-func getIPAddressFromCmdLine() (IPAddress string){
+func getIPAddressFromCmdLine(port int) (IPAddress string) {
 	cmd := exec.Command("ifconfig")
 	IPAddressBytes, _ := cmd.Output()
 	IPAddress = string(IPAddressBytes)
@@ -87,23 +84,25 @@ func getIPAddressFromCmdLine() (IPAddress string){
 	IPAddress = re.FindAllString(IPAddress, -1)[1]
 	IPAddress = strings.Split(IPAddress, " ")[1]
 
+	slaveAddressArray := []string{"http://", IPAddress,":", strconv.Itoa(port)}
+	IPAddress = strings.Join(slaveAddressArray, "")
+
 	return IPAddress
 }
 
-func sendIPAddressToMaster() {
+func getMasterReceiveSlaveAddress(masterIPAddress string) (masterAddress string) {
+	masterIPAddressAndExtentionArray := []string{masterIPAddress, "/receive_slave"} 
+	return strings.Join(masterIPAddressAndExtentionArray, "")
+}
+
+func sendIPAddressToMaster(slaveName string, slaveIPAddress string, masterAddress string) {
 	client := &http.Client{}
-	slaveIPAddress := getIPAddressFromCmdLine()
 	form := url.Values{}
-	slaveAddressArray := []string{"http://", slaveIPAddress,":", strconv.Itoa(port)}
-	slaveIPAddress = strings.Join(slaveAddressArray, "")
 	form.Set("slaveName", slaveName)
 	form.Set("slaveIPAddress", slaveIPAddress)
 	fmt.Println("slaveIPAddress: ", slaveIPAddress)
 
-	masterIPAddressAndExtentionArray := []string{DEFAULT_MASTER_IP_ADDRESS, "/receive_slave"} 
-	masterReceiveSlaveAddress := strings.Join(masterIPAddressAndExtentionArray, "")
-
-	_, err := client.PostForm(masterReceiveSlaveAddress, form)
+	_, err := client.PostForm(masterAddress, form)
 
 	if err != nil {
 		fmt.Printf("Error communicating with master: %v\n", err)
@@ -111,7 +110,7 @@ func sendIPAddressToMaster() {
 		// os.Exit(1)
 	}
 
-	fmt.Printf("Slave mapped to master at %v.\n", DEFAULT_MASTER_IP_ADDRESS)
+	fmt.Printf("Slave mapped to master at %v.\n", masterAddress)
 	fmt.Printf("Slave Name: %v.\n", slaveName)
 	if slaveName == DEFAULT_SLAVE_NAME {
 		fmt.Println("TIP: Specify slave name at startup with the flag '-slaveName'") 

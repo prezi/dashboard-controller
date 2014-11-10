@@ -48,7 +48,7 @@ func TestDestinationUrlSlave2(t *testing.T) {
 	assert.Equal(t, "http://10.0.0.231:8080", destinationURL)
 }
 
-func TestSendUrlValueMessageToServer(t *testing.T) {
+func TestSendUrlValueMessageToSlave(t *testing.T) {
 	var numberOfMessagesSent = 0
 	var url = ""
 
@@ -61,6 +61,18 @@ func TestSendUrlValueMessageToServer(t *testing.T) {
 
 	assert.Equal(t, 1, numberOfMessagesSent)
 	assert.Equal(t, "http://index.hu", url)
+}
+
+func TestReceiveAndMapSlaveAddress(t *testing.T) {
+	name := ""
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		name = request.PostFormValue("slaveName")
+	}))
+
+	error := sendSlaveToWebserver([]string{testServer.URL, "/receive_slave"}, "ApplePie")
+
+	assert.Equal(t, "ApplePie", name)
+	assert.Nil(t, error)
 }
 
 func TestSendValidSlaveToWebserver(t *testing.T) {
