@@ -46,21 +46,6 @@ func TestStatusCode(t *testing.T) {
 	assert.Equal(t, 200, responseStatusCode)
 }
 
-func TestSetHtmlMimeType(t *testing.T) {
-	var path = "file.html"
-	assert.Equal(t, "text/html; charset=utf-8", setUpTestServerWithPath(path))
-}
-
-func TestSetCssMimeType(t *testing.T) {
-	var path = "file.css"
-	assert.Equal(t, "text/css; charset=utf-8", setUpTestServerWithPath(path))
-}
-
-func TestSetJsMimeType(t *testing.T) {
-	var path = "file.js"
-	assert.Equal(t, "application/javascript", setUpTestServerWithPath(path))
-}
-
 func TestSendMaster(t *testing.T) {
 	var numberOfMessagesSent = 0
 	var url = ""
