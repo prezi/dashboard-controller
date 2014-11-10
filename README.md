@@ -66,11 +66,11 @@ Then run the executable with a speficied slave name. Here we intialize a slave w
  
     dashboard-controller$ $GOPATH/bin/slave -slaveName="Main Lobby"
 
-The slave will begin listening on a [default port number](https://github.com/prezi/dashboard-controller/blob/master/src/slave/slave.go#L14). Optionally, you can specify a port number with the [-port flag](https://github.com/prezi/dashboard-controller/blob/master/src/slave/slave.go#L50), 
+The slave will begin listening on a default port number. Optionally, you can specify a port number with the -port flag, 
  
     dashboard-controller$ $GOPATH/bin/slave -slaveName="Main Lobby" -port=9999
     
-The slave will automatically [map itself to the master](https://github.com/prezi/dashboard-controller/blob/master/src/slave/slave.go#L108), and the master in turn will [update the webserver](https://github.com/prezi/dashboard-controller/blob/master/src/master/master.go#L66) of a new slave. 
+The slave will automatically map itself to the master, and the master in turn will update the webserver of a new slave. 
 
 ####Tests
 ------------------
