@@ -7,6 +7,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestSendValidSlaveToWebserver(t *testing.T) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+	}))
+
+	error := sendSlaveToWebserver([]string{testServer.URL, "/receive_slave"},  "FantasticName")
+
+	assert.Nil(t, error)
+}
+
+func TestPrintServerConfirmation(t *testing.T) {
+	printServerResponse(nil, "HelloClient")
+}
+
 func TestParseJson(t *testing.T) {
 	var inputJson = []byte(`{"ID":"LeftScreen","URL":"http://google.com"}`)
 
