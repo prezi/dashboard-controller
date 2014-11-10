@@ -48,7 +48,7 @@ func TestDestinationUrlSlave2(t *testing.T) {
 	assert.Equal(t, "http://10.0.0.231:8080", destinationURL)
 }
 
-func TestSendUrlValueMessageToServer(t *testing.T) {
+func TestSendUrlValueMessageToSlave(t *testing.T) {
 	var numberOfMessagesSent = 0
 	var url = ""
 

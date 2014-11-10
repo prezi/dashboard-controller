@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func blockProgramWhileBrowserCloses() {
+func blockProgramWhileBrowserCloses(OS string) {
 	// block the code so that the browser can finish closing 
 	// use a while-loop to check if there is a browser process running, 
 	// exit the loop once all browser processes have closed
@@ -29,7 +29,7 @@ func blockProgramWhileBrowserCloses() {
 	}
 }
 
-func KillBrowser() {
+func KillBrowser(OS string) {
 	switch OS {
 	case "Linux":
 		fmt.Println("Executing command: killall chromium")
@@ -42,11 +42,11 @@ func KillBrowser() {
 	if err != nil {
 		fmt.Printf("Error killing current browser: %v\n", err)
 	} else {
-		blockProgramWhileBrowserCloses()	
+		blockProgramWhileBrowserCloses(OS)	
 	}
 }
 
-func OpenBrowser(url string){
+func OpenBrowser(OS string, url string) {
 	switch OS {
 	case "Linux":
 		fmt.Printf("Executing command: chromium --kiosk %v\n", url)

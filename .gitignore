@@ -5,4 +5,4 @@ setenv.txt
 src/playground
 src/github.com
 .DS_Store
-src/master/coverage.out
+coverage.out
