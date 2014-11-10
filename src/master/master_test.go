@@ -7,17 +7,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSendValidSlaveToWebserver(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-	}))
+func TestInitializeSlaveIPs(t *testing.T) {
+	slaveIPMap := initializeSlaveIPs()
 
-	error := sendSlaveToWebserver([]string{testServer.URL, "/receive_slave"},  "FantasticName")
-
-	assert.Nil(t, error)
-}
-
-func TestPrintServerConfirmation(t *testing.T) {
-	printServerResponse(nil, "HelloClient")
+	assert.Equal(t, "http://10.0.0.42:8080", slaveIPMap["1"])
+	assert.Equal(t, "http://10.0.0.231:8080", slaveIPMap["2"])
 }
 
 func TestParseJson(t *testing.T) {
@@ -40,6 +34,20 @@ func TestParseJsonForEmptyInput(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestDestinationUrlSlave1(t *testing.T) {
+	slaveIPMap = initializeSlaveIPs()
+	destinationURL := destinationSlaveAddress("1")
+
+	assert.Equal(t, "http://10.0.0.42:8080", destinationURL)
+}
+
+func TestDestinationUrlSlave2(t *testing.T) {
+	slaveIPMap = initializeSlaveIPs()
+	destinationURL := destinationSlaveAddress("2")
+
+	assert.Equal(t, "http://10.0.0.231:8080", destinationURL)
+}
+
 func TestSendUrlValueMessageToServer(t *testing.T) {
 	var numberOfMessagesSent = 0
 	var url = ""
@@ -55,23 +63,15 @@ func TestSendUrlValueMessageToServer(t *testing.T) {
 	assert.Equal(t, "http://index.hu", url)
 }
 
-func TestInitializeSlaveIPs(t *testing.T) {
-	slaveIPMap := initializeSlaveIPs()
+func TestSendValidSlaveToWebserver(t *testing.T) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+	}))
 
-	assert.Equal(t, "http://10.0.0.42:8080", slaveIPMap["1"])
-	assert.Equal(t, "http://10.0.0.231:8080", slaveIPMap["2"])
+	error := sendSlaveToWebserver([]string{testServer.URL, "/receive_slave"},  "FantasticName")
+
+	assert.Nil(t, error)
 }
 
-func TestDestinationUrlSlave1(t *testing.T) {
-	slaveIPMap = initializeSlaveIPs()
-	destinationURL := destinationSlaveAddress("1")
-
-	assert.Equal(t, "http://10.0.0.42:8080", destinationURL)
-}
-
-func TestDestinationUrlSlave2(t *testing.T) {
-	slaveIPMap = initializeSlaveIPs()
-	destinationURL := destinationSlaveAddress("2")
-
-	assert.Equal(t, "http://10.0.0.231:8080", destinationURL)
+func TestPrintServerConfirmation(t *testing.T) {
+	printServerResponse(nil, "HelloClient")
 }
