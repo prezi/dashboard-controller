@@ -58,7 +58,9 @@ func sendMaster(masterUrl,urlToDisplay, id string) {
 	client := &http.Client{}
 	response, err := client.Post(masterUrl, "application/json", strings.NewReader(string(json_message)))
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		//TODO return error? 
+		return
 	}
 	defer response.Body.Close()
 }
@@ -90,6 +92,11 @@ func sendInfo(response_writer http.ResponseWriter, status_code , URL , slave_ID 
 
 func formHandler(response_writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "GET" {
+		//if (request.URL.path)
+		//fmt.Println(request.URL.Path)
+		if (request.URL.Path!="/") {
+			http.Redirect(response_writer,request,"/",301)
+		}
 		template, err := template.ParseFiles(path.Join(TEMPLATE_PATH,"form.html"))
 		if (err != nil) {
     		http.Error(response_writer, http.StatusText(500), 500)
@@ -104,7 +111,7 @@ func submitHandler(response_writer http.ResponseWriter, request *http.Request) {
 		urlToDisplay := request.FormValue("url")
 		slave_ID := request.FormValue("rb-id")
 		status_code := statusCode(urlToDisplay)
-	    //sendMaster(MASTER_URL,urlToDisplay, slave_ID)
+	    sendMaster(MASTER_URL,urlToDisplay, slave_ID)
 		sendInfo(response_writer, strconv.Itoa(status_code), urlToDisplay, slave_ID)
 	}
 }
