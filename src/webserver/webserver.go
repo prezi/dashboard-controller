@@ -4,9 +4,7 @@ import (
 	"strings"
 	"net/http"
 	"log"
-	"mime"
 	"path"
-	"path/filepath"
 	"html/template"
 	"encoding/json"
 	"strconv"
@@ -67,7 +65,6 @@ func sendMaster(masterUrl,urlToDisplay, id string) {
 
 func reply(URL, status_code, slave_ID string) ([]byte) {
 	// reply := Reply{status_code, URL, slave_ID}
-	
 	t, err := template.ParseFiles(path.Join(TEMPLATE_PATH,"infobox.html"))		
 	if (err != nil) {
 			log.Fatal(err)
@@ -83,15 +80,12 @@ func reply(URL, status_code, slave_ID string) ([]byte) {
 	return json_message
 }
 
-func sendInfo(response_writer http.ResponseWriter, status_code string, URL string, slave_ID string) {
+func sendInfo(response_writer http.ResponseWriter, status_code , URL , slave_ID string) {
 	reply_Message := reply(URL, status_code, slave_ID)
-	response_writer.Header().Set("Content-Type", "application/json")
+	header:=response_writer.Header()
+	header.Set("Content-Type", "application/json")
+	//log.Fatal("sth")
 	response_writer.Write(reply_Message)
-}
-
-func setMimeType(responseWriter http.ResponseWriter, path string) {
-	mime_type := mime.TypeByExtension(filepath.Ext(path))
-	responseWriter.Header().Set("Content-type", mime_type)
 }
 
 func formHandler(response_writer http.ResponseWriter, request *http.Request) {
@@ -110,7 +104,7 @@ func submitHandler(response_writer http.ResponseWriter, request *http.Request) {
 		urlToDisplay := request.FormValue("url")
 		slave_ID := request.FormValue("rb-id")
 		status_code := statusCode(urlToDisplay)
-	    sendMaster(MASTER_URL,urlToDisplay, slave_ID)
+	    //sendMaster(MASTER_URL,urlToDisplay, slave_ID)
 		sendInfo(response_writer, strconv.Itoa(status_code), urlToDisplay, slave_ID)
 	}
 }
