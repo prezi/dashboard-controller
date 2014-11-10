@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./slaveModules/"
+	"slave/slaveModules"
 	"fmt"
 	"net/http"
 	"os"
