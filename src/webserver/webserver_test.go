@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"net/url"
 )
 
 type Slave struct {
@@ -79,11 +80,12 @@ func TestSendMaster(t *testing.T) {
 
 	}))
 
-	sendMaster(testServer.URL, "http://index.hu", "2")
+	returnValue := sendMaster(testServer.URL, "http://index.hu", "2")
 
 	assert.Equal(t, 1, numberOfMessagesSent)
 	assert.Equal(t, "http://index.hu", url)
 	assert.Equal(t, "2", id)
+	assert.Equal(t, 1, returnValue)
 }
 
 func TestReply(t *testing.T) {
@@ -116,4 +118,52 @@ func TestSendInfo(t *testing.T) {
 	assert.Equal(t, true, strings.Contains(reply, "aaaa"))
 	assert.Equal(t, true, strings.Contains(reply, "bbbb"))
 	assert.Equal(t, true, strings.Contains(reply, "cccc"))
+}
+
+func sendGetToFormHandler(URL string) (int) {
+	TEMPLATE_PATH="templates/"
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		request.URL.Path = URL
+		formHandler(w,request)
+	}))
+
+	client := &http.Client{}
+	resp, _ := client.Get(testServer.URL)
+
+	return resp.StatusCode
+}
+
+func TestFormHandler(t *testing.T) {
+	assert.Equal(t, 200, sendGetToFormHandler("/"))
+	assert.Equal(t, 301, sendGetToFormHandler("addfs"))
+}
+
+func TestSubmitHandler(t *testing.T) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		submitHandler(w,request)
+	}))
+
+	client := &http.Client{}
+	resp, _ := client.PostForm(testServer.URL, url.Values{"slave-id": {"1"}, "url": {"http://www.google.com"}})
+
+	POSTRequestBody, _ := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	reply := parseJsonReply(POSTRequestBody).HTML
+
+	assert.Equal(t, true, strings.Contains(reply, "http://www.google.com"))
+}
+
+func TestReceiveAndMapSlaveAddress(t *testing.T) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		receiveAndMapSlaveAddress(w,request)
+	}))
+
+	client := &http.Client{}
+	resp, _ := client.PostForm(testServer.URL, url.Values{"slaveName":{"3"}})
+	POSTRequestBody, _ := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	reply := parseJsonReply(POSTRequestBody).HTML
+
+	assert.Equal(t, "", reply)
+	assert.Equal(t, "id_list", id_list) //proper id_list needed here!
 }

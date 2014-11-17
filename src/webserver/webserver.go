@@ -110,16 +110,18 @@ func formHandler(response_writer http.ResponseWriter, request *http.Request) {
 func submitHandler(response_writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
 		urlToDisplay := request.FormValue("url") 
-		slave_ID := request.FormValue("rb-id") 
+		slave_ID := request.FormValue("slave-id") 
 		status_code := statusCode(urlToDisplay)
-		c := make(chan int)
-		go func() {
-	    	c <- sendMaster(MASTER_URL,urlToDisplay, slave_ID) 
-    	}()
-    	ccc := <-c
-    	if (ccc == 1) {
-			sendInfo(response_writer, strconv.Itoa(status_code), urlToDisplay, slave_ID)
-		}
+		//c := make(chan int)
+		// go func() {
+	 //    	c <- sendMaster(MASTER_URL,urlToDisplay, slave_ID) 
+  //   	}()
+  //   	ccc := <-c
+  //   	if (ccc == 1) {
+		// 	sendInfo(response_writer, strconv.Itoa(status_code), urlToDisplay, slave_ID)
+		// }
+		sendMaster(MASTER_URL,urlToDisplay, slave_ID)
+		sendInfo(response_writer, strconv.Itoa(status_code), urlToDisplay, slave_ID)
 	}
 }
 
