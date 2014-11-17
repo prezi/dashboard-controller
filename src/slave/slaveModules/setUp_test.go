@@ -6,12 +6,15 @@ import (
 	"fmt"
 	"testing"
 	"github.com/stretchr/testify/assert"
+	"regexp"
 )
 
 func TestGetIPAddressFromCmdLine(t *testing.T) {
 	IPAddress := getIPAddressFromCmdLine(8080)
-	fmt.Println(IPAddress)
-	assert.Equal(t, "http://10.0.0.34:8080", IPAddress) // this will differ on each user's computer. use regexp.
+	fmt.Println("Current IP Address: ", IPAddress)
+	IPAddressRegexpPattern := "([0-9]*\\.){3}[0-9]*:[0-9]*"
+	re := regexp.MustCompile(IPAddressRegexpPattern)
+	assert.Equal(t, true, re.MatchString(IPAddress))
 }
 
 func TestGetMasterReceiveSlaveAddress(t *testing.T) {
