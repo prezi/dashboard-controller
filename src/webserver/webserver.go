@@ -48,21 +48,22 @@ func statusCode(link string) (int) {
 	}
 }
 
-func sendMaster(masterUrl,urlToDisplay, id string) {
+func sendMaster(masterUrl,urlToDisplay, id string) (int) {
 	m := Message{id, urlToDisplay}
 	json_message, err := json.Marshal(m)
 	if (err != nil) {
 		log.Fatal(err)
+		return 0
 	}
-
 	client := &http.Client{}
 	response, err := client.Post(masterUrl, "application/json", strings.NewReader(string(json_message)))
 	if err != nil {
 		fmt.Println(err)
+		return 0
 		//TODO return error? 
-		return
 	}
 	defer response.Body.Close()
+	return 1
 }
 
 func reply(URL, status_code, slave_ID string) ([]byte) {
@@ -102,17 +103,23 @@ func formHandler(response_writer http.ResponseWriter, request *http.Request) {
     		http.Error(response_writer, http.StatusText(500), 500)
 			log.Fatal(err)
 		} 
-		template.Execute(response_writer, id_list)
+		template.Execute(response_writer, id_list) //similar to testsendinfo, body test whether it receives what we send or not
 	}
 }
 
 func submitHandler(response_writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
-		urlToDisplay := request.FormValue("url")
-		slave_ID := request.FormValue("rb-id")
+		urlToDisplay := request.FormValue("url") //errorok johetnek vissza azokat kellene kezelni
+		slave_ID := request.FormValue("rb-id") 
 		status_code := statusCode(urlToDisplay)
-	    sendMaster(MASTER_URL,urlToDisplay, slave_ID)
-		sendInfo(response_writer, strconv.Itoa(status_code), urlToDisplay, slave_ID)
+		c := make(chan int)
+		go func() {
+	    	c <- sendMaster(MASTER_URL,urlToDisplay, slave_ID) 
+    	}()
+    	ccc := <-c
+    	if (ccc == 1) {
+			sendInfo(response_writer, strconv.Itoa(status_code), urlToDisplay, slave_ID)
+		}
 	}
 }
 
