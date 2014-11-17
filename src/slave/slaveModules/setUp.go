@@ -13,15 +13,17 @@ import (
 )
 
 const DEFAULT_LOCALHOST_PORT = 8080
-const DEFAULT_MASTER_IP_ADDRESS = "http://localhost:5000" // TODO: allow user to specify with flag
+const DEFAULT_MASTER_IP_ADDRESS = "localhost:5000" // TODO: Fix TCP connection for local IP. For now, can only communicate with master if same localhost as slave.
 const DEFAULT_SLAVE_NAME = "SLAVE NAME UNSPECIFIED"
 
 var err error
 
 func SetUp() (port int) {
 	var slaveName string
+	var masterIP string
 	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
 	flag.StringVar(&slaveName, "slaveName", DEFAULT_SLAVE_NAME, "slave name")
+	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")
 	flag.Parse()
 
 	// :0.0 indicates the first screen attached to the first display in localhost
@@ -31,7 +33,8 @@ func SetUp() (port int) {
 	}
 
 	slaveIPAddress := getIPAddressFromCmdLine(port)
-	masterIPAddress := getMasterReceiveSlaveAddress(DEFAULT_MASTER_IP_ADDRESS) // TODO: make this dynamic
+	masterIPAddress := getMasterReceiveSlaveAddress(masterIP) // TODO: make this dynamic
+	fmt.Println("THIS IS THE MASTER IP ADDRESS", masterIPAddress)
 	sendIPAddressToMaster(slaveName, slaveIPAddress, masterIPAddress)
 
 	fmt.Printf("Listening on port: %v\n", port)
@@ -91,7 +94,7 @@ func getIPAddressFromCmdLine(port int) (IPAddress string) {
 }
 
 func getMasterReceiveSlaveAddress(masterIPAddress string) (masterAddress string) {
-	masterIPAddressAndExtentionArray := []string{masterIPAddress, "/receive_slave"} 
+	masterIPAddressAndExtentionArray := []string{"http://", masterIPAddress, "/receive_slave"} 
 	return strings.Join(masterIPAddressAndExtentionArray, "")
 }
 
