@@ -15,18 +15,17 @@ type Slave struct {
 }
 
 var slaveIPMap = make(map[string]string)
-// var slaveHeartbeatMap = make(map[string]string) // TODO: make these map to time values
 
 func main() {
 	slaveIPMap = masterModule.SetUp()
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/", sendRequestToSlave)
 	http.HandleFunc("/receive_slave", masterModule.ReceiveAndMapSlaveAddress)
-	// http.HandleFunc("/receive_heartbeat", masterModule.MonitorSlaveHeartbeats)
-	// master.Module.removeDeadSlaves()
+	http.HandleFunc("/receive_heartbeat", masterModule.MonitorSlaveHeartbeats)
+	go masterModule.MonitorSlaves(3)
 	http.ListenAndServe("localhost:5000", nil)
 }
 
-func handler(_ http.ResponseWriter, request *http.Request) {
+func sendRequestToSlave(_ http.ResponseWriter, request *http.Request) {
 	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
 	defer request.Body.Close()
 

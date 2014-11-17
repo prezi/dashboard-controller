@@ -12,8 +12,9 @@ var OS string
 
 func main() {
 	port, slaveName, masterIP := slaveModule.SetUp()
+	// port, _, _ := slaveModule.SetUp()
 	OS = slaveModule.GetOS()
-	slaveModule.Heartbeat(slaveName, masterIP)
+	go slaveModule.Heartbeat(1, slaveName, masterIP)
 	http.HandleFunc("/", handleRequest)
 
 	// start HTTP server with given address and handler

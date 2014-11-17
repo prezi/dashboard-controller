@@ -5,27 +5,25 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"os"
+	// "os"
 )
 
-func Heartbeat(slaveName string, masterIP string) {
-
-	beat := time.Tick(1 * time.Second)
+func Heartbeat(heartbeatInterval int, slaveName string, masterIP string) {
+	beat := time.Tick(time.Duration(heartbeatInterval) * time.Second)
     for now := range beat {
        	client := &http.Client{}
 		form := url.Values{}
 		form.Set("slaveName", slaveName)
-		// form.Set("slaveIPAddress", slaveIPAddress)
 		form.Set("heartbeatTimestamp", now.String())
-		fmt.Println("hearbeat")
+		fmt.Println("hearbeat", now.String())
 
-		masterIPAddressForHeartbeat := "http://localhost:5000"
+		masterIPAddressForHeartbeat := "http://localhost:5000/receive_heartbeat"
 		_, err := client.PostForm(masterIPAddressForHeartbeat, form)
 
 		if err != nil {
 			fmt.Printf("Error communicating with master: %v\n", err)
 			fmt.Println("Aborting program.")
-			os.Exit(1)
+			// os.Exit(1)
 		}
     }
 }
