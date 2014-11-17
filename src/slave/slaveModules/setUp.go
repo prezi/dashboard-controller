@@ -18,9 +18,7 @@ const DEFAULT_SLAVE_NAME = "SLAVE NAME UNSPECIFIED"
 
 var err error
 
-func SetUp() (port int) {
-	var slaveName string
-	var masterIP string
+func SetUp() (port int, slaveName string, masterIP string) {
 	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
 	flag.StringVar(&slaveName, "slaveName", DEFAULT_SLAVE_NAME, "slave name")
 	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")
@@ -33,15 +31,15 @@ func SetUp() (port int) {
 	}
 
 	slaveIPAddress := getIPAddressFromCmdLine(port)
-	masterIPAddress := getMasterReceiveSlaveAddress(masterIP) // TODO: make this dynamic
-	fmt.Println("THIS IS THE MASTER IP ADDRESS", masterIPAddress)
-	sendIPAddressToMaster(slaveName, slaveIPAddress, masterIPAddress)
+	masterIPAddressToReceiveSlave := getMasterReceiveSlaveAddress(masterIP) // TODO: make this dynamic
+	fmt.Println("THIS IS THE MASTER IP ADDRESS TO RECEIVE SLAVES", masterIPAddressToReceiveSlave)
+	sendIPAddressToMaster(slaveName, slaveIPAddress, masterIPAddressToReceiveSlave)
 
 	fmt.Printf("Listening on port: %v\n", port)
 	fmt.Println("You can send HTTP POST requests through the command-line with a 'url' parameter to open the url in a browser.")
 	fmt.Printf("e.g.: curl localhost:%v -X POST -d \"url=http://www.google.com\"\n", port)
 
-	return port
+	return port, slaveName, masterIP
 }
 
 func GetOS() (OS string) {
