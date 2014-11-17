@@ -103,13 +103,13 @@ func formHandler(response_writer http.ResponseWriter, request *http.Request) {
     		http.Error(response_writer, http.StatusText(500), 500)
 			log.Fatal(err)
 		} 
-		template.Execute(response_writer, id_list) //similar to testsendinfo, body test whether it receives what we send or not
+		template.Execute(response_writer, id_list) 
 	}
 }
 
 func submitHandler(response_writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
-		urlToDisplay := request.FormValue("url") //errorok johetnek vissza azokat kellene kezelni
+		urlToDisplay := request.FormValue("url") 
 		slave_ID := request.FormValue("rb-id") 
 		status_code := statusCode(urlToDisplay)
 		c := make(chan int)
