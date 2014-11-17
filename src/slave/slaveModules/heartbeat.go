@@ -16,7 +16,7 @@ func Heartbeat(slaveName string, masterIP string) {
 		form := url.Values{}
 		form.Set("slaveName", slaveName)
 		// form.Set("slaveIPAddress", slaveIPAddress)
-		form.Set("heartbeat timestamp", now.String())
+		form.Set("heartbeatTimestamp", now.String())
 		fmt.Println("hearbeat")
 
 		masterIPAddressForHeartbeat := "http://localhost:5000"
