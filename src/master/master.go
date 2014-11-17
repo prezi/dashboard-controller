@@ -25,8 +25,8 @@ func main() {
 
 func initializeSlaveIPs() (slaveIPMap map[string]string) {
 	slaveIPs := make(map[string]string)
-	slaveIPs["1"] = "http://10.0.0.42:8080"
-	slaveIPs["2"] = "http://10.0.0.231:8080"
+	slaveIPs["1"] = "http://10.0.0.122:8080"
+	slaveIPs["2"] = "http://10.0.1.11:8080"
 
 	return slaveIPs
 }
