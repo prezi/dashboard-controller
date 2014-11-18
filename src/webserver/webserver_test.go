@@ -163,7 +163,7 @@ func TestReceiveAndMapSlaveAddress(t *testing.T) {
 	POSTRequestBody, _ := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	reply := parseJsonReply(POSTRequestBody).HTML
-
+	testIdList := []string{"1", "2", "3"}
 	assert.Equal(t, "", reply)
-	assert.Equal(t, "id_list", id_list) //proper id_list needed here!
+	assert.Equal(t, testIdList, id_list.Id) //proper id_list needed here!
 }
