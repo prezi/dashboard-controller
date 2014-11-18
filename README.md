@@ -11,6 +11,7 @@ Contents
 
 Introduction
 ------------------
+
 Use the Dashboard Controller program to remotely open urls on browser windows.
 
 Our implemented system uses [Google Chrome](http://www.google.com/chrome/) web browser. 
@@ -21,6 +22,7 @@ Together, they make a delicious Apple-Raspberry-Pi system.
 
 Architecture
 ------------------
+
  - slave 
   - Receives url from master and loads url in a browser. 
   - Compatible with OS X and Linux operating systems with Google Chrome installed. 
@@ -49,9 +51,9 @@ To run the code from the cloned repository directory,
 
 And for the webserver, 
 
-    dashboard-controller$ go run webserver.go
+    dashboard-controller$ go run src/webserver/webserver.go 
 
-(There is currently a bug where the webserver must be run from the webserver directory to ensure the correct path to "form.html".)
+(There is currently a bug where the webserver must be run from the root directory to ensure the correct path to "form.html".)
 
 ####Slave
 ------------------
@@ -62,28 +64,36 @@ From the repository directory, compile slave code with the command,
  
     dashboard-controller$ go install slave
 
-Then run the executable with a speficied slave name. Here we intialize a slave with the name "Main Lobby".
+Then run the executable with a speficied slave name and master IP address. 
  
-    dashboard-controller$ $GOPATH/bin/slave -slaveName="Main Lobby"
+    dashboard-controller$ $GOPATH/bin/slave -slaveName="Main Lobby" -masterIP=10.0.0.195:4949
 
-The slave will begin listening on a default port number. Optionally, you can specify a port number with the -port flag, 
+The slave will begin listening on a default port number (8080). Optionally, you can specify a port number for the slave with the -port flag.
  
-    dashboard-controller$ $GOPATH/bin/slave -slaveName="Main Lobby" -port=9999
+    dashboard-controller$ $GOPATH/bin/slave -slaveName="Main Lobby" -masterIP=10.0.0.195:4949 -port=9999 
     
-The slave will automatically map itself to the master, and the master in turn will update the webserver of a new slave. 
+The slave will automatically map itself to the master. The slave will periodically emit heartbeats to the master. If the slave's heartbeats do not reach the master for some period of the time, the master will mark the slave as dead and remove it from the map of available slaves. 
 
-####Tests
+Tests
 ------------------
 
 In order to run the tests, first install [Go](https://golang.org/)'s [testify](https://godoc.org/github.com/stretchr/testify) package with the command
 
     dashboard-controller$ go get github.com/stretchr/testify
 
-Navigate into the directory where the test file is located, and run the tests with 'go test test\_file\_name\_without\_extension'. For example, in the master directory that contains master.go and master_test.go, run
+Navigate into the directory where the test file is located, and run the tests with 'go test'. For example, in the master directory that contains master.go and master_test.go, run
 
-    dashboard-controller/src/master$ go test master
-    
+    dashboard-controller/src/master$ go test 
+
+The -cover flag will output the test coverage %. 
+
+    dashboard-controller/src/master$ go test -cover
+
+Use the following command for a visual display of test coverage. 
+
+    dashboard-controller/src/master$ go tool cover -html=cover.out
 
 Posting a URL
 ------------------
+
 Access the website running on your [localhost](https://github.com/prezi/dashboard-controller/blob/master/src/webserver/webserver.go#L126). Fill in the text fields, submit, and see your url post on the indicated slave. :) 
