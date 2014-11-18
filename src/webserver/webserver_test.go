@@ -162,8 +162,6 @@ func TestReceiveAndMapSlaveAddress(t *testing.T) {
 	resp, _ := client.PostForm(testServer.URL, url.Values{"slaveName":{"3"}})
 	POSTRequestBody, _ := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
-	reply := parseJsonReply(POSTRequestBody).HTML
-	testIdList := []string{"1", "2", "3"}
-	assert.Equal(t, "", reply)
-	assert.Equal(t, testIdList, id_list.Id) //proper id_list needed here!
+	assert.Equal(t, 0, len(POSTRequestBody))
+	assert.Equal(t, "3", id_list.Id[len(id_list.Id)-1])
 }
