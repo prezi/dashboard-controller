@@ -18,7 +18,7 @@ func TestGetIPAddressFromCmdLine(t *testing.T) {
 }
 
 func TestGetMasterReceiveSlaveAddress(t *testing.T) {
-	masterAddress := getMasterReceiveSlaveAddress("http://localhost:5000")
+	masterAddress := getMasterReceiveSlaveAddress("localhost:5000")
 	assert.Equal(t, "http://localhost:5000/receive_slave", masterAddress)
 }
 

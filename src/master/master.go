@@ -1,12 +1,12 @@
 package main
 
 import (
+	"master/masterModules"
 	"net/http"
 	"io/ioutil"
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"strings"
 )
 
 type Slave struct {
@@ -17,21 +17,15 @@ type Slave struct {
 var slaveIPMap = make(map[string]string)
 
 func main() {
-	slaveIPMap = initializeSlaveIPs()
-	http.HandleFunc("/", handler)
-	http.HandleFunc("/receive_slave", receiveAndMapSlaveAddress)
+	slaveIPMap = masterModule.SetUp()
+	http.HandleFunc("/", sendRequestToSlave)
+	http.HandleFunc("/receive_slave", masterModule.ReceiveAndMapSlaveAddress)
+	http.HandleFunc("/receive_heartbeat", masterModule.MonitorSlaveHeartbeats)
+	go masterModule.MonitorSlaves(3)
 	http.ListenAndServe("localhost:5000", nil)
 }
 
-func initializeSlaveIPs() (slaveIPMap map[string]string) {
-	slaveIPs := make(map[string]string)
-	slaveIPs["1"] = "http://10.0.0.122:8080"
-	slaveIPs["2"] = "http://10.0.1.11:8080"
-
-	return slaveIPs
-}
-
-func handler(_ http.ResponseWriter, request *http.Request) {
+func sendRequestToSlave(_ http.ResponseWriter, request *http.Request) {
 	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
 	defer request.Body.Close()
 
@@ -76,46 +70,4 @@ func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string) {
 	form.Set("url", urlToDisplay)
 
 	_,_ = client.PostForm(slaveIPAddress, form)
-}
-
-func receiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
-	slaveName := request.PostFormValue("slaveName")
-	slaveIPAddress := request.PostFormValue("slaveIPAddress")
-	fmt.Printf("\nNEW SLAVE RECEIVED.\n")
-	fmt.Println("Slave Name: ", slaveName)
-	fmt.Println("Slave IP address: ", slaveIPAddress)
-
-	if returnedIPAddress, existsInMap := slaveIPMap[slaveName]; existsInMap == false {
-		webserverIPAddressAndExtentionArray := []string{"http://localhost:4003", "/receive_slave"}
-
-		err := sendSlaveToWebserver(webserverIPAddressAndExtentionArray, slaveName)
-		printServerResponse(err, slaveName)
-	} else {
-		fmt.Printf("WARNING: Slave with name \"%v\" already exists with the IP address: %v. \nUpdating %v's IP address to %v.\n", slaveName, returnedIPAddress, slaveName, slaveIPAddress)
-	}
-	slaveIPMap[slaveName] = slaveIPAddress
-	fmt.Printf("Mapped \"%v\" to %v.\n", slaveName, slaveIPAddress)
-	fmt.Println("Valid slave IDs are: ", slaveIPMap)
-}
-
-func sendSlaveToWebserver(webserverIPAddressAndExtentionArray []string, slaveName string) (err error) {
-	client := &http.Client{}
-	webserverReceiveSlaveAddress := strings.Join(webserverIPAddressAndExtentionArray, "")
-
-	form := url.Values{}
-	form.Set("slaveName", slaveName)
-	_, err = client.PostForm(webserverReceiveSlaveAddress, form)
-
-	printServerResponse(err, slaveName)
-
-	return
-}
-
-func printServerResponse(error error, slaveName string) {
-	if error != nil {
-		fmt.Printf("Error communicating with webserver: %v\n", error)
-		fmt.Printf("%v not updated on webserver.\n", slaveName)
-	} else {
-		fmt.Printf("Added \"%v\" to webserver slave list.\n", slaveName)
-	}
 }

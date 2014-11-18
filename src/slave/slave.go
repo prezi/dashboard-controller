@@ -11,8 +11,10 @@ import (
 var OS string
 
 func main() {
-	port := slaveModule.SetUp()
+	port, slaveName, masterIP := slaveModule.SetUp()
+	// port, _, _ := slaveModule.SetUp()
 	OS = slaveModule.GetOS()
+	go slaveModule.Heartbeat(1, slaveName, masterIP)
 	http.HandleFunc("/", handleRequest)
 
 	// start HTTP server with given address and handler
