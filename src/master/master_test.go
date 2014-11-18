@@ -1,18 +1,12 @@
 package main
 
 import (
+	"master/masterModules"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestInitializeSlaveIPs(t *testing.T) {
-	slaveIPMap := initializeSlaveIPs()
-
-	assert.Equal(t, "http://10.0.0.122:8080", slaveIPMap["1"])
-	assert.Equal(t, "http://10.0.1.11:8080", slaveIPMap["2"])
-}
 
 func TestParseJson(t *testing.T) {
 	var inputJson = []byte(`{"ID":"LeftScreen","URL":"http://google.com"}`)
@@ -34,15 +28,15 @@ func TestParseJsonForEmptyInput(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestDestinationUrlSlave1(t *testing.T) {
-	slaveIPMap = initializeSlaveIPs()
+func TestDestinationAddressSlave1(t *testing.T) {
+	slaveIPMap = masterModule.SetUp()
 	destinationURL := destinationSlaveAddress("1")
 
 	assert.Equal(t, "http://10.0.0.122:8080", destinationURL)
 }
 
-func TestDestinationUrlSlave2(t *testing.T) {
-	slaveIPMap = initializeSlaveIPs()
+func TestDestinationAddressSlave2(t *testing.T) {
+	slaveIPMap = masterModule.SetUp()
 	destinationURL := destinationSlaveAddress("2")
 
 	assert.Equal(t, "http://10.0.1.11:8080", destinationURL)
@@ -61,29 +55,4 @@ func TestSendUrlValueMessageToSlave(t *testing.T) {
 
 	assert.Equal(t, 1, numberOfMessagesSent)
 	assert.Equal(t, "http://index.hu", url)
-}
-
-func TestReceiveAndMapSlaveAddress(t *testing.T) {
-	name := ""
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		name = request.PostFormValue("slaveName")
-	}))
-
-	error := sendSlaveToWebserver([]string{testServer.URL, "/receive_slave"}, "ApplePie")
-
-	assert.Equal(t, "ApplePie", name)
-	assert.Nil(t, error)
-}
-
-func TestSendValidSlaveToWebserver(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-	}))
-
-	error := sendSlaveToWebserver([]string{testServer.URL, "/receive_slave"},  "FantasticName")
-
-	assert.Nil(t, error)
-}
-
-func TestPrintServerConfirmation(t *testing.T) {
-	printServerResponse(nil, "HelloClient")
 }
