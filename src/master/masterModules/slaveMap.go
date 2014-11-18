@@ -10,10 +10,20 @@ import (
 
 // var slaveIPMap = make(map[string]string)
 var slaveIPMap = initializeSlaveIPs()
-var slaveHeartbeatMap = make(map[string]time.Time) // TODO: make these map to time values
+var slaveHeartbeatMap = make(map[string]time.Time) 
+// TODO: Create a single map with name as key and IP, heartbeat time as values.
+// Should values be tuples or hashmaps?
 
 func SetUp() (slaveMap map[string]string) {
 	return slaveIPMap
+}
+
+func initializeSlaveIPs() (slaveIPMap map[string]string) {
+	slaveIPs := make(map[string]string)
+	slaveIPs["1"] = "http://10.0.0.122:8080"
+	slaveIPs["2"] = "http://10.0.1.11:8080"
+
+	return slaveIPs
 }
 
 func ReceiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
@@ -24,7 +34,7 @@ func ReceiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 	fmt.Println("Slave IP address: ", slaveIPAddress)
 
 	if returnedIPAddress, existsInMap := slaveIPMap[slaveName]; existsInMap == false {
-		webserverIPAddressAndExtentionArray := []string{"http://localhost:4003", "/receive_slave"}
+		webserverIPAddressAndExtentionArray := []string{"http://localhost:4003", "/receive_slave"} // TODO: make dynamic webserver address
 
 		err := sendSlaveToWebserver(webserverIPAddressAndExtentionArray, slaveName)
 		printServerResponse(err, slaveName)
@@ -64,15 +74,11 @@ func MonitorSlaves(timeInterval int) {
 func removeDeadSlaves(deadTime int) {
 	for slaveName, lastHeartbeatTime := range slaveHeartbeatMap {
 		if time.Now().Sub(lastHeartbeatTime) > time.Duration(deadTime) * time.Second {
-			fmt.Println("REMOVING DEAD SLAVE: ", slaveName)
+			fmt.Printf("\nREMOVING DEAD SLAVE: %v\n", slaveName)
 			delete(slaveHeartbeatMap, slaveName)
 			delete(slaveIPMap, slaveName)
 			fmt.Println("Updated Slave Map: ", slaveIPMap)
 			fmt.Printf("\n\n")
-
-			// Need to delete slave from webserver, too? 
-			// I think it's better to keep centralized slave list.
-			// Webserver will fetch entire list from master with each refresh.
 		}
 	}
 }
@@ -98,12 +104,3 @@ func printServerResponse(error error, slaveName string) {
 		fmt.Printf("Added \"%v\" to webserver slave list.\n", slaveName)
 	}
 }
-
-func initializeSlaveIPs() (slaveIPMap map[string]string) {
-	slaveIPs := make(map[string]string)
-	slaveIPs["1"] = "http://10.0.0.122:8080"
-	slaveIPs["2"] = "http://10.0.1.11:8080"
-
-	return slaveIPs
-}
-

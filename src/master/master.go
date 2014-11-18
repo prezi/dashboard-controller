@@ -22,7 +22,7 @@ func main() {
 	http.HandleFunc("/receive_slave", masterModule.ReceiveAndMapSlaveAddress)
 	http.HandleFunc("/receive_heartbeat", masterModule.MonitorSlaveHeartbeats)
 	go masterModule.MonitorSlaves(3)
-	http.ListenAndServe("localhost:5000", nil)
+	http.ListenAndServe(":5000", nil)
 }
 
 func sendRequestToSlave(_ http.ResponseWriter, request *http.Request) {

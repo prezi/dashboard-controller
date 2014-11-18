@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	// "os"
 )
 
 func Heartbeat(heartbeatInterval int, slaveName string, masterIP string) {
+	masterIPAddressForHeartbeat := getMasterReceiveHeartbeatAddress(masterIP)
 	beat := time.Tick(time.Duration(heartbeatInterval) * time.Second)
     for now := range beat {
        	client := &http.Client{}
 		form := url.Values{}
 		form.Set("slaveName", slaveName)
 		form.Set("heartbeatTimestamp", now.String())
-		fmt.Println("hearbeat", now.String())
 
-		masterIPAddressForHeartbeat := "http://localhost:5000/receive_heartbeat"
 		_, err := client.PostForm(masterIPAddressForHeartbeat, form)
 
 		if err != nil {
@@ -26,4 +26,9 @@ func Heartbeat(heartbeatInterval int, slaveName string, masterIP string) {
 			// os.Exit(1)
 		}
     }
+}
+
+func getMasterReceiveHeartbeatAddress(masterIP string) (masterAddress string) {
+	masterIPAddressAndExtentionArray := []string{"http://", masterIP, "/receive_heartbeat"} 
+	return strings.Join(masterIPAddressAndExtentionArray, "")
 }
