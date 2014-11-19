@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"io/ioutil"
+	"regexp"
+	"os/exec"
 )
 
 var MASTER_URL = "http://localhost:5000"
@@ -130,4 +132,30 @@ func receiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 	}
 	fmt.Printf("\nNEW SLAVE RECEIVED.\n")
 	fmt.Println("Slave Name: ", id_list.Id)
+}
+
+func getIPAddress(port int) (IPAddress string) {
+	IPAddressBytes := getIPAddressBytesFromCmdLine()
+
+	return addProtocolAndPortToIp(parseIpAddress(IPAddressBytes), port)
+}
+func getIPAddressBytesFromCmdLine() (IPAddressWithNoise string) {
+	cmd := exec.Command("ifconfig")
+	IPAddressBytes, _ := cmd.Output()
+	IPAddressWithNoise = string(IPAddressBytes)
+	return
+}
+
+func parseIpAddress(IPAddress string) string {
+	inetAddressRegexpPattern := "inet (addr:)?([0-9]*\\.){3}[0-9]*"
+	re := regexp.MustCompile(inetAddressRegexpPattern)
+	IPAddress = re.FindAllString(IPAddress, -1)[1]
+	IPAddress = strings.Split(IPAddress, " ")[1]
+	return IPAddress
+}
+
+func addProtocolAndPortToIp(IPAddress string, port int) (fullAddress string) {
+	slaveAddressArray := []string{"http://", IPAddress, ":", strconv.Itoa(port)}
+	fullAddress = strings.Join(slaveAddressArray, "")
+	return
 }
