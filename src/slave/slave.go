@@ -8,17 +8,13 @@ import (
 	"strconv"
 )
 
-var OS string
-
 func main() {
-	port, slaveName, masterIP := slaveModule.SetUp()
-	// port, _, _ := slaveModule.SetUp()
-	OS = slaveModule.GetOS()
+	port, slaveName, masterIP, OS := slaveModule.SetUp()
 	go slaveModule.Heartbeat(1, slaveName, masterIP)
-	http.HandleFunc("/", handleRequest)
 
-	// start HTTP server with given address and handler
-	// handler=nil will default handler to DefaultServeMux
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		slaveModule.BrowserHandler(w, r, OS)
+		})
 	err := http.ListenAndServe(":" + strconv.Itoa(port), nil)
 	if err != nil {
 		fmt.Printf("Error starting HTTP server: %v\n", err)
@@ -26,11 +22,4 @@ func main() {
 		fmt.Println("Aborting program.")
 		os.Exit(1)
 	}
-}
-
-func handleRequest(writer http.ResponseWriter, request *http.Request) {
-	url := request.PostFormValue("url")
-	slaveModule.KillBrowser(OS)
-	slaveModule.OpenBrowser(OS, url)
-	fmt.Fprintf(writer, "SUCCESS. \"%v\" has been posted.\n", url)
 }

@@ -6,3 +6,4 @@ src/playground
 src/github.com
 .DS_Store
 coverage.out
+cover.out

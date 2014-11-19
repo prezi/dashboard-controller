@@ -3,15 +3,21 @@ package slaveModule
 import (
 	"net/http"
 	"net/http/httptest"
-	"fmt"
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"regexp"
 )
 
+func TestSetUp(t *testing.T) {
+	port, slaveName, masterIP, OS := SetUp()
+	assert.Equal(t, port, 8080)
+	assert.Equal(t, slaveName, "SLAVE NAME UNSPECIFIED")
+	assert.Equal(t, masterIP, "localhost:5000")
+	assert.IsType(t, "Some OS Name", OS)
+}
+
 func TestGetIPAddressFromCmdLine(t *testing.T) {
 	IPAddress := getIPAddressFromCmdLine(8080)
-	fmt.Println("Current IP Address: ", IPAddress)
 	IPAddressRegexpPattern := "([0-9]*\\.){3}[0-9]*:[0-9]*"
 	re := regexp.MustCompile(IPAddressRegexpPattern)
 	assert.Equal(t, true, re.MatchString(IPAddress))
@@ -43,5 +49,4 @@ func TestSendIPAddressToMaster_DEFAULT_SLAVE_NAME(t *testing.T) {
 	sendIPAddressToMaster("DEFAULT_SLAVE_NAME", "http://localhost:8080", testServer.URL)
 	assert.Equal(t, 1, numberOfMessagesSent)
 }
-
 

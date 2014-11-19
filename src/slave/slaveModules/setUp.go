@@ -13,17 +13,14 @@ import (
 )
 
 const DEFAULT_LOCALHOST_PORT = 8080
-const DEFAULT_MASTER_IP_ADDRESS = "localhost:5000" // TODO: Fix TCP connection for local IP. For now, can only communicate with master if same localhost as slave.
+const DEFAULT_MASTER_IP_ADDRESS = "localhost:5000" 
 const DEFAULT_SLAVE_NAME = "SLAVE NAME UNSPECIFIED"
 
 var err error
 
-func SetUp() (port int, slaveName string, masterIP string) {
-	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
-	flag.StringVar(&slaveName, "slaveName", DEFAULT_SLAVE_NAME, "slave name")
-	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")
-	flag.Parse()
-
+func SetUp() (port int, slaveName, masterIP, OS string) {
+	port, slaveName, masterIP = configFlags()
+	OS = getOS()
 	// :0.0 indicates the first screen attached to the first display in localhost
 	err = os.Setenv("DISPLAY",":0.0")
 	if err != nil {
@@ -31,18 +28,25 @@ func SetUp() (port int, slaveName string, masterIP string) {
 	}
 
 	slaveIPAddress := getIPAddressFromCmdLine(port)
-	masterIPAddressToReceiveSlave := getMasterReceiveSlaveAddress(masterIP) // TODO: make this dynamic
-	fmt.Println("THIS IS THE MASTER IP ADDRESS TO RECEIVE SLAVES", masterIPAddressToReceiveSlave)
+	masterIPAddressToReceiveSlave := getMasterReceiveSlaveAddress(masterIP)
 	sendIPAddressToMaster(slaveName, slaveIPAddress, masterIPAddressToReceiveSlave)
 
 	fmt.Printf("Listening on port: %v\n", port)
 	fmt.Println("You can send HTTP POST requests through the command-line with a 'url' parameter to open the url in a browser.")
 	fmt.Printf("e.g.: curl localhost:%v -X POST -d \"url=http://www.google.com\"\n", port)
 
+	return port, slaveName, masterIP, OS
+}
+
+func configFlags() (port int, slaveName, masterIP string) {
+	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
+	flag.StringVar(&slaveName, "slaveName", DEFAULT_SLAVE_NAME, "slave name")
+	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")
+	flag.Parse()
 	return port, slaveName, masterIP
 }
 
-func GetOS() (OS string) {
+func getOS() (OS string) {
 	operatingSystemBytes, err := exec.Command("uname", "-a").Output() // display operating system name...why do we need the -a?
 	operatingSystemName := string(operatingSystemBytes)
 
