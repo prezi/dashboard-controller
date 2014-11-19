@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"fmt"
 	"strings"
-	"net/url"
+	// "net/url"
 	"time"
+	"encoding/json"
 )
 
 // var slaveIPMap = make(map[string]string)
@@ -13,6 +14,10 @@ var slaveIPMap = initializeSlaveIPs()
 var slaveHeartbeatMap = make(map[string]time.Time) 
 // TODO: Create a single map with name as key and IP, heartbeat time as values.
 // Should values be tuples or hashmaps?
+
+type IdList struct {
+	Id []string
+}
 
 func SetUp() (slaveMap map[string]string) {
 	return slaveIPMap
@@ -36,7 +41,7 @@ func ReceiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 	if returnedIPAddress, existsInMap := slaveIPMap[slaveName]; existsInMap == false {
 		webserverIPAddressAndExtentionArray := []string{"http://localhost:4003", "/receive_slave"} // TODO: make dynamic webserver address
 
-		err := sendSlaveToWebserver(webserverIPAddressAndExtentionArray, slaveName)
+		err := sendSlaveToWebserver(webserverIPAddressAndExtentionArray, slaveIPMap)
 		printServerResponse(err, slaveName)
 	} else {
 		fmt.Printf("WARNING: Slave with name \"%v\" already exists with the IP address: %v. \nUpdating %v's IP address to %v.\n", slaveName, returnedIPAddress, slaveName, slaveIPAddress)
@@ -83,17 +88,18 @@ func removeDeadSlaves(deadTime int) {
 	}
 }
 
-func sendSlaveToWebserver(webserverIPAddressAndExtentionArray []string, slaveName string) (err error) {
+func sendSlaveToWebserver(webserverIPAddressAndExtentionArray []string, slaveIPs map[string]string) (err error) {
+	err = nil
 	client := &http.Client{}
 	webserverReceiveSlaveAddress := strings.Join(webserverIPAddressAndExtentionArray, "")
+	var idList IdList
+	for slaveName := range slaveIPs {
+        idList.Id = append(idList.Id, slaveName)
+    }
+	jsonMessage, err := json.Marshal(idList)
+	_,err = client.Post(webserverReceiveSlaveAddress, "application/json", strings.NewReader(string(jsonMessage)))
+	return err
 
-	form := url.Values{}
-	form.Set("slaveName", slaveName)
-	_, err = client.PostForm(webserverReceiveSlaveAddress, form)
-
-	printServerResponse(err, slaveName)
-
-	return
 }
 
 func printServerResponse(error error, slaveName string) {
