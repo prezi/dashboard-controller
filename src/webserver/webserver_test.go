@@ -72,7 +72,6 @@ func TestSendUrlAndIdToMaster(t *testing.T) {
 		slave := parseJsonSlave(POSTRequestBody)
 		url = slave.URL
 		id = slave.ID
-
 	}))
 	
 	sendUrlAndIdToMaster(testServer.URL, "http://index.hu", "2")
@@ -132,9 +131,10 @@ func TestReceiveAndMapSlaveAddress(t *testing.T) {
 	}))
 
 	client := &http.Client{}
-	resp, _ := client.PostForm(testServer.URL, url.Values{"slaveName":{"3"}})
-	POSTRequestBody, _ := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	assert.Equal(t, 0, len(POSTRequestBody))
-	assert.Equal(t, "3", id_list.Id[len(id_list.Id)-1])
+	var testIdList IdList
+	testIdList.Id = append(testIdList.Id, "testSlaveId")
+	jsonMessage, _ := json.Marshal(testIdList)
+	client.Post(testServer.URL, "application/json", strings.NewReader(string(jsonMessage)))
+
+	assert.Equal(t, testIdList, id_list)
 }

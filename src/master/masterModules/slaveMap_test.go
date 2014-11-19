@@ -19,24 +19,11 @@ func TestInitializeSlaveIPs(t *testing.T) {
 }
 
 func TestReceiveAndMapSlaveAddress(t *testing.T) {
-	// name := ""
-	// testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-	// 	name = request.PostFormValue("slaveName")
-	// }))
 
-	// error := sendSlaveToWebserver([]string{testServer.URL, "/receive_slave"}, "ApplePie")
-
-	// assert.Equal(t, "ApplePie", name)
-	// assert.Nil(t, error)
 }
 
 func TestSendValidSlaveToWebserver(t *testing.T) {
-	// testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-	// }))
 
-	// error := sendSlaveToWebserver([]string{testServer.URL, "/receive_slave"},  "FantasticName")
-
-	// assert.Nil(t, error)
 }
 
 func TestPrintServerConfirmation(t *testing.T) {

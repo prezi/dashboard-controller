@@ -9,6 +9,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"io/ioutil"
 )
 
 var MASTER_URL = "http://localhost:5000"
@@ -120,8 +121,13 @@ func confirmationMessage(URL, status_code, slave_ID string) []byte {
 }
 
 func receiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
-	slaveName := request.PostFormValue("slaveName")
+	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
+	defer request.Body.Close()
+
+	err := json.Unmarshal(POSTRequestBody, &id_list)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
 	fmt.Printf("\nNEW SLAVE RECEIVED.\n")
-	fmt.Println("Slave Name: ", slaveName)
-	id_list.Id = append(id_list.Id, slaveName)
+	fmt.Println("Slave Name: ", id_list.Id)
 }

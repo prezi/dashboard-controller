@@ -38,15 +38,19 @@ func ReceiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 	fmt.Println("Slave Name: ", slaveName)
 	fmt.Println("Slave IP address: ", slaveIPAddress)
 
-	if returnedIPAddress, existsInMap := slaveIPMap[slaveName]; existsInMap == false {
-		webserverIPAddressAndExtentionArray := []string{"http://localhost:4003", "/receive_slave"} // TODO: make dynamic webserver address
 
-		err := sendSlaveToWebserver(webserverIPAddressAndExtentionArray, slaveIPMap)
-		printServerResponse(err, slaveName)
-	} else {
+
+
+	if returnedIPAddress, existsInMap := slaveIPMap[slaveName]; existsInMap {
+
 		fmt.Printf("WARNING: Slave with name \"%v\" already exists with the IP address: %v. \nUpdating %v's IP address to %v.\n", slaveName, returnedIPAddress, slaveName, slaveIPAddress)
+		
 	}
 	slaveIPMap[slaveName] = slaveIPAddress
+		
+	webserverIPAddressAndExtentionArray := []string{"http://localhost:4003", "/receive_slave"} // TODO: make dynamic webserver address
+	err := sendSlaveToWebserver(webserverIPAddressAndExtentionArray, slaveIPMap)
+	printServerResponse(err, slaveName)
 	slaveHeartbeatMap[slaveName] = time.Now()
 	fmt.Printf("Mapped \"%v\" to %v.\n", slaveName, slaveIPAddress)
 	fmt.Println("Valid slave IDs are: ", slaveIPMap)
