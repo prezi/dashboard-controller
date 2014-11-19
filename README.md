@@ -74,6 +74,11 @@ The slave will begin listening on a default port number (8080). Optionally, you 
     
 The slave will automatically map itself to the master. The slave will periodically emit heartbeats to the master. If the slave's heartbeats do not reach the master for some period of the time, the master will mark the slave as dead and remove it from the map of available slaves. 
 
+Posting a URL
+------------------
+
+Access the website running on your [localhost](https://github.com/prezi/dashboard-controller/blob/master/src/webserver/webserver.go#L126). Fill in the text fields, submit, and see your url post on the indicated slave. :) 
+
 Tests
 ------------------
 
@@ -89,11 +94,4 @@ The -cover flag will output the test coverage %.
 
     dashboard-controller/src/master$ go test -cover
 
-Use the following command for a visual display of test coverage. 
-
-    dashboard-controller/src/master$ go tool cover -html=cover.out
-
-Posting a URL
-------------------
-
-Access the website running on your [localhost](https://github.com/prezi/dashboard-controller/blob/master/src/webserver/webserver.go#L126). Fill in the text fields, submit, and see your url post on the indicated slave. :) 
+For more testing options, please see the this [Go blog post](http://blog.golang.org/cover). 
