@@ -32,7 +32,7 @@ func TestSendSlaveToWebserver(t *testing.T) {
 
 	}))
 	slaveIPs := initializeSlaveIPs()
-	sendSlaveToWebserver([]string{testServer.URL}, slaveIPs)
+	sendSlaveToWebserver(testServer.URL, slaveIPs)
 	validIdList := []string{"1","2"}
 	sort.Strings(validIdList)
 	sort.Strings(returnedIds)

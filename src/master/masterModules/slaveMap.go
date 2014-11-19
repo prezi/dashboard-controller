@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 )
 
+var webserverAddress = "http://localhost:4003"// TODO: make dynamic webserver address
+
 // var slaveIPMap = make(map[string]string)
 var slaveIPMap = initializeSlaveIPs()
 var slaveHeartbeatMap = make(map[string]time.Time) 
@@ -38,18 +40,13 @@ func ReceiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 	fmt.Println("Slave Name: ", slaveName)
 	fmt.Println("Slave IP address: ", slaveIPAddress)
 
-
-
-
 	if returnedIPAddress, existsInMap := slaveIPMap[slaveName]; existsInMap {
 
 		fmt.Printf("WARNING: Slave with name \"%v\" already exists with the IP address: %v. \nUpdating %v's IP address to %v.\n", slaveName, returnedIPAddress, slaveName, slaveIPAddress)
 		
 	}
 	slaveIPMap[slaveName] = slaveIPAddress
-		
-	webserverIPAddressAndExtentionArray := []string{"http://localhost:4003", "/receive_slave"} // TODO: make dynamic webserver address
-	err := sendSlaveToWebserver(webserverIPAddressAndExtentionArray, slaveIPMap)
+	err := sendSlaveToWebserver(webserverAddress, slaveIPMap)
 	printServerResponse(err, slaveName)
 	slaveHeartbeatMap[slaveName] = time.Now()
 	fmt.Printf("Mapped \"%v\" to %v.\n", slaveName, slaveIPAddress)
@@ -88,20 +85,21 @@ func removeDeadSlaves(deadTime int) {
 			delete(slaveIPMap, slaveName)
 			fmt.Println("Updated Slave Map: ", slaveIPMap)
 			fmt.Printf("\n\n")
+			sendSlaveToWebserver(webserverAddress, slaveIPMap)
 		}
 	}
 }
 
-func sendSlaveToWebserver(webserverIPAddressAndExtentionArray []string, slaveIPs map[string]string) (err error) {
+func sendSlaveToWebserver(webserverAddress string, slaveIPs map[string]string) (err error) {
 	err = nil
 	client := &http.Client{}
-	webserverReceiveSlaveAddress := strings.Join(webserverIPAddressAndExtentionArray, "")
+	webserverAddress = webserverAddress + "/receive_slave"
 	var idList IdList
 	for slaveName := range slaveIPs {
         idList.Id = append(idList.Id, slaveName)
     }
 	jsonMessage, err := json.Marshal(idList)
-	_,err = client.Post(webserverReceiveSlaveAddress, "application/json", strings.NewReader(string(jsonMessage)))
+	_,err = client.Post(webserverAddress, "application/json", strings.NewReader(string(jsonMessage)))
 	return err
 
 }
