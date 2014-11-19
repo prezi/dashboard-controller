@@ -10,20 +10,11 @@ import (
 	"sort"
 )
 
-
 func TestInitializeSlaveIPs(t *testing.T) {
 	slaveIPMap := initializeSlaveIPs()
 
 	assert.Equal(t, "http://10.0.0.122:8080", slaveIPMap["1"])
 	assert.Equal(t, "http://10.0.1.11:8080", slaveIPMap["2"])
-}
-
-func TestReceiveAndMapSlaveAddress(t *testing.T) {
-
-}
-
-func TestSendValidSlaveToWebserver(t *testing.T) {
-
 }
 
 func TestPrintServerConfirmation(t *testing.T) {
@@ -40,12 +31,10 @@ func TestSendSlaveToWebserver(t *testing.T) {
 		returnedIds = idlist.Id
 
 	}))
-	slaveIPs := make(map[string]string)
-	slaveIPs["1"] = "http://10.0.0.122:8080"
-	slaveIPs["2"] = "http://10.0.1.11:8080"
+	slaveIPs := initializeSlaveIPs()
 	sendSlaveToWebserver([]string{testServer.URL}, slaveIPs)
 	validIdList := []string{"1","2"}
 	sort.Strings(validIdList)
 	sort.Strings(returnedIds)
-	assert.Equal(t,returnedIds,validIdList)
+	assert.Equal(t, returnedIds, validIdList)
 }
