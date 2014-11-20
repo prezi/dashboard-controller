@@ -8,6 +8,7 @@ import (
 )
 
 const testURL = "http://www.placekitten.com"
+const testBrowser = false
 
 func TestBrowserHandler(t *testing.T) {
 	OS := "Some Unknown OS"
@@ -20,17 +21,25 @@ func TestBrowserHandler(t *testing.T) {
 }
 
 func TestKillBrowserOS_X(t *testing.T) {
+	if testBrowser {
 	killBrowser("OS X")
+	}
 }
 
 func TestKillBrowserLinux(t *testing.T) {
+	if testBrowser {
 	killBrowser("Linux")
+	}
 }
 
 func TestOpenBrowserOS_X(t *testing.T) {
+	if testBrowser {
 	openBrowser("OS X", testURL)
+	}
 }
 
 func TestOpenBrowserLinux(t *testing.T) {
+	if testBrowser {
 	openBrowser("Linux", testURL)
+	}
 }

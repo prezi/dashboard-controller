@@ -53,7 +53,7 @@ func openBrowser(OS, url string) (err error) {
 	switch OS {
 	case "Linux":
 		fmt.Printf("Executing command: chromium --kiosk %v\n", url)
-		err = exec.Command("chromium", "--kiosk", url).Run()		
+		err = exec.Command("chromium", "--kiosk", url).Run()
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
 		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()
