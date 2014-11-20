@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"net/url"
-	"regexp"
+	"net"
 )
 
 const DEFAULT_LOCALHOST_PORT = 8080
@@ -27,7 +27,7 @@ func SetUp() (port int, slaveName, masterIP, OS string) {
 		fmt.Printf("Error setting DISPLAY environment variable: %v\n", err)
 	}
 
-	slaveIPAddress := getIPAddressFromCmdLine(port)
+	slaveIPAddress := getIPAddress(port)
 	masterIPAddressToReceiveSlave := getMasterReceiveSlaveAddress(masterIP)
 	sendIPAddressToMaster(slaveName, slaveIPAddress, masterIPAddressToReceiveSlave)
 
@@ -54,12 +54,12 @@ func getOS() (OS string) {
 	// fmt.Println("cmd", operatingSystemName)
 
 	if err != nil {
-		fmt.Printf("Error encountered while reading kernal: %v\n", err)
+		fmt.Printf("Error encountered while reading kernel: %v\n", err)
 		kernel = "Unknown"
 	} else {
 		kernel = strings.Split(operatingSystemName, " ")[0]
 	}
-	fmt.Println("Kernal detected: ", kernel)
+	fmt.Println("Kernel detected: ", kernel)
 
 	switch kernel {
 	case "Linux":
@@ -80,18 +80,24 @@ func getOS() (OS string) {
 	return OS
 }
 
-func getIPAddressFromCmdLine(port int) (IPAddress string) {
-	cmd := exec.Command("ifconfig")
-	IPAddressBytes, _ := cmd.Output()
-	IPAddress = string(IPAddressBytes)
-	inetAddressRegexpPattern := "inet (addr:)?([0-9]*\\.){3}[0-9]*"
-	re := regexp.MustCompile(inetAddressRegexpPattern)
-	IPAddress = re.FindAllString(IPAddress, -1)[1]
-	IPAddress = strings.Split(IPAddress, " ")[1]
+func getIPAddress(port int) (IPAddress string) {
+	name, err := os.Hostname()
+	if err != nil {
+		fmt.Printf("ERROR: %v\n", err)
+		os.Exit(1)
+	}
 
+	IPAddressArray, err := net.LookupHost(name)
+
+	if err != nil {
+		fmt.Printf("ERROR: %v\n", err)
+		os.Exit(1)
+	}
+
+	IPAddress = IPAddressArray[0]
 	slaveAddressArray := []string{"http://", IPAddress,":", strconv.Itoa(port)}
 	IPAddress = strings.Join(slaveAddressArray, "")
-
+	
 	return IPAddress
 }
 
@@ -105,7 +111,7 @@ func sendIPAddressToMaster(slaveName string, slaveIPAddress string, masterAddres
 	form := url.Values{}
 	form.Set("slaveName", slaveName)
 	form.Set("slaveIPAddress", slaveIPAddress)
-	fmt.Println("slaveIPAddress: ", slaveIPAddress)
+	// fmt.Println("slaveIPAddress: ", slaveIPAddress)
 
 	_, err := client.PostForm(masterAddress, form)
 

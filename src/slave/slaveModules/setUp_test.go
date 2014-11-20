@@ -16,8 +16,8 @@ func TestSetUp(t *testing.T) {
 	assert.IsType(t, "Some OS Name", OS)
 }
 
-func TestGetIPAddressFromCmdLine(t *testing.T) {
-	IPAddress := getIPAddressFromCmdLine(8080)
+func TestGetIPAddress(t *testing.T) {
+	IPAddress := getIPAddress(8080)
 	IPAddressRegexpPattern := "([0-9]*\\.){3}[0-9]*:[0-9]*"
 	re := regexp.MustCompile(IPAddressRegexpPattern)
 	assert.Equal(t, true, re.MatchString(IPAddress))
