@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"io/ioutil"
+	"network"
 )
 
 var MASTER_URL = "http://localhost:5000"
@@ -41,6 +42,8 @@ var id_list = IdList{
 
 func main() {
 	fs := http.FileServer(http.Dir(STATIC_PATH))
+	_ = network.GetUrl("4003")
+
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", formHandler)
 	http.HandleFunc("/form-submit", submitHandler)
