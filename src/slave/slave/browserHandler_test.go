@@ -1,4 +1,4 @@
-package slaveModule
+package slave
 
 import (
 	"net/http"
@@ -8,7 +8,9 @@ import (
 )
 
 const testURL = "http://www.placekitten.com"
-const testBrowser = false
+const testBrowser = false 
+
+// TODO: This code can be greatly improved. 
 
 func TestBrowserHandler(t *testing.T) {
 	OS := "Some Unknown OS"

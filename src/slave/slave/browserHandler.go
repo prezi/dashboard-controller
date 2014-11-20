@@ -1,4 +1,4 @@
-package slaveModule
+package slave
 
 import (
 	"net/http"

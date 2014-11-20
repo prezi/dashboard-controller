@@ -1,25 +1,19 @@
 package main
 
 import (
-	"slave/slaveModules"
-	"fmt"
+	"slave/slave"
+	"network"
 	"net/http"
-	"os"
 	"strconv"
 )
 
 func main() {
-	port, slaveName, masterIP, OS := slaveModule.SetUp()
-	go slaveModule.Heartbeat(1, slaveName, masterIP)
+	port, slaveName, masterURL, OS := slave.SetUp()
+	go slave.Heartbeat(1, slaveName, masterURL)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		slaveModule.BrowserHandler(w, r, OS)
+		slave.BrowserHandler(w, r, OS)
 		})
 	err := http.ListenAndServe(":" + strconv.Itoa(port), nil)
-	if err != nil {
-		fmt.Printf("Error starting HTTP server: %v\n", err)
-		fmt.Println("ERROR: Failed to start HTTP server.")
-		fmt.Println("Aborting program.")
-		os.Exit(1)
-	}
+	network.ErrorHandler(err, "Error starting HTTP server: %v\n")
 }

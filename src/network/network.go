@@ -1,69 +1,64 @@
 package network
 
 import (
-	"strings"
-	"regexp"
-	"os/exec"
 	"net"
 	"net/url"
 	"net/http"
 	"fmt"
+	"os"
+	"strconv"
 )
 
 const DEFAULT_SLAVE_NAME = "SLAVE NAME UNSPECIFIED"
 
-func GetUrl(port string) string {
-	IPAddressBytes := getIPAddressBytesFromCmdLine()
+func GetLocalIPAddress() (IPAddress string) {
+	name, err := os.Hostname()
+	if err != nil {
+		fmt.Printf("ERROR: %v\n", err)
+		os.Exit(1)
+	}
 
-	return addProtocolAndPortToIp(parseIpAddress(IPAddressBytes), port)
-}
-func getIPAddressBytesFromCmdLine() (IPAddressWithNoise string) {
-	cmd := exec.Command("ifconfig")
-	IPAddressBytes, _ := cmd.Output()
-	IPAddressWithNoise = string(IPAddressBytes)
-	return
-}
+	IPAddressArray, err := net.LookupHost(name)
 
-func parseIpAddress(IPAddress string) string {
-	inetAddressRegexpPattern := "inet (addr:)?([0-9]*\\.){3}[0-9]*"
-	re := regexp.MustCompile(inetAddressRegexpPattern)
-	IPAddress = re.FindAllString(IPAddress, -1)[1]
-	IPAddress = strings.Split(IPAddress, " ")[1]
-	return IPAddress
+	if err != nil {
+		fmt.Printf("ERROR: %v\n", err)
+		os.Exit(1)
+	}
+
+	return IPAddressArray[0]
 }
 
-func addProtocolAndPortToIp(IPAddress string, port string) string {
-	hostIPWithPort := net.JoinHostPort(IPAddress, port)
-	url := "http://"
-	url += hostIPWithPort
-	return url
+func AddProtocolAndPortToIP(IPAddress string, port int) (url string) {
+	hostIPWithPort := net.JoinHostPort(IPAddress, strconv.Itoa(port))
+	return "http://" + hostIPWithPort
 }
 
-func GetMasterUrl(masterIPAddress string) (masterAddress string) {
-	masterIPAddressAndExtentionArray := []string{"http://", masterIPAddress, "/receive_slave"}
-	return strings.Join(masterIPAddressAndExtentionArray, "")
+func ErrorHandler(err error, message string) (errorOccurred bool) {
+	if err != nil {
+		fmt.Printf(message, err)
+		fmt.Println("Aborting program.")
+		// os.Exit(1)
+		return true
+	}	
+	return false
 }
 
-func sendIPAddressToMaster(slaveName string, slaveIPAddress string, masterAddress string) {
+func sendSlaveURLToMaster(slaveName, slaveURL, masterURL string) {
 	client := &http.Client{}
-form := url.Values{}
-form.Set("slaveName", slaveName)
-form.Set("slaveIPAddress", slaveIPAddress)
-fmt.Println("slaveIPAddress: ", slaveIPAddress)
+	form := url.Values{}
+	form.Set("slaveName", slaveName)
+	form.Set("slaveURL", slaveURL)
+	fmt.Println("slaveURL: ", slaveURL)
 
-_, err := client.PostForm(masterAddress, form)
+	_, err := client.PostForm(masterURL, form)
 
-if err != nil {
-fmt.Printf("Error communicating with master: %v\n", err)
-fmt.Println("Aborting program.")
-// os.Exit(1)
-}
+	ErrorHandler(err, "Error communicating with master: %v\n")
 
-fmt.Printf("Slave mapped to master at %v.\n", masterAddress)
-fmt.Printf("Slave Name: %v.\n", slaveName)
-if slaveName == DEFAULT_SLAVE_NAME {
-fmt.Println("TIP: Specify slave name at startup with the flag '-slaveName'")
-fmt.Println("eg. -slaveName=\"Main Lobby\"")
-}
-fmt.Printf("\n\n")
+	fmt.Printf("Slave mapped to master at %v.\n", masterURL)
+	fmt.Printf("Slave Name: %v.\n", slaveName)
+	if slaveName == DEFAULT_SLAVE_NAME {
+		fmt.Println("TIP: Specify slave name at startup with the flag '-slaveName'") 
+		fmt.Println("eg. -slaveName=\"Main Lobby\"")
+	}
+	fmt.Printf("\n\n")
 }

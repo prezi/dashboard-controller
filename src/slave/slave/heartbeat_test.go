@@ -1,4 +1,4 @@
-package slaveModule
+package slave
 
 import (
 	"github.com/stretchr/testify/assert"

@@ -66,13 +66,14 @@ From the repository directory, compile slave code with the command,
 
 Then run the executable with a speficied slave name and master IP address. 
  
-    dashboard-controller$ $GOPATH/bin/slave -slaveName="Main Lobby" -masterIP=10.0.0.195:4949
+    dashboard-controller$ $GOPATH/bin/slave -slaveName="Main Lobby" -masterIP=10.0.0.195
 
-The slave will begin listening on a default port number (8080). Optionally, you can specify a port number for the slave with the -port flag.
+The slave will begin listening on its default port number: 8080. The master's default port number is 5000.
+Optionally, you can specify a port number for the slave and/or master with the -port and -masterPort flags, respectively.
  
-    dashboard-controller$ $GOPATH/bin/slave -slaveName="Main Lobby" -masterIP=10.0.0.195:4949 -port=9999 
+    dashboard-controller$ $GOPATH/bin/slave -slaveName="Main Lobby" -port=9999 -masterIP=10.0.0.195 -masterPort=9090 
     
-The slave will automatically map itself to the master. The slave will periodically emit heartbeats to the master. If the slave's heartbeats do not reach the master for some period of the time, the master will mark the slave as dead and remove it from the map of available slaves. 
+The slave will automatically map itself to the master and periodically emit heartbeats to the master. If the slave's heartbeats do not reach the master for some period of the time, the master will mark the slave as dead and remove it from the map of available slaves. 
 
 Posting a URL
 ------------------
