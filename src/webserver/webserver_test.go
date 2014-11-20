@@ -159,7 +159,6 @@ func TestParseIpAddress(t *testing.T) {
 	parsedIPAddress := parseIpAddress(getIPAddressBytesFromCmdLine())
 	temp_string := ""
 
-	assert.Len(t, parsedIPAddress, 9)
 	assert.IsType(t, temp_string, parsedIPAddress)
 }
 
