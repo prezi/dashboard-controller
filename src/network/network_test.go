@@ -17,7 +17,7 @@ func TestGetLocalIPAddress(t *testing.T) {
 }
 
 func TestAddProtocolAndPortToIP(t *testing.T) {
-	assert.Equal(t, "http://10.0.0.126:1234", AddProtocolAndPortToIP("10.0.0.126", 1234))
+	assert.Equal(t, "http://10.0.0.126:1234", AddProtocolAndPortToIP("10.0.0.126", "1234"))
 }
 
 func TestErrorHandler(t *testing.T) {
@@ -26,8 +26,8 @@ func TestErrorHandler(t *testing.T) {
 	assert.Equal(t, true, ErrorHandler(err, "%v"))
 }
 
-func TestSetMasterUrl(t *testing.T) {
-	masterURL := SetMasterUrl()
+func TestGetMasterUrl(t *testing.T) {
+	masterURL := GetMasterUrl()
 	assert.Equal(t, "http://localhost:5000", masterURL )
 }
 
