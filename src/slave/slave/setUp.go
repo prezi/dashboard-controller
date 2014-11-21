@@ -13,14 +13,14 @@ import (
 
 const (
 	DEFAULT_SLAVE_NAME = "SLAVE NAME UNSPECIFIED"
-	DEFAULT_LOCALHOST_PORT = 8080
+	DEFAULT_LOCALHOST_PORT = "8080"
 	DEFAULT_MASTER_IP_ADDRESS = "localhost"
-	DEFAULT_MASTER_PORT = 5000
+	DEFAULT_MASTER_PORT = "5000"
 )
 
 var err error
 
-func SetUp() (port int, slaveName, masterURL, OS string) {
+func SetUp() (port, slaveName, masterURL, OS string) {
 	port, slaveName, masterIP, masterPort := configFlags()
 	masterURL = network.AddProtocolAndPortToIP(masterIP, masterPort)
 	OS = getOS()
@@ -43,11 +43,11 @@ func SetUp() (port int, slaveName, masterURL, OS string) {
 	return port, slaveName, masterURL, OS
 }
 
-func configFlags() (port int, slaveName, masterIP string, masterPort int) {
-	flag.IntVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
+func configFlags() (port, slaveName, masterIP, masterPort string) {
+	flag.StringVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
 	flag.StringVar(&slaveName, "slaveName", DEFAULT_SLAVE_NAME, "slave name")
 	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")
-	flag.IntVar(&masterPort, "masterPort", DEFAULT_MASTER_PORT, "master port number")
+	flag.StringVar(&masterPort, "masterPort", DEFAULT_MASTER_PORT, "master port number")
 	flag.Parse()
 	return port, slaveName, masterIP, masterPort
 }

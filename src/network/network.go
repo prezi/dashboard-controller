@@ -6,14 +6,13 @@ import (
 	"net/http"
 	"fmt"
 	"os"
-	"strconv"
 	"flag"
 )
 
 const (
 	DEFAULT_SLAVE_NAME = "SLAVE NAME UNSPECIFIED"
 	DEFAULT_MASTER_IP_ADDRESS = "localhost"
-	DEFAULT_MASTER_PORT = 5000
+	DEFAULT_MASTER_PORT = "5000"
 )
 
 func GetLocalIPAddress() (IPAddress string) {
@@ -33,8 +32,8 @@ func GetLocalIPAddress() (IPAddress string) {
 	return IPAddressArray[0]
 }
 
-func AddProtocolAndPortToIP(IPAddress string, port int) (url string) {
-	hostIPWithPort := net.JoinHostPort(IPAddress, strconv.Itoa(port))
+func AddProtocolAndPortToIP(IPAddress, port string) (url string) {
+	hostIPWithPort := net.JoinHostPort(IPAddress, port)
 	return "http://" + hostIPWithPort
 }
 
@@ -52,7 +51,7 @@ func SetMasterUrl() (masterUrl string) {
 	masterIP:= DEFAULT_MASTER_IP_ADDRESS
 	masterPort:= DEFAULT_MASTER_PORT
 	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")
-	flag.IntVar(&masterPort, "masterPort", DEFAULT_MASTER_PORT, "master port number")
+	flag.StringVar(&masterPort, "masterPort", DEFAULT_MASTER_PORT, "master port number")
 	flag.Parse()
 	return AddProtocolAndPortToIP(masterIP, masterPort)
 }
