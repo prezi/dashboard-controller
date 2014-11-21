@@ -19,6 +19,10 @@ func TestAddProtocolAndPortToIP(t *testing.T) {
 	assert.Equal(t, "http://10.0.0.126:1234", AddProtocolAndPortToIP("10.0.0.126", 1234))
 }
 
+func TestSetMasterIP(t *testing.T) {
+
+}
+
 func TestSendSlaveURLToMaster(t *testing.T) {
 	var numberOfMessagesSent = 0
 	handler := http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {

@@ -43,6 +43,10 @@ func ErrorHandler(err error, message string) (errorOccurred bool) {
 	return false
 }
 
+func SetMasterIP() (url string) {
+	return ""
+}
+
 func sendSlaveURLToMaster(slaveName, slaveURL, masterURL string) {
 	client := &http.Client{}
 	form := url.Values{}

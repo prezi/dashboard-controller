@@ -99,7 +99,7 @@ func sendSlaveURLToMaster(slaveName, slaveURL, masterURL string) {
 	fmt.Printf("Slave mapped to master at %v.\n", masterURL)
 	fmt.Printf("Slave Name: %v.\n", slaveName)
 	if slaveName == DEFAULT_SLAVE_NAME {
-		fmt.Println("TIP: Specify slave name at startup with the flag '-slaveName'") 
+		fmt.Println("TIP: Specify slave name at startup with the flag '-slaveName'")
 		fmt.Println("eg. -slaveName=\"Main Lobby\"")
 	}
 	fmt.Printf("\n\n")

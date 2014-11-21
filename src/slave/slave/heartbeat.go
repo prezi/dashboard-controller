@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"network"
-	// "os"
 )
 
 func Heartbeat(heartbeatInterval int, slaveName, masterURL string) (err error) {
@@ -21,7 +20,6 @@ func Heartbeat(heartbeatInterval int, slaveName, masterURL string) (err error) {
 		_, err = client.PostForm(masterURLForHeartbeat, form)
 
 		network.ErrorHandler(err, "Error communicating with master: %v\n")
-		return err
     }
     return nil
 }
