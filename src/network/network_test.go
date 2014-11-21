@@ -26,8 +26,9 @@ func TestErrorHandler(t *testing.T) {
 	assert.Equal(t, true, ErrorHandler(err, "%v"))
 }
 
-func TestSetMasterIP(t *testing.T) {
-
+func TestSetMasterUrl(t *testing.T) {
+	masterURL := SetMasterUrl()
+	assert.Equal(t, "http://localhost:5000", masterURL )
 }
 
 func TestSendSlaveURLToMaster(t *testing.T) {

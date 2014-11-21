@@ -7,9 +7,14 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"flag"
 )
 
-const DEFAULT_SLAVE_NAME = "SLAVE NAME UNSPECIFIED"
+const (
+	DEFAULT_SLAVE_NAME = "SLAVE NAME UNSPECIFIED"
+	DEFAULT_MASTER_IP_ADDRESS = "localhost"
+	DEFAULT_MASTER_PORT = 5000
+)
 
 func GetLocalIPAddress() (IPAddress string) {
 	name, err := os.Hostname()
@@ -43,8 +48,13 @@ func ErrorHandler(err error, message string) (errorOccurred bool) {
 	return false
 }
 
-func SetMasterIP() (url string) {
-	return ""
+func SetMasterUrl() (masterUrl string) {
+	masterIP:= DEFAULT_MASTER_IP_ADDRESS
+	masterPort:= DEFAULT_MASTER_PORT
+	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")
+	flag.IntVar(&masterPort, "masterPort", DEFAULT_MASTER_PORT, "master port number")
+	flag.Parse()
+	return AddProtocolAndPortToIP(masterIP, masterPort)
 }
 
 func sendSlaveURLToMaster(slaveName, slaveURL, masterURL string) {
