@@ -21,8 +21,8 @@ const (
 var err error
 
 func SetUp() (port, slaveName, masterURL, OS string) {
-	port, slaveName = configFlags()
-	masterURL = network.GetMasterUrl()
+	port, slaveName, masterIP, masterPort := configFlags()
+	masterURL = network.AddProtocolAndPortToIP(masterIP, masterPort)
 	OS = getOS()
 	// :0.0 indicates the first screen attached to the first display in localhost
 	err = os.Setenv("DISPLAY",":0.0")
@@ -43,11 +43,13 @@ func SetUp() (port, slaveName, masterURL, OS string) {
 	return port, slaveName, masterURL, OS
 }
 
-func configFlags() (port, slaveName string) {
+func configFlags() (port, slaveName, masterIP, masterPort string) {
 	flag.StringVar(&port, "port", DEFAULT_LOCALHOST_PORT, "the port to listen on for commands")
 	flag.StringVar(&slaveName, "slaveName", DEFAULT_SLAVE_NAME, "slave name")
+	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")
+	flag.StringVar(&masterPort, "masterPort", DEFAULT_MASTER_PORT, "master port number")
 	flag.Parse()
-	return port, slaveName
+	return port, slaveName, masterIP, masterPort
 }
 
 func getOS() (OS string) {

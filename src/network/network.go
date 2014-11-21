@@ -47,7 +47,7 @@ func ErrorHandler(err error, message string) (errorOccurred bool) {
 	return false
 }
 
-func GetMasterUrl() (masterUrl string) {
+func SetMasterUrl() (masterUrl string) {
 	masterIP:= DEFAULT_MASTER_IP_ADDRESS
 	masterPort:= DEFAULT_MASTER_PORT
 	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")

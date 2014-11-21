@@ -4,6 +4,7 @@ import (
 	"slave/slave"
 	"network"
 	"net/http"
+	"strconv"
 )
 
 func main() {
@@ -13,6 +14,6 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		slave.BrowserHandler(w, r, OS)
 		})
-	err := http.ListenAndServe(":" + port, nil)
+	err := http.ListenAndServe(":" + strconv.Itoa(port), nil)
 	network.ErrorHandler(err, "Error starting HTTP server: %v\n")
 }
