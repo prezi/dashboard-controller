@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"net/http"
 	"net/http/httptest"
+	"errors"
 )
 
 func TestGetLocalIPAddress(t *testing.T) {
@@ -17,6 +18,12 @@ func TestGetLocalIPAddress(t *testing.T) {
 
 func TestAddProtocolAndPortToIP(t *testing.T) {
 	assert.Equal(t, "http://10.0.0.126:1234", AddProtocolAndPortToIP("10.0.0.126", 1234))
+}
+
+func TestErrorHandler(t *testing.T) {
+	assert.Equal(t, false, ErrorHandler(nil, "This is an error message."))
+	err := errors.New("This is an error message.")
+	assert.Equal(t, true, ErrorHandler(err, "%v"))
 }
 
 func TestSetMasterIP(t *testing.T) {
