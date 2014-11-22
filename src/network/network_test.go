@@ -3,21 +3,13 @@ package network
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"regexp"
 	"net/http"
 	"net/http/httptest"
 	"errors"
 )
 
-func TestGetLocalIPAddress(t *testing.T) {
-	IPAddress := GetLocalIPAddress()
-	IPAddressRegexpPattern := "([0-9]*\\.){3}[0-9]*"
-	re := regexp.MustCompile(IPAddressRegexpPattern)
-	assert.Equal(t, true, re.MatchString(IPAddress))
-}
-
 func TestAddProtocolAndPortToIP(t *testing.T) {
-	assert.Equal(t, "http://10.0.0.126:1234", AddProtocolAndPortToIP("10.0.0.126", 1234))
+	assert.Equal(t, "http://10.0.0.126:1234", AddProtocolAndPortToIP("10.0.0.126", "1234"))
 }
 
 func TestErrorHandler(t *testing.T) {
