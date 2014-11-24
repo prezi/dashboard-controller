@@ -32,21 +32,25 @@ func killBrowser(OS string) (err error) {
 	return
 }
 
-func blockWhileBrowserCloses(OS string) {
-	var existingProcess []byte
-	for {
-		switch OS {
-		case "Linux":
-			time.Sleep(75 * time.Millisecond)
-			existingProcess, err = exec.Command("pgrep", "chromium").CombinedOutput()		
-		case "OS X":
-			time.Sleep(75 * time.Millisecond)
-			existingProcess, err = exec.Command("pgrep", "Google Chrome").CombinedOutput()
-		}
-		if len(existingProcess) == 0 {
-			break
-		}
+func blockWhileBrowserCloses(OS string) (err error){
+	existingProcess, err := getProcessList(OS)
+	for len(existingProcess) != 0 {
+		time.Sleep(100 * time.Millisecond)
+		existingProcess, err = getProcessList(OS)
 	}
+	return
+}
+
+func getProcessList(OS string) (existingProcess []byte,err error) {
+	switch OS {
+	case "Linux":
+		time.Sleep(75 * time.Millisecond)
+		existingProcess, err = exec.Command("pgrep", "chromium").CombinedOutput()		
+	case "OS X":
+		time.Sleep(75 * time.Millisecond)
+		existingProcess, err = exec.Command("pgrep", "Google Chrome").CombinedOutput()
+	}
+	return
 }
 
 func openBrowser(OS, url string) (err error) {
