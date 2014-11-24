@@ -1,4 +1,4 @@
-package masterModule
+package master
 
 import (
 	"net/http"
@@ -15,6 +15,20 @@ func TestInitializeSlaveIPs(t *testing.T) {
 
 	assert.Equal(t, "http://10.0.0.122:8080", slaveIPMap["1"])
 	assert.Equal(t, "http://10.0.1.11:8080", slaveIPMap["2"])
+}
+
+func TestDestinationAddressSlave1(t *testing.T) {
+	slaveIPMap = SetUp()
+	destinationURL := destinationSlaveAddress("1")
+
+	assert.Equal(t, "http://10.0.0.122:8080", destinationURL)
+}
+
+func TestDestinationAddressSlave2(t *testing.T) {
+	slaveIPMap = SetUp()
+	destinationURL := destinationSlaveAddress("2")
+
+	assert.Equal(t, "http://10.0.1.11:8080", destinationURL)
 }
 
 func TestPrintServerConfirmation(t *testing.T) {
