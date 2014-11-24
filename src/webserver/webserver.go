@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"io/ioutil"
+	"errors"
+	"net/url"
 )
 
 var MASTER_URL = "http://localhost:5000"
@@ -40,6 +42,7 @@ var id_list = IdList{
 }
 
 func main() {
+	requestSlaveIdsOnStart(MASTER_URL,"/webserver-init")
 	fs := http.FileServer(http.Dir(STATIC_PATH))
 
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
@@ -47,6 +50,23 @@ func main() {
 	http.HandleFunc("/form-submit", submitHandler)
 	http.HandleFunc("/receive_slave", receiveAndMapSlaveAddress)
 	http.ListenAndServe(":4003", nil)
+}
+
+func requestSlaveIdsOnStart(masterUrl,pattern string) (err error) {
+	err = nil
+	postRequestUrl := masterUrl
+	postRequestUrl += pattern
+	client := &http.Client{}
+	form := url.Values{}
+	form.Set("message","send_me_the_list")
+	resp, err := client.PostForm(postRequestUrl,form)
+	if err != nil {
+		return
+	}
+	if resp.StatusCode != 200 {
+		err = errors.New("Master is not available")
+	}
+	return
 }
 
 func formHandler(response_writer http.ResponseWriter, request *http.Request) {
