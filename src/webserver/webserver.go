@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"errors"
 	"net/url"
+	"os"
 )
 
 var MASTER_URL = "http://localhost:5000"
@@ -76,9 +77,11 @@ func formHandler(response_writer http.ResponseWriter, request *http.Request) {
 		}
 		template, err := template.ParseFiles(path.Join(TEMPLATE_PATH, "form.html"))
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Html files not found. Please restart from the root folder.")
+			os.Exit(1)
+		} else {
+			template.Execute(response_writer, id_list)
 		}
-		template.Execute(response_writer, id_list)
 	}
 }
 
