@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"flag"
+	"strings"
 )
 
 const (
@@ -22,14 +23,15 @@ func GetLocalIPAddress() (IPAddress string) {
 		os.Exit(1)
 	}
 
-	IPAddressArray, err := net.LookupHost(name)
-
+	InterfaceAddress, err := net.InterfaceAddrs()
 	if err != nil {
 		fmt.Printf("ERROR: %v\n", err)
 		os.Exit(1)
 	}
-
-	return IPAddressArray[0]
+	fmt.Println("Name:",name)
+	fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+	fmt.Println("Own IP:",InterfaceAddress)
+	return strings.Split(InterfaceAddress[1].String(),"/")[0]
 }
 
 func AddProtocolAndPortToIP(IPAddress, port string) (url string) {
