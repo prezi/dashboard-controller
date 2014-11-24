@@ -8,6 +8,7 @@ import (
 	"os"
 	"flag"
 	"strings"
+	"os/exec"
 )
 
 const (
@@ -23,15 +24,58 @@ func GetLocalIPAddress() (IPAddress string) {
 		os.Exit(1)
 	}
 
-	InterfaceAddress, err := net.InterfaceAddrs()
+	OS := GetOS()
+	switch OS {
+	case "OSX":
+		IPAddressArray, _ := net.LookupHost(name)
+		IPAddress = IPAddressArray[0]
+	case "Linux":
+		InterfaceAddress, _ := net.InterfaceAddrs()
+		IPAddress = strings.Split(InterfaceAddress[1].String(),"/")[0]
+	default:
+		IPAddressArray, _ := net.LookupHost(name)
+		IPAddress = IPAddressArray[0]
+	}
+
 	if err != nil {
 		fmt.Printf("ERROR: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Println("Name:",name)
-	fmt.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-	fmt.Println("Own IP:",InterfaceAddress)
-	return strings.Split(InterfaceAddress[1].String(),"/")[0]
+
+	return
+}
+
+func GetOS() (OS string) {
+	operatingSystemBytes, err := exec.Command("uname", "-a").Output() // display operating system name...why do we need the -a?
+	operatingSystemName := string(operatingSystemBytes)
+
+	var kernel string
+	// fmt.Println("cmd", operatingSystemName)
+
+	if ErrorHandler(err, "Error encountered while reading kernel: %v\n") {
+		kernel = "Unknown"
+	} else {
+		kernel = strings.Split(operatingSystemName, " ")[0]
+	}
+	fmt.Println("Kernel detected: ", kernel)
+
+	switch kernel {
+	case "Linux":
+		OS = "Linux"
+	case "Darwin":
+		OS = "OS X"
+	default:
+		OS = "Unknown"
+	}
+
+	if (OS == "Unknown") {
+		fmt.Println("ERROR: Failed to detect operating system.")
+		fmt.Println("Aborting program.")
+		os.Exit(1)
+	} else {
+		fmt.Printf("Operating system detected: %v\n", OS)
+	}
+	return OS
 }
 
 func AddProtocolAndPortToIP(IPAddress, port string) (url string) {

@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"os/exec"
-	"strings"
 	"net/url"
 	"network"
 )
@@ -23,7 +21,7 @@ var err error
 func SetUp() (port, slaveName, masterURL, OS string) {
 	port, slaveName, masterIP, masterPort := configFlags()
 	masterURL = network.AddProtocolAndPortToIP(masterIP, masterPort)
-	OS = getOS()
+	OS = network.GetOS()
 	// :0.0 indicates the first screen attached to the first display in localhost
 	err = os.Setenv("DISPLAY",":0.0")
 	if err != nil {
@@ -52,38 +50,7 @@ func configFlags() (port, slaveName, masterIP, masterPort string) {
 	return port, slaveName, masterIP, masterPort
 }
 
-func getOS() (OS string) {
-	operatingSystemBytes, err := exec.Command("uname", "-a").Output() // display operating system name...why do we need the -a?
-	operatingSystemName := string(operatingSystemBytes)
 
-	var kernel string
-	// fmt.Println("cmd", operatingSystemName)
-
-	if network.ErrorHandler(err, "Error encountered while reading kernel: %v\n") {
-		kernel = "Unknown"
-	} else {
-		kernel = strings.Split(operatingSystemName, " ")[0]
-	}
-	fmt.Println("Kernel detected: ", kernel)
-
-	switch kernel {
-	case "Linux":
-		OS = "Linux"
-	case "Darwin":
-		OS = "OS X"
-	default:
-		OS = "Unknown"
-	}
-
-	if (OS == "Unknown") {
-		fmt.Println("ERROR: Failed to detect operating system.")
-		fmt.Println("Aborting program.")
-		os.Exit(1)
-	} else {
-		fmt.Printf("Operating system detected: %v\n", OS)
-	}
-	return OS
-}
 
 func sendSlaveURLToMaster(slaveName, slaveURL, masterURL string) {
 	client := &http.Client{}
