@@ -43,7 +43,6 @@ var id_list = IdList{
 }
 
 func main() {
-	requestSlaveIdsOnStart(MASTER_URL,"/webserver-init")
 	fs := http.FileServer(http.Dir(STATIC_PATH))
 
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
@@ -51,6 +50,7 @@ func main() {
 	http.HandleFunc("/form-submit", submitHandler)
 	http.HandleFunc("/receive_slave", receiveAndMapSlaveAddress)
 	http.ListenAndServe(":4003", nil)
+	requestSlaveIdsOnStart(MASTER_URL,"/webserver-init")
 }
 
 func requestSlaveIdsOnStart(masterUrl,pattern string) (err error) {

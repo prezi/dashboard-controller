@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 	"encoding/json"
-	"sync"
+	// "sync"
 )
 
 var webserverAddress = "http://localhost:4003"// TODO: make dynamic webserver address
@@ -80,15 +80,8 @@ func sendSlaveToWebserver(webserverAddress string, slaveMap map[string]Slave) (e
 func WebserverRequestSlaveIds(writer http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
 	message := request.PostFormValue("message")
 	if message == "send_me_the_list" {
-		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Wait()
-			sendSlaveToWebserver(webserverAddress, slaveMap)
-		}()
-		wg.Done()
-		fmt.Println("Webserver initialized with slave IDs.")
-		return
+		sendSlaveToWebserver(webserverAddress, slaveMap)
+		writer.WriteHeader(200)
 	} else {
 		writer.WriteHeader(500)
 	}
