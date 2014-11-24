@@ -12,6 +12,7 @@ func main() {
 	http.HandleFunc("/", master.ReceiveRequestAndSendToSlave)
 	http.HandleFunc("/receive_slave", master.ReceiveAndMapSlaveAddress)
 	http.HandleFunc("/receive_heartbeat", master.MonitorSlaveHeartbeats)
+	http.HandleFunc("/webserver-init", master.WebserverRequestSlaveIds)
 	go master.MonitorSlaves(3)
 	http.ListenAndServe(":5000", nil)
 }

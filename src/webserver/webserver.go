@@ -62,6 +62,7 @@ func requestSlaveIdsOnStart(masterUrl,pattern string) (err error) {
 	form.Set("message","send_me_the_list")
 	resp, err := client.PostForm(postRequestUrl,form)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 	if resp.StatusCode != 200 {

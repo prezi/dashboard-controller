@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"sort"
+	"net/url"
 )
 
 func TestInitializeSlaveIPs(t *testing.T) {
@@ -51,4 +52,18 @@ func TestSendSlaveToWebserver(t *testing.T) {
 	sort.Strings(validIdList)
 	sort.Strings(returnedIds)
 	assert.Equal(t, returnedIds, validIdList)
+}
+
+func TestWebserverRequestSlaveIds(t *testing.T) {
+	testServer := httptest.NewServer(http.HandlerFunc(WebserverRequestSlaveIds))
+
+	client := &http.Client{}
+	form := url.Values{}
+	form.Set("message","send_me_the_list")
+	resp, err := client.PostForm(testServer.URL,form)
+	assert.Equal(t, 200, resp.StatusCode)
+	assert.Equal(t, nil, err)
+	form.Set("message","wrong_message")
+	resp, err = client.PostForm(testServer.URL,form)
+	assert.Equal(t, 500 , resp.StatusCode)
 }
