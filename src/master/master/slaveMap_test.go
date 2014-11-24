@@ -1,4 +1,4 @@
-package masterModule
+package master
 
 import (
 	"net/http"

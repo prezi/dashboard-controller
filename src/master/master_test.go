@@ -1,7 +1,7 @@
 package main
 
 import (
-	"master/masterModules"
+	"master/master"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -29,14 +29,14 @@ func TestParseJsonForEmptyInput(t *testing.T) {
 }
 
 func TestDestinationAddressSlave1(t *testing.T) {
-	slaveIPMap = masterModule.SetUp()
+	slaveIPMap = master.SetUp()
 	destinationURL := destinationSlaveAddress("1")
 
 	assert.Equal(t, "http://10.0.0.122:8080", destinationURL)
 }
 
 func TestDestinationAddressSlave2(t *testing.T) {
-	slaveIPMap = masterModule.SetUp()
+	slaveIPMap = master.SetUp()
 	destinationURL := destinationSlaveAddress("2")
 
 	assert.Equal(t, "http://10.0.1.11:8080", destinationURL)

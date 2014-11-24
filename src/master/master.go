@@ -1,7 +1,7 @@
 package main
 
 import (
-	"master/masterModules"
+	"master/master"
 	"net/http"
 	"io/ioutil"
 	"encoding/json"
@@ -17,11 +17,11 @@ type Slave struct {
 var slaveIPMap = make(map[string]string)
 
 func main() {
-	slaveIPMap = masterModule.SetUp()
+	slaveIPMap = master.SetUp()
 	http.HandleFunc("/", sendRequestToSlave)
-	http.HandleFunc("/receive_slave", masterModule.ReceiveAndMapSlaveAddress)
-	http.HandleFunc("/receive_heartbeat", masterModule.MonitorSlaveHeartbeats)
-	go masterModule.MonitorSlaves(3)
+	http.HandleFunc("/receive_slave", master.ReceiveAndMapSlaveAddress)
+	http.HandleFunc("/receive_heartbeat", master.MonitorSlaveHeartbeats)
+	go master.MonitorSlaves(3)
 	http.ListenAndServe(":5000", nil)
 }
 

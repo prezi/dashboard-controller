@@ -1,10 +1,9 @@
-package masterModule
+package master
 
 import (
 	"net/http"
 	"fmt"
 	"strings"
-	// "net/url"
 	"time"
 	"encoding/json"
 )
@@ -15,7 +14,7 @@ var webserverAddress = "http://localhost:4003"// TODO: make dynamic webserver ad
 var slaveIPMap = initializeSlaveIPs()
 var slaveHeartbeatMap = make(map[string]time.Time) 
 // TODO: Create a single map with name as key and IP, heartbeat time as values.
-// Should values be tuples or hashmaps?
+// Should values be lists or hashmaps or objects?
 
 type IdList struct {
 	Id []string
@@ -55,18 +54,8 @@ func ReceiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 
 func MonitorSlaveHeartbeats(_ http.ResponseWriter, request *http.Request) {
 	slaveName := request.PostFormValue("slaveName")
-	heartbeatTimestamp := request.PostFormValue("heartbeatTimestamp")
-
-	timeFormat := "2006-01-02 15:04:05.999999999 -0700 MST"
-	heartbeatTime, err := time.Parse(timeFormat, heartbeatTimestamp)
-
-	if err != nil {
-		fmt.Println("Error encountered when parsing heartbeat timestamp from slave.")
-		fmt.Println("ERROR: ", err)
-	}
-
-	slaveHeartbeatMap[slaveName] = heartbeatTime
-
+	heartbeatTimestamp := time.Now()
+	slaveHeartbeatMap[slaveName] = heartbeatTimestamp
 }
 
 func MonitorSlaves(timeInterval int) {
@@ -101,7 +90,6 @@ func sendSlaveToWebserver(webserverAddress string, slaveIPs map[string]string) (
 	jsonMessage, err := json.Marshal(idList)
 	_,err = client.Post(webserverAddress, "application/json", strings.NewReader(string(jsonMessage)))
 	return err
-
 }
 
 func printServerResponse(error error, slaveName string) {

@@ -15,10 +15,8 @@ func Heartbeat(heartbeatInterval int, slaveName, masterURL string) (err error) {
 	form := url.Values{}
 	form.Set("slaveName", slaveName)
 
-    for now := range beat {
-		form.Set("heartbeatTimestamp", now.String())
+    for _ = range beat {
 		_, err = client.PostForm(masterURLForHeartbeat, form)
-
 		network.ErrorHandler(err, "Error communicating with master: %v\n")
     }
     return nil
