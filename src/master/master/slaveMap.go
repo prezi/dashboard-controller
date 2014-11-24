@@ -40,16 +40,24 @@ func ReceiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 	fmt.Println("Slave URL: ", slaveURL)
 
 	if returnedIPAddress, existsInMap := slaveIPMap[slaveName]; existsInMap {
-
 		fmt.Printf("WARNING: Slave with name \"%v\" already exists with the IP address: %v. \nUpdating %v's IP address to %v.\n", slaveName, returnedIPAddress, slaveName, slaveURL)
-		
 	}
 	slaveIPMap[slaveName] = slaveURL
 	err := sendSlaveToWebserver(webserverAddress, slaveIPMap)
 	printServerResponse(err, slaveName)
+
 	slaveHeartbeatMap[slaveName] = time.Now()
 	fmt.Printf("Mapped \"%v\" to %v.\n", slaveName, slaveURL)
 	fmt.Println("Valid slave IDs are: ", slaveIPMap)
+}
+
+func printServerResponse(error error, slaveName string) {
+	if error != nil {
+		fmt.Printf("Error communicating with webserver: %v\n", error)
+		fmt.Printf("%v not updated on webserver.\n", slaveName)
+	} else {
+		fmt.Printf("Added \"%v\" to webserver slave list.\n", slaveName)
+	}
 }
 
 func MonitorSlaveHeartbeats(_ http.ResponseWriter, request *http.Request) {
@@ -59,8 +67,7 @@ func MonitorSlaveHeartbeats(_ http.ResponseWriter, request *http.Request) {
 }
 
 func MonitorSlaves(timeInterval int) {
-	timer := time.Tick(time.Duration(timeInterval) * time.Second)
-    
+	timer := time.Tick(time.Duration(timeInterval) * time.Second)   
     for _ = range timer {
 		removeDeadSlaves(timeInterval)
     }
@@ -90,13 +97,4 @@ func sendSlaveToWebserver(webserverAddress string, slaveIPs map[string]string) (
 	jsonMessage, err := json.Marshal(idList)
 	_,err = client.Post(webserverAddress, "application/json", strings.NewReader(string(jsonMessage)))
 	return err
-}
-
-func printServerResponse(error error, slaveName string) {
-	if error != nil {
-		fmt.Printf("Error communicating with webserver: %v\n", error)
-		fmt.Printf("%v not updated on webserver.\n", slaveName)
-	} else {
-		fmt.Printf("Added \"%v\" to webserver slave list.\n", slaveName)
-	}
 }
