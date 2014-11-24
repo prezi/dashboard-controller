@@ -11,25 +11,11 @@ import (
 	"net/url"
 )
 
-func TestInitializeSlaveIPs(t *testing.T) {
-	slaveIPMap := initializeSlaveIPs()
+func TestInitializeSlaveMap(t *testing.T) {
+	slaveMap := initializeSlaveMap()
 
-	assert.Equal(t, "http://10.0.0.122:8080", slaveIPMap["1"])
-	assert.Equal(t, "http://10.0.1.11:8080", slaveIPMap["2"])
-}
-
-func TestDestinationAddressSlave1(t *testing.T) {
-	slaveIPMap = SetUp()
-	destinationURL := destinationSlaveAddress("1")
-
-	assert.Equal(t, "http://10.0.0.122:8080", destinationURL)
-}
-
-func TestDestinationAddressSlave2(t *testing.T) {
-	slaveIPMap = SetUp()
-	destinationURL := destinationSlaveAddress("2")
-
-	assert.Equal(t, "http://10.0.1.11:8080", destinationURL)
+	assert.Equal(t, "http://10.0.0.122:8080", slaveMap["slave1"].URL)
+	assert.Equal(t, "http://10.0.1.11:8080", slaveMap["slave2"].URL)
 }
 
 func TestPrintServerConfirmation(t *testing.T) {
@@ -37,7 +23,7 @@ func TestPrintServerConfirmation(t *testing.T) {
 }
 
 func TestSendSlaveToWebserver(t *testing.T) {
-	returnedIds := []string{"1","2"}
+	returnedIds := []string{"slave1","slave2"}
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		POSTRequestBody,_:=ioutil.ReadAll(request.Body)
 		defer request.Body.Close()
@@ -46,16 +32,21 @@ func TestSendSlaveToWebserver(t *testing.T) {
 		returnedIds = idlist.Id
 
 	}))
-	slaveIPs := initializeSlaveIPs()
+	slaveIPs := initializeSlaveMap()
 	sendSlaveToWebserver(testServer.URL, slaveIPs)
-	validIdList := []string{"1","2"}
+	validIdList := []string{"slave1","slave2"}
 	sort.Strings(validIdList)
 	sort.Strings(returnedIds)
 	assert.Equal(t, returnedIds, validIdList)
 }
 
 func TestWebserverRequestSlaveIds(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(WebserverRequestSlaveIds))
+	slaveMap := initializeSlaveMap()
+	WebserverRequestSlaveIdsHandler := func(w http.ResponseWriter, r *http.Request) {
+			WebserverRequestSlaveIds(w, r, slaveMap)
+		}
+
+	testServer := httptest.NewServer(http.HandlerFunc(WebserverRequestSlaveIdsHandler))
 
 	client := &http.Client{}
 	form := url.Values{}

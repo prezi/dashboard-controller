@@ -12,9 +12,9 @@ import (
 	"net/url"
 )
 
-type Slave struct {
-	ID  string
-	URL string
+type PostURLRequest struct {
+	DestinationSlaveName string
+	URLToLoadInBrowser string
 }
 
 func TestRequestSlaveIdsOnStart(t *testing.T) {
@@ -87,8 +87,8 @@ func TestSendUrlAndIdToMaster(t *testing.T) {
 		POSTRequestBody, _ := ioutil.ReadAll(request.Body)
 		defer request.Body.Close()
 		slave := parseJsonSlave(POSTRequestBody)
-		url = slave.URL
-		id = slave.ID
+		url = slave.URLToLoadInBrowser
+		id = slave.DestinationSlaveName
 	}))
 	
 	sendUrlAndIdToMaster(testServer.URL, "http://index.hu", "2")
@@ -97,7 +97,7 @@ func TestSendUrlAndIdToMaster(t *testing.T) {
 	assert.Equal(t, "2", id)
 }
 
-func parseJsonSlave(input []byte) (slave Slave) {
+func parseJsonSlave(input []byte) (slave PostURLRequest) {
 	err := json.Unmarshal(input, &slave)
 	if err != nil {
 		fmt.Println("error:", err)

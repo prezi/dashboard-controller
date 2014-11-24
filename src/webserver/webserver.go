@@ -20,8 +20,8 @@ var TEMPLATE_PATH = "src/webserver/templates/"
 var STATIC_PATH = "src/webserver/static"
 
 type Message struct {
-	ID  string
-	URL string
+	DestinationSlaveName string
+	URLToLoadInBrowser string
 }
 
 type StatusMessage struct {
@@ -39,7 +39,7 @@ type IdList struct {
 }
 
 var id_list = IdList{
-	Id: []string{"1", "2"},
+	Id: []string{"slave1", "slave2"},
 }
 
 func main() {

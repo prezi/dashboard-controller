@@ -8,23 +8,37 @@ import (
 )
 
 func TestParseJson(t *testing.T) {
-	var inputJson = []byte(`{"ID":"LeftScreen","URL":"http://google.com"}`)
+	inputJSON := []byte(`{"DestinationSlaveName": "LeftScreen", "URLToLoadInBrowser": "http://google.com"}`)
 
-	parsedJson, err := parseJson(inputJson)
-
-	assert.Equal(t, "LeftScreen", parsedJson.ID)
-	assert.Equal(t, "http://google.com", parsedJson.URL)
+	parsedJson, err := parseJson(inputJSON)
+	assert.Equal(t, "LeftScreen", parsedJson.DestinationSlaveName)
+	assert.Equal(t, "http://google.com", parsedJson.URLToLoadInBrowser)
+	
 	assert.Nil(t, err)
 }
 
 func TestParseJsonForEmptyInput(t *testing.T) {
-	var inputJson = []byte(`{}`)
+	var inputJSON = []byte(`{}`)
 
-	parsedJson, err := parseJson(inputJson)
+	parsedJson, err := parseJson(inputJSON)
 
-	assert.Equal(t, "", parsedJson.ID)
-	assert.Equal(t, "", parsedJson.URL)
+	assert.Equal(t, "", parsedJson.DestinationSlaveName)
+	assert.Equal(t, "", parsedJson.URLToLoadInBrowser)
 	assert.Nil(t, err)
+}
+
+func TestDestinationAddressSlave1(t *testing.T) {
+	slaveMap := SetUp()
+	destinationURL := destinationSlaveAddress("slave1", slaveMap)
+
+	assert.Equal(t, "http://10.0.0.122:8080", destinationURL)
+}
+
+func TestDestinationAddressSlave2(t *testing.T) {
+	slaveMap := SetUp()
+	destinationURL := destinationSlaveAddress("slave2", slaveMap)
+
+	assert.Equal(t, "http://10.0.1.11:8080", destinationURL)
 }
 
 func TestSendUrlValueMessageToSlave(t *testing.T) {

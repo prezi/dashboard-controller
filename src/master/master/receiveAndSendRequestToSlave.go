@@ -8,44 +8,44 @@ import (
 	"net/url"
 )
 
-type Slave struct {
-	ID string
-	URL string
+type PostURLRequest struct {
+	DestinationSlaveName string
+	URLToLoadInBrowser string
 }
 
-func ReceiveRequestAndSendToSlave(_ http.ResponseWriter, request *http.Request) {
+func ReceiveRequestAndSendToSlave(_ http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
 	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
 	defer request.Body.Close()
 
 	slave, _ := parseJson(POSTRequestBody)
-	destinationSlaveAddress := destinationSlaveAddress(slave.ID)
+	destinationSlaveAddress := destinationSlaveAddress(slave.DestinationSlaveName, slaveMap)
 	if destinationSlaveAddress == "" {
 		fmt.Println("Abandoning request.")
 		return
 	}
 
-	fmt.Printf("\nSending %v to %v at %v", slave.URL, slave.ID, destinationSlaveAddress)
-	sendUrlValueMessageToSlave(destinationSlaveAddress, slave.URL)
+	fmt.Printf("\nSending %v to %v at %v", slave.URLToLoadInBrowser, slave.DestinationSlaveName, destinationSlaveAddress)
+	sendUrlValueMessageToSlave(destinationSlaveAddress, slave.URLToLoadInBrowser)
 }
 
-func parseJson(input []byte) (slave Slave, err error) {
-	err = json.Unmarshal(input, &slave)
+func parseJson(input []byte) (request PostURLRequest, err error) {
+	err = json.Unmarshal(input, &request)
 	if err != nil {
 		fmt.Println("error:", err)
 	}
-	return slave, err
+	return request, err
 }
 
-func destinationSlaveAddress(slaveID string) (slaveAddress string) {
-	if len(slaveIPMap) == 0 {
+func destinationSlaveAddress(slaveName string, slaveMap map[string]Slave) (slaveAddress string) {
+	if len(slaveMap) == 0 {
 		fmt.Println("ERROR: No slaves available.")
 		return
 	}
 
-	slaveAddress = slaveIPMap[slaveID]
+	slaveAddress = slaveMap[slaveName].URL
 	if slaveAddress ==  "" {
-		fmt.Printf("ERROR: \"%v\" is not a valid slave ID.\n", slaveID)
-		fmt.Println("Valid slave IDs are: ", slaveIPMap)
+		fmt.Printf("ERROR: \"%v\" is not a valid slave ID.\n", slaveName)
+		fmt.Println("Valid slave IDs are: ", slaveMap)
 		return
 	}
 	return slaveAddress

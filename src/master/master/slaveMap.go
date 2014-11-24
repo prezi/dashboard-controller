@@ -11,45 +11,48 @@ import (
 
 var webserverAddress = "http://localhost:4003"// TODO: make dynamic webserver address
 
-// var slaveIPMap = make(map[string]string)
-var slaveIPMap = initializeSlaveIPs()
-var slaveHeartbeatMap = make(map[string]time.Time) 
-// TODO: Create a single map with name as key and IP, heartbeat time as values.
-// Should values be lists or hashmaps or objects?
+type Slave struct {
+	URL string
+	heartbeat time.Time
+	displayedURL string // TODO: store currently displayed URL for each slave
+}
 
 type IdList struct {
 	Id []string
 }
 
-func SetUp() (slaveMap map[string]string) {
-	return slaveIPMap
+// TODO: Allow user to input names of currently running slaves at master startup.
+// Alternatively, allow to manually add names of currently running slave while the master is running.
+func SetUp() (slaveMap map[string]Slave) {
+	return initializeSlaveMap()  
 }
 
-func initializeSlaveIPs() (slaveIPMap map[string]string) {
-	slaveIPs := make(map[string]string)
-	slaveIPs["1"] = "http://10.0.0.122:8080"
-	slaveIPs["2"] = "http://10.0.1.11:8080"
-
-	return slaveIPs
+func initializeSlaveMap() (slaveMap map[string]Slave) {
+	slaveMap = make(map[string]Slave)
+	slaveMap["slave1"] = Slave{URL: "http://10.0.0.122:8080", heartbeat: time.Now()}
+	slaveMap["slave2"] = Slave{URL: "http://10.0.1.11:8080", heartbeat: time.Now()}
+	return slaveMap
 }
 
-func ReceiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
+func ReceiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
 	slaveName := request.PostFormValue("slaveName")
 	slaveURL := request.PostFormValue("slaveURL")
 	fmt.Printf("\nNEW SLAVE RECEIVED.\n")
 	fmt.Println("Slave Name: ", slaveName)
 	fmt.Println("Slave URL: ", slaveURL)
 
-	if returnedIPAddress, existsInMap := slaveIPMap[slaveName]; existsInMap {
-		fmt.Printf("WARNING: Slave with name \"%v\" already exists with the IP address: %v. \nUpdating %v's IP address to %v.\n", slaveName, returnedIPAddress, slaveName, slaveURL)
+	if returnedSlave, existsInMap := slaveMap[slaveName]; existsInMap {
+		fmt.Printf("WARNING: Slave with name \"%v\" already exists with the IP address: %v. \nUpdating %v's IP address to %v.\n", slaveName, returnedSlave.URL, slaveName, slaveURL)
 	}
-	slaveIPMap[slaveName] = slaveURL
-	err := sendSlaveToWebserver(webserverAddress, slaveIPMap)
+	slaveMap[slaveName] = Slave{URL: slaveURL, heartbeat: time.Now()}
+	err := sendSlaveToWebserver(webserverAddress, slaveMap)
 	printServerResponse(err, slaveName)
 
-	slaveHeartbeatMap[slaveName] = time.Now()
 	fmt.Printf("Mapped \"%v\" to %v.\n", slaveName, slaveURL)
-	fmt.Println("Valid slave IDs are: ", slaveIPMap)
+	fmt.Println("Valid slave IDs are: ")
+	for slaveName, _ := range slaveMap {
+		fmt.Println(slaveName)
+	}
 }
 
 func printServerResponse(error error, slaveName string) {
@@ -61,38 +64,12 @@ func printServerResponse(error error, slaveName string) {
 	}
 }
 
-func MonitorSlaveHeartbeats(_ http.ResponseWriter, request *http.Request) {
-	slaveName := request.PostFormValue("slaveName")
-	heartbeatTimestamp := time.Now()
-	slaveHeartbeatMap[slaveName] = heartbeatTimestamp
-}
-
-func MonitorSlaves(timeInterval int) {
-	timer := time.Tick(time.Duration(timeInterval) * time.Second)   
-    for _ = range timer {
-		removeDeadSlaves(timeInterval)
-    }
-}
-
-func removeDeadSlaves(deadTime int) {
-	for slaveName, lastHeartbeatTime := range slaveHeartbeatMap {
-		if time.Now().Sub(lastHeartbeatTime) > time.Duration(deadTime) * time.Second {
-			fmt.Printf("\nREMOVING DEAD SLAVE: %v\n", slaveName)
-			delete(slaveHeartbeatMap, slaveName)
-			delete(slaveIPMap, slaveName)
-			fmt.Println("Updated Slave Map: ", slaveIPMap)
-			fmt.Printf("\n\n")
-			sendSlaveToWebserver(webserverAddress, slaveIPMap)
-		}
-	}
-}
-
-func sendSlaveToWebserver(webserverAddress string, slaveIPs map[string]string) (err error) {
+func sendSlaveToWebserver(webserverAddress string, slaveMap map[string]Slave) (err error) {
 	err = nil
 	client := &http.Client{}
 	webserverAddress = webserverAddress + "/receive_slave"
 	var idList IdList
-	for slaveName := range slaveIPs {
+	for slaveName := range slaveMap {
         idList.Id = append(idList.Id, slaveName)
     }
 	jsonMessage, err := json.Marshal(idList)
@@ -100,15 +77,14 @@ func sendSlaveToWebserver(webserverAddress string, slaveIPs map[string]string) (
 	return err
 }
 
-
-func WebserverRequestSlaveIds(writer http.ResponseWriter, request *http.Request) {
+func WebserverRequestSlaveIds(writer http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
 	message := request.PostFormValue("message")
 	if message == "send_me_the_list" {
 		var wg sync.WaitGroup
 		wg.Add(1)
 		go func() {
 			defer wg.Wait()
-			sendSlaveToWebserver(webserverAddress, slaveIPMap)
+			sendSlaveToWebserver(webserverAddress, slaveMap)
 		}()
 		wg.Done()
 		fmt.Println("Webserver initialized with slave IDs.")
