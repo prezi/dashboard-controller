@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 	"encoding/json"
-	// "sync"
 )
 
 var webserverAddress = "http://localhost:4003"// TODO: make dynamic webserver address
+
 
 type Slave struct {
 	URL string

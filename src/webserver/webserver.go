@@ -13,11 +13,18 @@ import (
 	"errors"
 	"net/url"
 	"os"
+	"network"
+	"flag"
 )
 
 var MASTER_URL = "http://localhost:5000"
 var TEMPLATE_PATH = "src/webserver/templates/"
 var STATIC_PATH = "src/webserver/static"
+
+const (
+	DEFAULT_MASTER_IP_ADDRESS = "localhost"
+	DEFAULT_MASTER_PORT = "5000"
+)
 
 type Message struct {
 	DestinationSlaveName string
@@ -44,13 +51,37 @@ var id_list = IdList{
 
 func main() {
 	fs := http.FileServer(http.Dir(STATIC_PATH))
-
+	MASTER_URL = setMasterAddress()
+	RegisterToMaster(MASTER_URL)
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", formHandler)
 	http.HandleFunc("/form-submit", submitHandler)
 	http.HandleFunc("/receive_slave", receiveAndMapSlaveAddress)
 	http.ListenAndServe(":4003", nil)
-	requestSlaveIdsOnStart(MASTER_URL,"/webserver-init")
+	requestSlaveIdsOnStart(MASTER_URL,"/webserver_init")
+}
+
+func RegisterToMaster(masterUrl string) {
+	masterURLForWebserverRegistration := masterUrl + "/register_webserver"
+
+	client := &http.Client{}
+	form := url.Values{}
+	form.Set("webserverUrl", network.GetLocalIPAddress(DEFAULT_MASTER_PORT))
+	_, _ = client.PostForm(masterURLForWebserverRegistration, form)
+}
+
+func setMasterAddress() (masterUrl string) {
+	masterIP, masterPort := configFlags()
+	masterUrl = network.AddProtocolAndPortToIP(masterIP, masterPort)
+
+	return
+}
+
+func configFlags() (masterIP, masterPort string) {
+	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")
+	flag.StringVar(&masterPort, "masterPort", DEFAULT_MASTER_PORT, "master port number")
+	flag.Parse()
+	return masterIP, masterPort
 }
 
 func requestSlaveIdsOnStart(masterUrl,pattern string) (err error) {
