@@ -26,7 +26,7 @@ func GetLocalIPAddress() (IPAddress string) {
 
 	OS := GetOS()
 	switch OS {
-	case "OSX":
+	case "OS X":
 		IPAddressArray, _ := net.LookupHost(name)
 		IPAddress = IPAddressArray[0]
 	case "Linux":
