@@ -34,27 +34,6 @@ func initializeSlaveMap() (slaveMap map[string]Slave) {
 	return slaveMap
 }
 
-func ReceiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
-	slaveName := request.PostFormValue("slaveName")
-	slaveURL := request.PostFormValue("slaveURL")
-	fmt.Printf("\nNEW SLAVE RECEIVED.\n")
-	fmt.Println("Slave Name: ", slaveName)
-	fmt.Println("Slave URL: ", slaveURL)
-
-	if returnedSlave, existsInMap := slaveMap[slaveName]; existsInMap {
-		fmt.Printf("WARNING: Slave with name \"%v\" already exists with the IP address: %v. \nUpdating %v's IP address to %v.\n", slaveName, returnedSlave.URL, slaveName, slaveURL)
-	}
-	slaveMap[slaveName] = Slave{URL: slaveURL, heartbeat: time.Now()}
-	err := sendSlaveToWebserver(webserverAddress, slaveMap)
-	printServerResponse(err, slaveName)
-
-	fmt.Printf("Mapped \"%v\" to %v.\n", slaveName, slaveURL)
-	fmt.Println("Valid slave IDs are: ")
-	for slaveName, _ := range slaveMap {
-		fmt.Println(slaveName)
-	}
-}
-
 func printServerResponse(error error, slaveName string) {
 	if error != nil {
 		fmt.Printf("Error communicating with webserver: %v\n", error)

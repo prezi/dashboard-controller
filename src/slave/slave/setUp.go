@@ -3,9 +3,7 @@ package slave
 import (
 	"flag"
 	"fmt"
-	"net/http"
 	"os"
-	"net/url"
 	"network"
 )
 
@@ -33,7 +31,6 @@ func SetUp() (port, slaveName, masterURL, OS string) {
 
 	masterURLToReceiveSlave := masterURL + "/receive_slave"
 	fmt.Print(slaveName, slaveURL, masterURLToReceiveSlave)
-	// sendSlaveURLToMaster(slaveName, slaveURL, masterURLToReceiveSlave)
 
 	fmt.Printf("Listening on port: %v\n", port)
 	fmt.Println("You can send HTTP POST requests through the command-line with a 'url' parameter to open the url in a browser.")
@@ -51,24 +48,3 @@ func configFlags() (port, slaveName, masterIP, masterPort string) {
 	return port, slaveName, masterIP, masterPort
 }
 
-
-
-func sendSlaveURLToMaster(slaveName, slaveURL, masterURL string) {
-	client := &http.Client{}
-	form := url.Values{}
-	form.Set("slaveName", slaveName)
-	form.Set("slaveURL", slaveURL)
-	fmt.Println("slaveURL: ", slaveURL)
-
-	_, err := client.PostForm(masterURL, form)
-
-	network.ErrorHandler(err, "Error communicating with master: %v\n")
-
-	fmt.Printf("Slave mapped to master at %v.\n", masterURL)
-	fmt.Printf("Slave Name: %v.\n", slaveName)
-	if slaveName == DEFAULT_SLAVE_NAME {
-		fmt.Println("TIP: Specify slave name at startup with the flag '-slaveName'")
-		fmt.Println("eg. -slaveName=\"Main Lobby\"")
-	}
-	fmt.Printf("\n\n")
-}
