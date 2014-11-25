@@ -32,7 +32,8 @@ func SetUp() (port, slaveName, masterURL, OS string) {
 	slaveURL := network.AddProtocolAndPortToIP(slaveIPAddress, port)
 
 	masterURLToReceiveSlave := masterURL + "/receive_slave"
-	sendSlaveURLToMaster(slaveName, slaveURL, masterURLToReceiveSlave)
+	fmt.Print(slaveName, slaveURL, masterURLToReceiveSlave)
+	// sendSlaveURLToMaster(slaveName, slaveURL, masterURLToReceiveSlave)
 
 	fmt.Printf("Listening on port: %v\n", port)
 	fmt.Println("You can send HTTP POST requests through the command-line with a 'url' parameter to open the url in a browser.")
