@@ -28,7 +28,7 @@ func SetUp() (port, slaveName, masterURL, OS string) {
 		fmt.Printf("Error setting DISPLAY environment variable: %v\n", err)
 	}
 
-	slaveIPAddress := network.GetLocalIPAddress()
+	slaveIPAddress := network.GetLocalIPAddress(port)
 	slaveURL := network.AddProtocolAndPortToIP(slaveIPAddress, port)
 
 	masterURLToReceiveSlave := masterURL + "/receive_slave"

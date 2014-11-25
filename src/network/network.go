@@ -9,6 +9,7 @@ import (
 	"flag"
 	"strings"
 	"os/exec"
+	"regexp"
 )
 
 const (
@@ -17,32 +18,32 @@ const (
 	DEFAULT_MASTER_PORT = "5000"
 )
 
-func GetLocalIPAddress() (IPAddress string) {
-	name, err := os.Hostname()
-	if err != nil {
-		fmt.Printf("ERROR: %v\n", err)
-		os.Exit(1)
-	}
+func GetLocalIPAddress(port string) (IPAddress string) {
+	IPAddressBytes := getIPAddressBytesFromCmdLine()
 
-	OS := GetOS()
-	switch OS {
-	case "OS X":
-		IPAddressArray, _ := net.LookupHost(name)
-		IPAddress = IPAddressArray[0]
-	case "Linux":
-		InterfaceAddress, _ := net.InterfaceAddrs()
-		IPAddress = strings.Split(InterfaceAddress[1].String(),"/")[0]
-	default:
-		IPAddressArray, _ := net.LookupHost(name)
-		IPAddress = IPAddressArray[0]
-	}
+	return addProtocolAndPortToIp(parseIpAddress(IPAddressBytes), port)
+}
 
-	if err != nil {
-		fmt.Printf("ERROR: %v\n", err)
-		os.Exit(1)
-	}
-
+func getIPAddressBytesFromCmdLine() (IPAddressWithNoise string) {
+	cmd := exec.Command("ifconfig")
+	IPAddressBytes, _ := cmd.Output()
+	IPAddressWithNoise = string(IPAddressBytes)
 	return
+}
+
+func parseIpAddress(IPAddress string) string {
+	inetAddressRegexpPattern := "inet (addr:)?([0-9]*\\.){3}[0-9]*"
+	re := regexp.MustCompile(inetAddressRegexpPattern)
+	IPAddress = re.FindAllString(IPAddress, -1)[1]
+	IPAddress = strings.Split(IPAddress, " ")[1]
+	return IPAddress
+}
+
+func addProtocolAndPortToIp(IPAddress string, port string) string {
+	hostIPWithPort := net.JoinHostPort(IPAddress, port)
+	protocolWithHostIPAndPort := []string{"http://", hostIPWithPort}
+	url := strings.Join(protocolWithHostIPAndPort, "")
+	return url
 }
 
 func GetOS() (OS string) {
