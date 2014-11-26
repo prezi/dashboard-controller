@@ -44,8 +44,8 @@ func destinationSlaveAddress(slaveName string, slaveMap map[string]Slave) (slave
 
 	slaveAddress = slaveMap[slaveName].URL
 	if slaveAddress == "" {
-		fmt.Printf("ERROR: \"%v\" is not a valid slave ID.\n", slaveName)
-		fmt.Println("Valid slave IDs are: ", slaveMap)
+		fmt.Printf("ERROR: \"%v\" is not a valid slave name.\n", slaveName)
+		fmt.Println("Valid slave names are: ", slaveMap)
 		return
 	}
 	return slaveAddress

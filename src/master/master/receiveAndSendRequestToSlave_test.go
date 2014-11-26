@@ -28,14 +28,14 @@ func TestParseJsonForEmptyInput(t *testing.T) {
 }
 
 func TestDestinationAddressSlave1(t *testing.T) {
-	slaveMap := SetUp()
+	slaveMap := InitializeTestSlaveMap()
 	destinationURL := destinationSlaveAddress("slave1", slaveMap)
 
 	assert.Equal(t, "http://10.0.0.122:8080", destinationURL)
 }
 
 func TestDestinationAddressSlave2(t *testing.T) {
-	slaveMap := SetUp()
+	slaveMap := InitializeTestSlaveMap()
 	destinationURL := destinationSlaveAddress("slave2", slaveMap)
 
 	assert.Equal(t, "http://10.0.1.11:8080", destinationURL)

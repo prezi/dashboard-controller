@@ -30,8 +30,6 @@ func SetUp() (slaveMap map[string]Slave) {
 
 func initializeSlaveMap() (slaveMap map[string]Slave) {
 	slaveMap = make(map[string]Slave)
-	slaveMap["slave1"] = Slave{URL: "http://10.0.0.122:8080", heartbeat: time.Now()}
-	slaveMap["slave2"] = Slave{URL: "http://10.0.1.11:8080", heartbeat: time.Now()}
 	return slaveMap
 }
 
@@ -44,7 +42,7 @@ func printServerResponse(error error, slaveName string) {
 	}
 }
 
-func sendSlaveToWebserver(webserverAddress string, slaveMap map[string]Slave) (err error) {
+func sendSlaveListToWebserver(webserverAddress string, slaveMap map[string]Slave) (err error) {
 	err = nil
 	client := &http.Client{}
 	webserverAddress = webserverAddress + "/receive_slave"
@@ -57,7 +55,7 @@ func sendSlaveToWebserver(webserverAddress string, slaveMap map[string]Slave) (e
 	return err
 }
 
-func WebserverRequestSlaveIds(writer http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
+func WebserverRequestSlaveListAtStartUp(writer http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
 	newWebserverAddress, err := getWebserverAddress(request)
 	if err != nil {
 		writer.WriteHeader(500)
@@ -66,9 +64,8 @@ func WebserverRequestSlaveIds(writer http.ResponseWriter, request *http.Request,
 		if newWebserverAddress != webserverAddress {
 			webserverAddress = newWebserverAddress
 			fmt.Printf(`############## WebserverURL: %v`, webserverAddress)
-			sendSlaveToWebserver(webserverAddress, slaveMap)
+			sendSlaveListToWebserver(webserverAddress, slaveMap)
 		}
-
 	}
 }
 

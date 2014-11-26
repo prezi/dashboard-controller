@@ -13,9 +13,9 @@ func MonitorSlaveHeartbeats(_ http.ResponseWriter, request *http.Request, slaveM
 	if slaveInstance, existsInMap := slaveMap[slaveName]; existsInMap {
 		slaveMap[slaveName] = updateSlaveHeartbeat(slaveInstance, slaveAddress, slaveName)
 	} else {
-		fmt.Printf("Slave added with name %v, IP %v", slaveName, slaveAddress)
+		fmt.Printf("Slave added with name \"%v\", IP %v", slaveName, slaveAddress)
 		slaveMap[slaveName] = Slave{URL: slaveAddress, heartbeat: time.Now()}
-		sendSlaveToWebserver(webserverAddress, slaveMap)
+		sendSlaveListToWebserver(webserverAddress, slaveMap)
 	}
 }
 
@@ -50,16 +50,18 @@ func MonitorSlaves(timeInterval int, slaveMap map[string]Slave) {
 func removeDeadSlaves(deadTime int, slaveMap map[string]Slave) {
 	for slaveName, slave := range slaveMap {
 		if time.Now().Sub(slave.heartbeat) > time.Duration(deadTime)*time.Second {
-			fmt.Printf("\ntime elapsed since last update: %v", time.Now().Sub(slave.heartbeat))
 			fmt.Printf("\nREMOVING DEAD SLAVE: %v\n", slaveName)
 			delete(slaveMap, slaveName)
-			fmt.Println("Updated Slave Map: ")
-			fmt.Println("Valid slave IDs are: ")
-			for slaveName, _ := range slaveMap {
-				fmt.Println(slaveName)
+			fmt.Println("Current slaves are: ")
+			if len(slaveMap) == 0 {
+				fmt.Println("No slaves available.")
+			} else {
+				for slaveName, _ := range slaveMap {
+					fmt.Println(slaveName)
+				}
 			}
 			fmt.Printf("\n\n")
-			sendSlaveToWebserver(webserverAddress, slaveMap)
+			sendSlaveListToWebserver(webserverAddress, slaveMap)
 		}
 	}
 }

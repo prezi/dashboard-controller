@@ -9,10 +9,19 @@ import (
 	"net/url"
 	"sort"
 	"testing"
+	"time"
 )
 
+
+func InitializeTestSlaveMap() (slaveMap map[string]Slave) {
+	slaveMap = make(map[string]Slave)
+	slaveMap["slave1"] = Slave{URL: "http://10.0.0.122:8080", heartbeat: time.Now()}
+	slaveMap["slave2"] = Slave{URL: "http://10.0.1.11:8080", heartbeat: time.Now()}
+	return slaveMap
+}
+
 func TestInitializeSlaveMap(t *testing.T) {
-	slaveMap := initializeSlaveMap()
+	slaveMap := InitializeTestSlaveMap()
 
 	assert.Equal(t, "http://10.0.0.122:8080", slaveMap["slave1"].URL)
 	assert.Equal(t, "http://10.0.1.11:8080", slaveMap["slave2"].URL)
@@ -22,7 +31,7 @@ func TestPrintServerConfirmation(t *testing.T) {
 	printServerResponse(nil, "HelloClient")
 }
 
-func TestSendSlaveToWebserver(t *testing.T) {
+func TestSendSlaveListToWebserver(t *testing.T) {
 	returnedIds := []string{"slave1", "slave2"}
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		POSTRequestBody, _ := ioutil.ReadAll(request.Body)
@@ -32,18 +41,18 @@ func TestSendSlaveToWebserver(t *testing.T) {
 		returnedIds = idlist.Id
 
 	}))
-	slaveIPs := initializeSlaveMap()
-	sendSlaveToWebserver(testServer.URL, slaveIPs)
+	slaveIPs := InitializeTestSlaveMap()
+	sendSlaveListToWebserver(testServer.URL, slaveIPs)
 	validIdList := []string{"slave1", "slave2"}
 	sort.Strings(validIdList)
 	sort.Strings(returnedIds)
 	assert.Equal(t, returnedIds, validIdList)
 }
 
-func TestWebserverRequestSlaveIds(t *testing.T) {
+func TestWebserverRequestSlaveListAtStartUp(t *testing.T) {
 	slaveMap := initializeSlaveMap()
 	WebserverRequestSlaveIdsHandler := func(w http.ResponseWriter, r *http.Request) {
-		WebserverRequestSlaveIds(w, r, slaveMap)
+		WebserverRequestSlaveListAtStartUp(w, r, slaveMap)
 	}
 
 	testServer := httptest.NewServer(http.HandlerFunc(WebserverRequestSlaveIdsHandler))

@@ -181,7 +181,7 @@ func receiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		fmt.Println("error:", err)
 	}
-	fmt.Printf("\nNEW SLAVE RECEIVED.\n")
+	fmt.Printf("\nSLAVE LIST UPDATED.\n")
 	fmt.Println("Slave Name: ", id_list.Id)
 }
 
