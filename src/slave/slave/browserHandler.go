@@ -12,7 +12,6 @@ func BrowserHandler(writer http.ResponseWriter, request *http.Request, OS string
 	killBrowser(OS)
 	openBrowser(OS, url)
 	fmt.Fprintf(writer, "SUCCESS. \"%v\" has been posted.\n", url)
-//	fmt.Println()
 }
 
 func killBrowser(OS string) (err error) {
