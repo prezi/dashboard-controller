@@ -1,16 +1,16 @@
 package master
 
 import (
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 )
 
 type PostURLRequest struct {
 	DestinationSlaveName string
-	URLToLoadInBrowser string
+	URLToLoadInBrowser   string
 }
 
 func ReceiveRequestAndSendToSlave(_ http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
@@ -43,7 +43,7 @@ func destinationSlaveAddress(slaveName string, slaveMap map[string]Slave) (slave
 	}
 
 	slaveAddress = slaveMap[slaveName].URL
-	if slaveAddress ==  "" {
+	if slaveAddress == "" {
 		fmt.Printf("ERROR: \"%v\" is not a valid slave ID.\n", slaveName)
 		fmt.Println("Valid slave IDs are: ", slaveMap)
 		return
@@ -57,5 +57,5 @@ func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string) {
 	form := url.Values{}
 	form.Set("url", urlToDisplay)
 
-	_,_ = client.PostForm(slaveIPAddress, form)
+	_, _ = client.PostForm(slaveIPAddress, form)
 }
