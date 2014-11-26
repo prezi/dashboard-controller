@@ -10,7 +10,6 @@ import (
 	"strings"
 	"testing"
 	"net/url"
-	"network"
 )
 
 type PostURLRequest struct {
@@ -38,17 +37,6 @@ func TestRequestSlaveIdsOnStart(t *testing.T) {
 func TestFormHandler(t *testing.T) {
 	assert.Equal(t, 200, sendGetToFormHandler("/"))
 	assert.Equal(t, 301, sendGetToFormHandler("addfs"))
-}
-
-func TestRegisterToMaster(t *testing.T) {
-	webserverUrl := ""
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		webserverUrl = request.PostFormValue("webserverUrl")
-	}))
-
-	RegisterToMaster(testServer.URL)
-
-	assert.Equal(t, network.GetLocalIPAddress(DEFAULT_MASTER_PORT), webserverUrl)
 }
 
 func TestSetDefaultMasterAddress(t *testing.T) {

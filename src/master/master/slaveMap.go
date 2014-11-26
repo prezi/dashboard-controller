@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"net"
 )
 
 var webserverAddress = "http://localhost:4003"// TODO: make dynamic webserver address
@@ -58,9 +59,18 @@ func sendSlaveToWebserver(webserverAddress string, slaveMap map[string]Slave) (e
 func WebserverRequestSlaveIds(writer http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
 	message := request.PostFormValue("message")
 	if message == "send_me_the_list" {
+		webserverAddress = getWebserverAddress(request)
+		fmt.Println("############## WebserverURL :", webserverAddress)
 		sendSlaveToWebserver(webserverAddress, slaveMap)
 		writer.WriteHeader(200)
 	} else {
 		writer.WriteHeader(500)
 	}
+}
+
+func getWebserverAddress(request *http.Request) (webserverAddress string) {
+	slaveIP,_,_ := net.SplitHostPort(request.RemoteAddr)
+	webserverPort := request.PostFormValue("webserverPort")
+	webserverAddress = "http://" + slaveIP + ":" + webserverPort
+	return
 }

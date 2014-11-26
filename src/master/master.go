@@ -8,9 +8,6 @@ import (
 
 func main() {
 	slaveMap := master.SetUp()
-	http.HandleFunc("/register_webserver", func(w http.ResponseWriter, r *http.Request) {
-		master.MonitorWebserverRegistration(w, r)
-	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		master.ReceiveRequestAndSendToSlave(w, r, slaveMap)
 	})

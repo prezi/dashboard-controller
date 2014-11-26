@@ -24,6 +24,7 @@ var STATIC_PATH = "src/webserver/static"
 const (
 	DEFAULT_MASTER_IP_ADDRESS = "localhost"
 	DEFAULT_MASTER_PORT = "5000"
+	DEFAULT_WEBSERVER_PORT = "4003"
 )
 
 type Message struct {
@@ -52,22 +53,12 @@ var id_list = IdList{
 func main() {
 	fs := http.FileServer(http.Dir(STATIC_PATH))
 	MASTER_URL = setMasterAddress()
-	RegisterToMaster(MASTER_URL)
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", formHandler)
 	http.HandleFunc("/form-submit", submitHandler)
 	http.HandleFunc("/receive_slave", receiveAndMapSlaveAddress)
-	http.ListenAndServe(":4003", nil)
-	requestSlaveIdsOnStart(MASTER_URL,"/webserver_init")
-}
-
-func RegisterToMaster(masterUrl string) {
-	masterURLForWebserverRegistration := masterUrl + "/register_webserver"
-
-	client := &http.Client{}
-	form := url.Values{}
-	form.Set("webserverUrl", network.GetLocalIPAddress(DEFAULT_MASTER_PORT))
-	_, _ = client.PostForm(masterURLForWebserverRegistration, form)
+	go requestSlaveIdsOnStart(MASTER_URL,"/webserver_init")
+	http.ListenAndServe(":" + DEFAULT_WEBSERVER_PORT, nil)
 }
 
 func setMasterAddress() (masterUrl string) {
@@ -90,6 +81,7 @@ func requestSlaveIdsOnStart(masterUrl,pattern string) (err error) {
 	client := &http.Client{}
 	form := url.Values{}
 	form.Set("message","send_me_the_list")
+	form.Set("webserverPort", DEFAULT_WEBSERVER_PORT)
 	resp, err := client.PostForm(postRequestUrl,form)
 	if err != nil {
 		fmt.Println(err)
