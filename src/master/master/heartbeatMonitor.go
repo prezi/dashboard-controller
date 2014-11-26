@@ -5,13 +5,14 @@ import (
 	"net"
 	"net/http"
 	"time"
+	"strconv"
 )
 
 func MonitorSlaveHeartbeats(_ http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
 	slaveName, slaveAddress := processRequest(request)
 
-	if slaveInstance, existsInMap := slaveMap[slaveName]; existsInMap {
-		slaveMap[slaveName] = updateSlaveHeartbeat(slaveInstance, slaveAddress, slaveName)
+	if _, existsInMap := slaveMap[slaveName]; existsInMap {
+		slaveMap = updateSlaveHeartbeat(slaveMap, slaveAddress, slaveName)
 	} else {
 		fmt.Printf("Slave added with name \"%v\", IP %v", slaveName, slaveAddress)
 		slaveMap[slaveName] = Slave{URL: slaveAddress, heartbeat: time.Now()}
@@ -28,16 +29,34 @@ func processRequest(request *http.Request) (slaveName, slaveAddress string) {
 	return
 }
 
-func updateSlaveHeartbeat(slaveInstance Slave, slaveAddress, slaveName string) Slave {
+func updateSlaveHeartbeat(slaveMap map[string]Slave, slaveAddress, slaveName string) map[string]Slave {
+	slaveInstance := slaveMap[slaveName]
 	if slaveInstance.URL != slaveAddress {
-		slaveInstance.URL = slaveAddress
-		fmt.Printf(`WARNING: Slave with name \"%v\" 
-			already exists with the IP address: %v. \n 
-			Updating %v's IP address to %v.\n`,
-			slaveName, slaveInstance.URL, slaveName, slaveAddress)
+		newSlaveName := getNewSlaveName(slaveMap,slaveName)
+		slaveMap[newSlaveName] = Slave{URL: slaveAddress, heartbeat: time.Now()}
+		fmt.Printf(`WARNING: Slave with name \"%v\"
+			already exists with the IP address: %v. \n
+			New slave with IP %v added with name %v\n`,
+			slaveName, slaveInstance.URL, newSlaveName, slaveAddress)
+	} else {
+		slaveInstance.heartbeat = time.Now()
+		slaveMap[slaveName] = slaveInstance
 	}
-	slaveInstance.heartbeat = time.Now()
-	return slaveInstance
+	return slaveMap
+}
+
+func getNewSlaveName(slaveMap map[string]Slave,slaveName string) (newSlaveName string) {
+	for number:=2; ;number++ {
+		newSlaveName = slaveName + "_"+strconv.Itoa(number)
+		fmt.Println(newSlaveName)
+		_, ok := slaveMap[slaveName]
+		if !ok {
+			return
+		}
+//		if _, existInMap := slaveMap[slaveName];  !existInMap {
+//			return
+//		}
+	}
 }
 
 func MonitorSlaves(timeInterval int, slaveMap map[string]Slave) {
