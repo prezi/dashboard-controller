@@ -17,23 +17,6 @@ type PostURLRequest struct {
 	URLToLoadInBrowser string
 }
 
-func TestRequestSlaveIdsOnStart(t *testing.T) {
-	var requestBody string;
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		requestBody = request.PostFormValue("message")
-	}))
-	testServerErrorRespond := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		w.WriteHeader(500)
-	}))
-	err := requestSlaveIdsOnStart(testServer.URL,"")
-	err2 := requestSlaveIdsOnStart("http://www.sdfdgfggdummy.com","")
-	err3 := requestSlaveIdsOnStart(testServerErrorRespond.URL,"")
-	assert.Equal(t, nil, err)
-	assert.NotEqual(t, nil, err2)
-	assert.NotEqual(t, nil, err3)
-	assert.Equal(t, "send_me_the_list", requestBody) 
-}
-
 func TestFormHandler(t *testing.T) {
 	assert.Equal(t, 200, sendGetToFormHandler("/"))
 	assert.Equal(t, 301, sendGetToFormHandler("addfs"))

@@ -50,11 +50,11 @@ func TestWebserverRequestSlaveIds(t *testing.T) {
 
 	client := &http.Client{}
 	form := url.Values{}
-	form.Set("message", "send_me_the_list")
+	form.Set("webserverPort", "5000")
 	resp, err := client.PostForm(testServer.URL, form)
 	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, nil, err)
-	form.Set("message", "wrong_message")
+	form.Set("webserverPort", "")
 	resp, err = client.PostForm(testServer.URL, form)
 	assert.Equal(t, 500, resp.StatusCode)
 }

@@ -9,17 +9,18 @@ import (
 	"path"
 	"strings"
 	"io/ioutil"
-	"errors"
 	"net/url"
 	"os"
 	"network"
 	"flag"
 	"strconv"
+	"time"
 )
 
 var MASTER_URL = "http://localhost:5000"
 var TEMPLATE_PATH = "src/webserver/templates/"
 var STATIC_PATH = "src/webserver/static"
+var WEBSERVER_PORT = "4003"
 
 const (
 	DEFAULT_MASTER_IP_ADDRESS = "localhost"
@@ -57,8 +58,8 @@ func main() {
 	http.HandleFunc("/", formHandler)
 	http.HandleFunc("/form-submit", submitHandler)
 	http.HandleFunc("/receive_slave", receiveAndMapSlaveAddress)
-	go requestSlaveIdsOnStart(MASTER_URL,"/webserver_init")
-	http.ListenAndServe(":" + DEFAULT_WEBSERVER_PORT, nil)
+	go startWebserverHeartbeats(5,MASTER_URL,"/webserver_init")
+	http.ListenAndServe(":" + WEBSERVER_PORT, nil)
 }
 
 func setMasterAddress() (masterUrl string) {
@@ -70,27 +71,23 @@ func setMasterAddress() (masterUrl string) {
 func configFlags() (masterIP, masterPort string) {
 	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")
 	flag.StringVar(&masterPort, "masterPort", DEFAULT_MASTER_PORT, "master port number")
+	flag.StringVar(&WEBSERVER_PORT, "webserverPort", DEFAULT_WEBSERVER_PORT, "webserver port number")
 	flag.Parse()
 	return masterIP, masterPort
 }
 
-func requestSlaveIdsOnStart(masterUrl,pattern string) (err error) {
-	err = nil
+func startWebserverHeartbeats(heartbeatInterval int,masterUrl,pattern string) {
+	var err error
 	postRequestUrl := masterUrl
 	postRequestUrl += pattern
 	client := &http.Client{}
 	form := url.Values{}
-	form.Set("message","send_me_the_list")
-	form.Set("webserverPort", DEFAULT_WEBSERVER_PORT)
-	resp, err := client.PostForm(postRequestUrl,form)
-	if err != nil {
-		fmt.Println(err)
-		return
+	form.Set("webserverPort", WEBSERVER_PORT)
+	beat := time.Tick(time.Duration(heartbeatInterval) * time.Second)
+	for _ = range beat {
+		_, err = client.PostForm(postRequestUrl,form)
+		network.ErrorHandler(err, "Error communicating with master: %v\n")
 	}
-	if resp.StatusCode != 200 {
-		err = errors.New("Master is not available")
-	}
-	return
 }
 
 func formHandler(response_writer http.ResponseWriter, request *http.Request) {
