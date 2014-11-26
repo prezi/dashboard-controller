@@ -133,21 +133,16 @@ func submitHandler(response_writer http.ResponseWriter, request *http.Request) {
 }
 
 func checkStatusCode(urlToDisplay string) int {
-	if len(urlToDisplay) < 4 {
-		return 0
-	}
-
-	if string(urlToDisplay[0:4]) != "http"{
+	if len(urlToDisplay) < 4 || string(urlToDisplay[0:4]) != "http" {
 		urlToDisplay = "http://" + urlToDisplay
 	}
-	
+
     response, err := http.Head(urlToDisplay)
 		if err != nil {
 			return 0
 		} else {
 			return response.StatusCode
 		}
-	
 }
 
 func sendUrlAndIdToMaster(masterUrl, urlToDisplay, id string) error {
