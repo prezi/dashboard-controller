@@ -1,9 +1,9 @@
 package master
 
 import (
-//	"github.com/stretchr/testify/assert"
+	//	"github.com/stretchr/testify/assert"
 	"testing"
-//	"net/http"
+	//	"net/http"
 )
 
 func TestMonitorWebserverRegistration(t *testing.T) {

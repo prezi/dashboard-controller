@@ -1,10 +1,10 @@
 package master
 
 import (
-	"net/http"
 	"fmt"
-	"time"
 	"net"
+	"net/http"
+	"time"
 )
 
 func MonitorSlaveHeartbeats(_ http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
@@ -13,7 +13,7 @@ func MonitorSlaveHeartbeats(_ http.ResponseWriter, request *http.Request, slaveM
 	if slaveInstance, existsInMap := slaveMap[slaveName]; existsInMap {
 		slaveMap[slaveName] = updateSlaveHeartbeat(slaveInstance, slaveAddress, slaveName)
 	} else {
-		fmt.Printf("Slave added with name %v, IP %v",slaveName,slaveAddress)
+		fmt.Printf("Slave added with name %v, IP %v", slaveName, slaveAddress)
 		slaveMap[slaveName] = Slave{URL: slaveAddress, heartbeat: time.Now()}
 	}
 }
@@ -21,17 +21,17 @@ func MonitorSlaveHeartbeats(_ http.ResponseWriter, request *http.Request, slaveM
 func processRequest(request *http.Request) (slaveName, slaveAddress string) {
 	slaveName = request.PostFormValue("slaveName")
 	slavePort := request.PostFormValue("slavePort")
-	slaveIP,_,_ := net.SplitHostPort(request.RemoteAddr)
-	slaveAddress = slaveIP+":"+slavePort
+	slaveIP, _, _ := net.SplitHostPort(request.RemoteAddr)
+	slaveAddress = slaveIP + ":" + slavePort
 	return
 }
 
-func updateSlaveHeartbeat(slaveInstance Slave, slaveAddress, slaveName string) (Slave) {
+func updateSlaveHeartbeat(slaveInstance Slave, slaveAddress, slaveName string) Slave {
 	if slaveInstance.URL != slaveAddress {
 		slaveInstance.URL = slaveAddress
 		fmt.Printf(`WARNING: Slave with name \"%v\" 
 			already exists with the IP address: %v. \n 
-			Updating %v's IP address to %v.\n`, 
+			Updating %v's IP address to %v.\n`,
 			slaveName, slaveInstance.URL, slaveName, slaveAddress)
 	}
 	slaveInstance.heartbeat = time.Now()
@@ -39,16 +39,16 @@ func updateSlaveHeartbeat(slaveInstance Slave, slaveAddress, slaveName string) (
 }
 
 func MonitorSlaves(timeInterval int, slaveMap map[string]Slave) {
-	timer := time.Tick(time.Duration(timeInterval) * time.Second)   
-    for _ = range timer {
+	timer := time.Tick(time.Duration(timeInterval) * time.Second)
+	for _ = range timer {
 		removeDeadSlaves(timeInterval, slaveMap)
-    }
+	}
 }
 
 func removeDeadSlaves(deadTime int, slaveMap map[string]Slave) {
 	for slaveName, slave := range slaveMap {
-		if time.Now().Sub(slave.heartbeat) > time.Duration(deadTime) * time.Second {
-			fmt.Printf("\ntime elapsed since last update: %v",time.Now().Sub(slave.heartbeat))
+		if time.Now().Sub(slave.heartbeat) > time.Duration(deadTime)*time.Second {
+			fmt.Printf("\ntime elapsed since last update: %v", time.Now().Sub(slave.heartbeat))
 			fmt.Printf("\nREMOVING DEAD SLAVE: %v\n", slaveName)
 			delete(slaveMap, slaveName)
 			fmt.Println("Updated Slave Map: ")

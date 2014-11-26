@@ -1,14 +1,14 @@
 package master
 
 import (
-	"net/http"
-	"net/http/httptest"
-	"testing"
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
-	"encoding/json"
-	"sort"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
+	"sort"
+	"testing"
 )
 
 func TestInitializeSlaveMap(t *testing.T) {
@@ -23,18 +23,18 @@ func TestPrintServerConfirmation(t *testing.T) {
 }
 
 func TestSendSlaveToWebserver(t *testing.T) {
-	returnedIds := []string{"slave1","slave2"}
+	returnedIds := []string{"slave1", "slave2"}
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		POSTRequestBody,_:=ioutil.ReadAll(request.Body)
+		POSTRequestBody, _ := ioutil.ReadAll(request.Body)
 		defer request.Body.Close()
-		var idlist IdList;
+		var idlist IdList
 		json.Unmarshal(POSTRequestBody, &idlist)
 		returnedIds = idlist.Id
 
 	}))
 	slaveIPs := initializeSlaveMap()
 	sendSlaveToWebserver(testServer.URL, slaveIPs)
-	validIdList := []string{"slave1","slave2"}
+	validIdList := []string{"slave1", "slave2"}
 	sort.Strings(validIdList)
 	sort.Strings(returnedIds)
 	assert.Equal(t, returnedIds, validIdList)
@@ -43,18 +43,18 @@ func TestSendSlaveToWebserver(t *testing.T) {
 func TestWebserverRequestSlaveIds(t *testing.T) {
 	slaveMap := initializeSlaveMap()
 	WebserverRequestSlaveIdsHandler := func(w http.ResponseWriter, r *http.Request) {
-			WebserverRequestSlaveIds(w, r, slaveMap)
-		}
+		WebserverRequestSlaveIds(w, r, slaveMap)
+	}
 
 	testServer := httptest.NewServer(http.HandlerFunc(WebserverRequestSlaveIdsHandler))
 
 	client := &http.Client{}
 	form := url.Values{}
-	form.Set("message","send_me_the_list")
-	resp, err := client.PostForm(testServer.URL,form)
+	form.Set("message", "send_me_the_list")
+	resp, err := client.PostForm(testServer.URL, form)
 	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, nil, err)
-	form.Set("message","wrong_message")
-	resp, err = client.PostForm(testServer.URL,form)
-	assert.Equal(t, 500 , resp.StatusCode)
+	form.Set("message", "wrong_message")
+	resp, err = client.PostForm(testServer.URL, form)
+	assert.Equal(t, 500, resp.StatusCode)
 }

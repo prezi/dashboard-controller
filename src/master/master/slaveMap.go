@@ -1,19 +1,18 @@
 package master
 
 import (
-	"net/http"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
-	"encoding/json"
 )
 
-var webserverAddress = "http://localhost:4003"// TODO: make dynamic webserver address
-
+var webserverAddress = "http://localhost:4003" // TODO: make dynamic webserver address
 
 type Slave struct {
-	URL string
-	heartbeat time.Time
+	URL          string
+	heartbeat    time.Time
 	displayedURL string // TODO: store currently displayed URL for each slave
 }
 
@@ -24,7 +23,7 @@ type IdList struct {
 // TODO: Allow user to input names of currently running slaves at master startup.
 // Alternatively, allow to manually add names of currently running slave while the master is running.
 func SetUp() (slaveMap map[string]Slave) {
-	return initializeSlaveMap()  
+	return initializeSlaveMap()
 }
 
 func initializeSlaveMap() (slaveMap map[string]Slave) {
@@ -49,10 +48,10 @@ func sendSlaveToWebserver(webserverAddress string, slaveMap map[string]Slave) (e
 	webserverAddress = webserverAddress + "/receive_slave"
 	var idList IdList
 	for slaveName := range slaveMap {
-        idList.Id = append(idList.Id, slaveName)
-    }
+		idList.Id = append(idList.Id, slaveName)
+	}
 	jsonMessage, err := json.Marshal(idList)
-	_,err = client.Post(webserverAddress, "application/json", strings.NewReader(string(jsonMessage)))
+	_, err = client.Post(webserverAddress, "application/json", strings.NewReader(string(jsonMessage)))
 	return err
 }
 

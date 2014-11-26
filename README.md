@@ -37,7 +37,7 @@ Architecture
 Set Up
 ------------------
 
-If you are not familiar with Go and run into trouble with the following instructions, please visit  ["How to Write Go Code"](https://golang.org/doc/code.html) for more details. 
+If you are not familiar with Go and run into trouble with the following instructions, please visit  ["How to Write Go Code"](https://golang.org/doc/code.html) for more details. In particular, pay attention to the GOPATH environment variable. 
 
 ####Webserver and Master
 ------------------

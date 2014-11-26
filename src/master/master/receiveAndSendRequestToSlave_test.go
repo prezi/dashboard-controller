@@ -1,10 +1,10 @@
 package master
 
 import (
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestParseJson(t *testing.T) {
@@ -13,7 +13,7 @@ func TestParseJson(t *testing.T) {
 	parsedJson, err := parseJson(inputJSON)
 	assert.Equal(t, "LeftScreen", parsedJson.DestinationSlaveName)
 	assert.Equal(t, "http://google.com", parsedJson.URLToLoadInBrowser)
-	
+
 	assert.Nil(t, err)
 }
 
