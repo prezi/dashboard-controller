@@ -15,14 +15,16 @@ func MonitorSlaveHeartbeats(_ http.ResponseWriter, request *http.Request, slaveM
 	} else {
 		fmt.Printf("Slave added with name %v, IP %v", slaveName, slaveAddress)
 		slaveMap[slaveName] = Slave{URL: slaveAddress, heartbeat: time.Now()}
+		sendSlaveToWebserver(webserverAddress, slaveMap)
 	}
 }
 
 func processRequest(request *http.Request) (slaveName, slaveAddress string) {
 	slaveName = request.PostFormValue("slaveName")
 	slavePort := request.PostFormValue("slavePort")
-	slaveIP, _, _ := net.SplitHostPort(request.RemoteAddr)
-	slaveAddress = slaveIP + ":" + slavePort
+
+	slaveIP,_,_ := net.SplitHostPort(request.RemoteAddr)
+	slaveAddress = "http://" + slaveIP + ":" + slavePort
 	return
 }
 

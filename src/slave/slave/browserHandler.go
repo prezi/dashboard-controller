@@ -12,6 +12,7 @@ func BrowserHandler(writer http.ResponseWriter, request *http.Request, OS string
 	killBrowser(OS)
 	openBrowser(OS, url)
 	fmt.Fprintf(writer, "SUCCESS. \"%v\" has been posted.\n", url)
+//	fmt.Println()
 }
 
 func killBrowser(OS string) (err error) {
@@ -54,13 +55,14 @@ func getProcessList(OS string) (existingProcess []byte,err error) {
 }
 
 func openBrowser(OS, url string) (err error) {
+	err = nil
 	switch OS {
 	case "Linux":
 		fmt.Printf("Executing command: chromium --kiosk %v\n", url)
-		err = exec.Command("chromium", "--kiosk", url).Run()
+		err = exec.Command("chromium", "--kiosk", url).Start()
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
-		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()
+		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Start()
 	}
 
 	if err != nil {

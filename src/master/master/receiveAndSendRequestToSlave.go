@@ -24,7 +24,7 @@ func ReceiveRequestAndSendToSlave(_ http.ResponseWriter, request *http.Request, 
 		return
 	}
 
-	fmt.Printf("\nSending %v to %v at %v", slave.URLToLoadInBrowser, slave.DestinationSlaveName, destinationSlaveAddress)
+	fmt.Printf("\nSending %v to %v at %v\n", slave.URLToLoadInBrowser, slave.DestinationSlaveName, destinationSlaveAddress)
 	sendUrlValueMessageToSlave(destinationSlaveAddress, slave.URLToLoadInBrowser)
 }
 
@@ -57,5 +57,16 @@ func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string) {
 	form := url.Values{}
 	form.Set("url", urlToDisplay)
 
-	_, _ = client.PostForm(slaveIPAddress, form)
+	response,err := client.PostForm(slaveIPAddress, form)
+	if err !=nil {
+		fmt.Printf("Error slave is not responding: %v\n", err)
+		return
+	}
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Printf("Error reading slave response: %v\n", err)
+		return
+	}
+	defer response.Body.Close()
+	fmt.Printf("Slave message: %v\n",(string(body)))
 }
