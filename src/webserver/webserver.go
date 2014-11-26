@@ -7,7 +7,6 @@ import (
 	"html/template"
 	"net/http"
 	"path"
-	"strconv"
 	"strings"
 	"io/ioutil"
 	"errors"
@@ -15,6 +14,7 @@ import (
 	"os"
 	"network"
 	"flag"
+	"strconv"
 )
 
 var MASTER_URL = "http://localhost:5000"
@@ -73,7 +73,6 @@ func RegisterToMaster(masterUrl string) {
 func setMasterAddress() (masterUrl string) {
 	masterIP, masterPort := configFlags()
 	masterUrl = network.AddProtocolAndPortToIP(masterIP, masterPort)
-
 	return
 }
 
@@ -122,18 +121,33 @@ func submitHandler(response_writer http.ResponseWriter, request *http.Request) {
 		urlToDisplay := request.FormValue("url")
 		slave_ID := request.FormValue("slave-id")
 		status_code := checkStatusCode(urlToDisplay)
-		sendUrlAndIdToMaster(MASTER_URL, urlToDisplay, slave_ID)
-		sendConfirmationMessageToUser(response_writer, strconv.Itoa(status_code), urlToDisplay, slave_ID)
+		statusMessage := ""
+		if 400 <= status_code || status_code == 0 {
+			statusMessage = "URL cannot be open :( (HTTP status code " + strconv.Itoa(status_code) + ")" 
+		} else {
+			sendUrlAndIdToMaster(MASTER_URL, urlToDisplay, slave_ID)
+			statusMessage = "Success!" 
+		}
+		sendConfirmationMessageToUser(response_writer, statusMessage, urlToDisplay, slave_ID)
 	}
 }
 
-func checkStatusCode(link string) int {
-	response, err := http.Head(link)
-	if err != nil {
+func checkStatusCode(urlToDisplay string) int {
+	if len(urlToDisplay) < 4 {
 		return 0
-	} else {
-		return response.StatusCode
 	}
+
+	if string(urlToDisplay[0:4]) != "http"{
+		urlToDisplay = "http://" + urlToDisplay
+	}
+	
+    response, err := http.Head(urlToDisplay)
+		if err != nil {
+			return 0
+		} else {
+			return response.StatusCode
+		}
+	
 }
 
 func sendUrlAndIdToMaster(masterUrl, urlToDisplay, id string) error {
