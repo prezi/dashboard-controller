@@ -3,6 +3,7 @@ package main
 import (
 	"master/master"
 	"net/http"
+	"log"
 )
 
 func main() {
@@ -20,5 +21,5 @@ func main() {
 		master.WebserverRequestSlaveIds(w, r, slaveMap)
 		})
 	go master.MonitorSlaves(3, slaveMap)
-	http.ListenAndServe(":5000", nil)
+	log.Fatal(http.ListenAndServe(":5000", nil))
 }
