@@ -14,8 +14,12 @@ func main() {
 	http.HandleFunc("/receive_heartbeat", func(w http.ResponseWriter, r *http.Request) {
 		master.MonitorSlaveHeartbeats(w, r, slaveMap)
 	})
+	http.HandleFunc("/webserver_heartbeat", func(w http.ResponseWriter, r *http.Request) {
+			master.UpdateWebserverAddress(w, r)
+		})
 	http.HandleFunc("/webserver_init", func(w http.ResponseWriter, r *http.Request) {
-		master.WebserverRequestSlaveListAtStartUp(w, r, slaveMap)
+
+		master.SendWebserverInit(w, r, slaveMap)
 	})
 	go master.MonitorSlaves(3, slaveMap)
 	log.Fatal(http.ListenAndServe(":5000", nil))

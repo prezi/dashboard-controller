@@ -5,7 +5,7 @@ import (
 	"net"
 	"net/http"
 	"time"
-	"strconv"
+	"net/url"
 )
 
 func MonitorSlaveHeartbeats(_ http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
@@ -32,12 +32,12 @@ func processRequest(request *http.Request) (slaveName, slaveAddress string) {
 func updateSlaveHeartbeat(slaveMap map[string]Slave, slaveAddress, slaveName string) map[string]Slave {
 	slaveInstance := slaveMap[slaveName]
 	if slaveInstance.URL != slaveAddress {
-		newSlaveName := getNewSlaveName(slaveMap,slaveName)
-		slaveMap[newSlaveName] = Slave{URL: slaveAddress, heartbeat: time.Now()}
 		fmt.Printf(`WARNING: Slave with name \"%v\"
 			already exists with the IP address: %v. \n
-			New slave with IP %v added with name %v\n`,
-			slaveName, slaveInstance.URL, newSlaveName, slaveAddress)
+			kill signal sent to slave with name \"%v\"
+			with IP address: %v`,
+			slaveName, slaveInstance.URL, slaveName, slaveAddress)
+		sendKillSignalToSlave(slaveAddress)
 	} else {
 		slaveInstance.heartbeat = time.Now()
 		slaveMap[slaveName] = slaveInstance
@@ -45,18 +45,11 @@ func updateSlaveHeartbeat(slaveMap map[string]Slave, slaveAddress, slaveName str
 	return slaveMap
 }
 
-func getNewSlaveName(slaveMap map[string]Slave,slaveName string) (newSlaveName string) {
-	for number:=2; ;number++ {
-		newSlaveName = slaveName + "_"+strconv.Itoa(number)
-		fmt.Println(newSlaveName)
-		_, ok := slaveMap[slaveName]
-		if !ok {
-			return
-		}
-//		if _, existInMap := slaveMap[slaveName];  !existInMap {
-//			return
-//		}
-	}
+func sendKillSignalToSlave(slaveAddress string) {
+	client :=  &http.Client{}
+	form := url.Values{}
+	form.Set("message", "die")
+	client.PostForm(slaveAddress+"/receive_killsignal",form)
 }
 
 func MonitorSlaves(timeInterval int, slaveMap map[string]Slave) {
@@ -82,5 +75,13 @@ func removeDeadSlaves(deadTime int, slaveMap map[string]Slave) {
 			fmt.Printf("\n\n")
 			sendSlaveListToWebserver(webserverAddress, slaveMap)
 		}
+	}
+}
+
+func UpdateWebserverAddress(w http.ResponseWriter, r *http.Request) {
+	newWebserverAddress, _ := getWebserverAddress(r)
+	if webserverAddress != newWebserverAddress {
+		fmt.Println("Webserver address has changed from %v to %v",webserverAddress,newWebserverAddress)
+		webserverAddress = newWebserverAddress
 	}
 }

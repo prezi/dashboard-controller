@@ -55,20 +55,6 @@ func sendSlaveListToWebserver(webserverAddress string, slaveMap map[string]Slave
 	return err
 }
 
-func WebserverRequestSlaveListAtStartUp(writer http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
-	newWebserverAddress, err := getWebserverAddress(request)
-	if err != nil {
-		writer.WriteHeader(500)
-	} else {
-		writer.WriteHeader(200)
-		if newWebserverAddress != webserverAddress {
-			webserverAddress = newWebserverAddress
-			fmt.Printf(`############## WebserverURL: %v`, webserverAddress)
-			sendSlaveListToWebserver(webserverAddress, slaveMap)
-		}
-	}
-}
-
 func getWebserverAddress(request *http.Request) (webserverAddress string,err error) {
 	err = nil
 	slaveIP,_,_ := net.SplitHostPort(request.RemoteAddr)
@@ -79,4 +65,11 @@ func getWebserverAddress(request *http.Request) (webserverAddress string,err err
 	}
 	webserverAddress = "http://" + slaveIP + ":" + webserverPort
 	return
+}
+
+func SendWebserverInit(w http.ResponseWriter, r *http.Request, slaveMap map[string]Slave) {
+	if r.FormValue("message") == "update me!" {
+		webserverAddress, _ = getWebserverAddress(r)
+		fmt.Println(sendSlaveListToWebserver(webserverAddress, slaveMap))
+	}
 }

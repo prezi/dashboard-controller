@@ -58,7 +58,8 @@ func main() {
 	http.HandleFunc("/", formHandler)
 	http.HandleFunc("/form-submit", submitHandler)
 	http.HandleFunc("/receive_slave", receiveAndMapSlaveAddress)
-	go startWebserverHeartbeats(5,MASTER_URL,"/webserver_init")
+	go sendInitToMaster(MASTER_URL,"/webserver_init")
+	go startWebserverHeartbeats(5,MASTER_URL,"/webserver_heartbeat")
 	http.ListenAndServe(":" + WEBSERVER_PORT, nil)
 }
 
@@ -183,6 +184,16 @@ func receiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 	}
 	fmt.Printf("\nSLAVE LIST UPDATED.\n")
 	fmt.Println("Slave Name: ", id_list.Id)
+}
+
+func sendInitToMaster(masterUrl, pattern string) {
+	postRequestUrl := masterUrl
+	postRequestUrl += pattern
+	client := &http.Client{}
+	form := url.Values{}
+	form.Set("message", "update me!")
+	form.Set("webserverPort", WEBSERVER_PORT)
+	client.PostForm(postRequestUrl,form)
 }
 
 func startWebserverHeartbeats(heartbeatInterval int,masterUrl,pattern string) {
