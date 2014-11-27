@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"network"
-
+	"os"
 	"os/exec"
 )
 
@@ -17,7 +17,7 @@ const (
 
 var err error
 
-func SetUp() (port, slaveName, masterURL, OS string, BrowserProcess *exec.Cmd) {
+func SetUp() (port, slaveName, masterURL, OS string, browserProcess *exec.Cmd) {
 	port, slaveName, masterIP, masterPort := configFlags()
 	masterURL = network.AddProtocolAndPortToIP(masterIP, masterPort)
 	OS = network.GetOS()
@@ -36,7 +36,6 @@ func SetUp() (port, slaveName, masterURL, OS string, BrowserProcess *exec.Cmd) {
 	fmt.Printf("Listening on port: %v\n", port)
 	fmt.Println("You can send HTTP POST requests through the command-line with a 'url' parameter to open the url in a browser.")
 	fmt.Printf("e.g.: curl localhost:%v -X POST -d \"url=http://www.google.com\"\n", port)
-	BrowserProcess = nil
 
 	return
 }

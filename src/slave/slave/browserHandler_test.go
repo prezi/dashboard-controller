@@ -4,17 +4,20 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os/exec"
 	"testing"
 )
 
 const testURL = "http://www.placekitten.com"
 const testBrowser = false
 
+var browserProcess *exec.Cmd
+
 // TODO: These tests can be greatly improved.
 func TestBrowserHandler(t *testing.T) {
 	OS := "Some Unknown OS"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		BrowserHandler(w, r, OS)
+		BrowserHandler(w, r, OS, browserProcess)
 	}))
 
 	client := &http.Client{}
@@ -23,13 +26,13 @@ func TestBrowserHandler(t *testing.T) {
 
 func TestKillBrowserOS_X(t *testing.T) {
 	if testBrowser {
-		killBrowser("OS X")
+		killBrowser("OS X", browserProcess)
 	}
 }
 
 func TestKillBrowserLinux(t *testing.T) {
 	if testBrowser {
-		killBrowser("Linux")
+		killBrowser("Linux", browserProcess)
 	}
 }
 

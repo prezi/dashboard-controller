@@ -7,24 +7,24 @@ import (
 	"time"
 )
 
-func BrowserHandler(writer http.ResponseWriter, request *http.Request, OS string, BrowserProcess *exec.Cmd) (*exec.Cmd){
-		url := request.PostFormValue("url")
-	killBrowser(OS,BrowserProcess)
-	BrowserProcess, _ = openBrowser(OS, url)
+func BrowserHandler(writer http.ResponseWriter, request *http.Request, OS string, browserProcess *exec.Cmd) *exec.Cmd {
+	url := request.PostFormValue("url")
+	killBrowser(OS, browserProcess)
+	browserProcess, _ = openBrowser(OS, url)
 	fmt.Fprintf(writer, "SUCCESS. \"%v\" has been posted.\n", url)
 
-	return BrowserProcess
+	return browserProcess
 }
 
-func killBrowser(OS string, BrowserProcess *exec.Cmd) (err error) {
+func killBrowser(OS string, browserProcess *exec.Cmd) (err error) {
 	switch OS {
 	case "Linux":
 		fmt.Println("Executing command: killall chromium")
-		if BrowserProcess != nil {
-			if err = BrowserProcess.Process.Kill(); err != nil {
-				fmt.Println("failed to kill: ", err)
+		if browserProcess != nil {
+			if err = browserProcess.Process.Kill(); err != nil {
+				fmt.Println("Failed to kill: ", err)
 			}
-			if err = BrowserProcess.Wait(); err != nil {
+			if err = browserProcess.Wait(); err != nil {
 				fmt.Println("Error returned: ", err)
 			}
 		}
@@ -63,13 +63,13 @@ func getProcessList(OS string) (existingProcess []byte, err error) {
 	return
 }
 
-func openBrowser(OS, url string) (BrowserProcess *exec.Cmd, err error){
+func openBrowser(OS, url string) (browserProcess *exec.Cmd, err error) {
 	err = nil
 	switch OS {
 	case "Linux":
 		fmt.Printf("Executing command: chromium --kiosk %v\n", url)
-		BrowserProcess = exec.Command("chromium", "--kiosk", url)
-		err = BrowserProcess.Start()
+		browserProcess = exec.Command("chromium", "--kiosk", url)
+		err = browserProcess.Start()
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
 		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url, "&").Run()
