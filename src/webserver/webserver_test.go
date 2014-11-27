@@ -7,14 +7,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
-	"net/url"
 )
 
 type PostURLRequest struct {
 	DestinationSlaveName string
-	URLToLoadInBrowser string
+	URLToLoadInBrowser   string
 }
 
 func TestFormHandler(t *testing.T) {
@@ -38,11 +38,11 @@ func parseJsonReply(input []byte) (reply Reply) {
 	return
 }
 
-func sendGetToFormHandler(URL string) (int) {
-	TEMPLATE_PATH="templates/"
+func sendGetToFormHandler(URL string) int {
+	TEMPLATE_PATH = "templates/"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		request.URL.Path = URL
-		formHandler(w,request)
+		formHandler(w, request)
 	}))
 
 	client := &http.Client{}
@@ -59,7 +59,7 @@ func TestSetDefaultMasterAddress(t *testing.T) {
 
 func TestSubmitHandler(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		submitHandler(w,request)
+		submitHandler(w, request)
 	}))
 
 	client := &http.Client{}
@@ -73,11 +73,11 @@ func TestSubmitHandler(t *testing.T) {
 }
 
 func TestSendConfirmationMessageToUser(t *testing.T) {
-	TEMPLATE_PATH="templates/"
+	TEMPLATE_PATH = "templates/"
 	var responseHeader string
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		sendConfirmationMessageToUser(w,"aaaa", "bbbb", "cccc")
-		responseHeader=w.Header().Get("Content-Type")
+		sendConfirmationMessageToUser(w, "aaaa", "bbbb", "cccc", "hello")
+		responseHeader = w.Header().Get("Content-Type")
 	}))
 	client := &http.Client{}
 	resp, _ := client.Get(testServer.URL)
@@ -91,6 +91,7 @@ func TestSendConfirmationMessageToUser(t *testing.T) {
 	assert.Equal(t, true, strings.Contains(reply, "aaaa"))
 	assert.Equal(t, true, strings.Contains(reply, "bbbb"))
 	assert.Equal(t, true, strings.Contains(reply, "cccc"))
+	assert.Equal(t, true, strings.Contains(reply, "hello"))
 }
 
 func TestStatusMessageForAvailableSever(t *testing.T) {
@@ -141,7 +142,7 @@ func TestSendUrlAndIdToMaster(t *testing.T) {
 		url = slave.URLToLoadInBrowser
 		id = slave.DestinationSlaveName
 	}))
-	
+
 	sendUrlAndIdToMaster(testServer.URL, "http://index.hu", "2")
 	assert.Equal(t, 1, numberOfMessagesSent)
 	assert.Equal(t, "http://index.hu", url)
@@ -149,7 +150,7 @@ func TestSendUrlAndIdToMaster(t *testing.T) {
 }
 func TestReceiveAndMapSlaveAddress(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		receiveAndMapSlaveAddress(w,request)
+		receiveAndMapSlaveAddress(w, request)
 	}))
 
 	client := &http.Client{}
@@ -162,9 +163,10 @@ func TestReceiveAndMapSlaveAddress(t *testing.T) {
 }
 
 func TestConfirmationMessage(t *testing.T) {
-	TEMPLATE_PATH="templates/"
-	answer_string := parseJsonReply(confirmationMessage("aaaa", "bbbb", "cccc")).HTML
+	TEMPLATE_PATH = "templates/"
+	answer_string := parseJsonReply(confirmationMessage("aaaa", "bbbb", "cccc", "hello")).HTML
 	assert.Equal(t, true, strings.Contains(answer_string, "aaaa"))
 	assert.Equal(t, true, strings.Contains(answer_string, "bbbb"))
 	assert.Equal(t, true, strings.Contains(answer_string, "cccc"))
+	assert.Equal(t, true, strings.Contains(answer_string, "hello"))
 }

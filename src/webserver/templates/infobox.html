@@ -1,14 +1,18 @@
 {{define "T"}}
 <div id="slave_id">
-    <span id="key">Status:</span>
+    <span id="key">Status message:</span>
     <span id="value">{{.Code}}</span>
 </div>
 <div id="url">
-    <span id="key">Destination Name:</span>
+    <span id="key">Requested URL:</span>
     <span id="value">{{.URL}}</span>
 </div>
 <div id="statuscode">
-    <span id="key">Status code:</span>
+    <span id="key">Destination Name:</span>
     <span id="value">{{.ID}}</span>
+</div>
+<div id="slaveError">
+    <span id="key">Slave Error:</span>
+    <span id="value">{{.SlaveError}}</span>
 </div>
 {{end}}

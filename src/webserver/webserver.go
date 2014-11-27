@@ -3,17 +3,17 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html/template"
-	"net/http"
-	"path"
-	"strings"
 	"io/ioutil"
+	"net/http"
 	"net/url"
-	"os"
 	"network"
-	"flag"
+	"os"
+	"path"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -24,19 +24,20 @@ var WEBSERVER_PORT = "4003"
 
 const (
 	DEFAULT_MASTER_IP_ADDRESS = "localhost"
-	DEFAULT_MASTER_PORT = "5000"
-	DEFAULT_WEBSERVER_PORT = "4003"
+	DEFAULT_MASTER_PORT       = "5000"
+	DEFAULT_WEBSERVER_PORT    = "4003"
 )
 
 type Message struct {
 	DestinationSlaveName string
-	URLToLoadInBrowser string
+	URLToLoadInBrowser   string
 }
 
 type StatusMessage struct {
-	Code string
-	URL  string
-	ID   string
+	Code       string
+	URL        string
+	ID         string
+	SlaveError string
 }
 
 type Reply struct {
@@ -58,9 +59,9 @@ func main() {
 	http.HandleFunc("/", formHandler)
 	http.HandleFunc("/form-submit", submitHandler)
 	http.HandleFunc("/receive_slave", receiveAndMapSlaveAddress)
-	go sendInitToMaster(MASTER_URL,"/webserver_init")
-	go startWebserverHeartbeats(5,MASTER_URL,"/webserver_heartbeat")
-	http.ListenAndServe(":" + WEBSERVER_PORT, nil)
+	go sendInitToMaster(MASTER_URL, "/webserver_init")
+	go startWebserverHeartbeats(5, MASTER_URL, "/webserver_heartbeat")
+	http.ListenAndServe(":"+WEBSERVER_PORT, nil)
 }
 
 func setMasterAddress() (masterUrl string) {
@@ -94,30 +95,44 @@ func formHandler(response_writer http.ResponseWriter, request *http.Request) {
 
 func submitHandler(response_writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
+		slaveError := ""
 		url := request.FormValue("url")
 		name := request.FormValue("slave-id")
-		sendConfirmationMessageToUser(response_writer, returnStatusMessageFrom(url), url, name)
-		if (isUrlValid(url) == true ) {
+		if slaveInSlaveList(name, id_list.Id) == false {
+			slaveError = "This slave does not exist, please refresh your browser."
+		}
+		sendConfirmationMessageToUser(response_writer, returnStatusMessageFrom(url), url, name, slaveError)
+		if isUrlValid(url) == true {
 			sendUrlAndIdToMaster(MASTER_URL, url, name)
 		}
 	}
 }
 
-func sendConfirmationMessageToUser(response_writer http.ResponseWriter, status_code, URL, slave_ID string) {
-	confirmationMessage := confirmationMessage(URL, status_code, slave_ID)
+func slaveInSlaveList(slaveName string, slaveIdList []string) bool {
+	for _, slaveId := range slaveIdList {
+		if slaveId == slaveName {
+			return true
+		}
+	}
+	return false
+}
+
+func sendConfirmationMessageToUser(response_writer http.ResponseWriter, status_code, URL, slave_ID, slaveError string) {
+	confirmationMessage := confirmationMessage(URL, status_code, slave_ID, slaveError)
+
 	header := response_writer.Header()
 	header.Set("Content-Type", "application/json")
 	response_writer.Write(confirmationMessage)
 }
 
-func confirmationMessage(URL, status_code, slave_ID string) []byte {
+func confirmationMessage(URL, status_code, slave_ID, slaveError string) []byte {
 	t, err := template.ParseFiles(path.Join(TEMPLATE_PATH, "infobox.html"))
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	buf := new(bytes.Buffer)
-	t.ExecuteTemplate(buf, "T", StatusMessage{status_code, URL, slave_ID})
+	t.ExecuteTemplate(buf, "T", StatusMessage{status_code, URL, slave_ID, slaveError})
 
 	jsonMessage, err := json.Marshal(Reply{HTML: buf.String()})
 	if err != nil {
@@ -150,7 +165,7 @@ func checkStatusCode(urlToDisplay string) int {
 }
 
 func isUrlValid(url string) bool {
-	if (400 <= checkStatusCode(url) || checkStatusCode(url) == 0) {
+	if 400 <= checkStatusCode(url) || checkStatusCode(url) == 0 {
 		return false
 	} else {
 		return true
@@ -193,10 +208,10 @@ func sendInitToMaster(masterUrl, pattern string) {
 	form := url.Values{}
 	form.Set("message", "update me!")
 	form.Set("webserverPort", WEBSERVER_PORT)
-	client.PostForm(postRequestUrl,form)
+	client.PostForm(postRequestUrl, form)
 }
 
-func startWebserverHeartbeats(heartbeatInterval int,masterUrl,pattern string) {
+func startWebserverHeartbeats(heartbeatInterval int, masterUrl, pattern string) {
 	var err error
 	postRequestUrl := masterUrl
 	postRequestUrl += pattern
@@ -205,7 +220,7 @@ func startWebserverHeartbeats(heartbeatInterval int,masterUrl,pattern string) {
 	form.Set("webserverPort", WEBSERVER_PORT)
 	beat := time.Tick(time.Duration(heartbeatInterval) * time.Second)
 	for _ = range beat {
-		_, err = client.PostForm(postRequestUrl,form)
+		_, err = client.PostForm(postRequestUrl, form)
 		network.ErrorHandler(err, "Error communicating with master: %v\n")
 	}
 }
