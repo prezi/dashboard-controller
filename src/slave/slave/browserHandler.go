@@ -7,26 +7,36 @@ import (
 	"time"
 )
 
-func BrowserHandler(writer http.ResponseWriter, request *http.Request, OS string) {
-	url := request.PostFormValue("url")
-	killBrowser(OS)
-	openBrowser(OS, url)
+func BrowserHandler(writer http.ResponseWriter, request *http.Request, OS string, BrowserProcess *exec.Cmd) (*exec.Cmd){
+		url := request.PostFormValue("url")
+	killBrowser(OS,BrowserProcess)
+	BrowserProcess, _ = openBrowser(OS, url)
 	fmt.Fprintf(writer, "SUCCESS. \"%v\" has been posted.\n", url)
+
+	return BrowserProcess
 }
 
-func killBrowser(OS string) (err error) {
+func killBrowser(OS string, BrowserProcess *exec.Cmd) (err error) {
 	switch OS {
 	case "Linux":
-		err = exec.Command("killall", "chromium").Run()
+		fmt.Println("Executing command: killall chromium")
+		if BrowserProcess != nil {
+			if err = BrowserProcess.Process.Kill(); err != nil {
+				fmt.Println("failed to kill: ", err)
+			}
+			if err = BrowserProcess.Wait(); err != nil {
+				fmt.Println("Error returned: ", err)
+			}
+		}
+
 	case "OS X":
 		fmt.Println("Executing command: killall 'Google Chrome'")
-		err = exec.Command("killall", "Google Chrome").Run()
-	}
-
-	if err != nil {
-		fmt.Printf("Error killing current browser: %v\n", err)
-	} else {
-		blockWhileBrowserCloses(OS)
+		err = exec.Command("killall", "Google Chrome").Start()
+		if err != nil {
+			fmt.Printf("Error killing current browser: %v\n", err)
+		} else {
+			blockWhileBrowserCloses(OS)
+		}
 	}
 	return
 }
@@ -53,17 +63,17 @@ func getProcessList(OS string) (existingProcess []byte, err error) {
 	return
 }
 
-func openBrowser(OS, url string) (err error) {
+func openBrowser(OS, url string) (BrowserProcess *exec.Cmd, err error){
 	err = nil
 	switch OS {
 	case "Linux":
 		fmt.Printf("Executing command: chromium --kiosk %v\n", url)
-		err = exec.Command("chromium", "--kiosk", url).Run()
+		BrowserProcess = exec.Command("chromium", "--kiosk", url)
+		err = BrowserProcess.Start()
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
 		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url, "&").Run()
 	}
-
 	if err != nil {
 		fmt.Printf("Error opening URL: %v\n", err)
 	}
