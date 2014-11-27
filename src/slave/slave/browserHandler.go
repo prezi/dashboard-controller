@@ -17,7 +17,6 @@ func BrowserHandler(writer http.ResponseWriter, request *http.Request, OS string
 func killBrowser(OS string) (err error) {
 	switch OS {
 	case "Linux":
-		fmt.Println("Executing command: killall chromium")
 		err = exec.Command("killall", "chromium").Run() 
 	case "OS X":
 		fmt.Println("Executing command: killall 'Google Chrome'")
@@ -33,10 +32,13 @@ func killBrowser(OS string) (err error) {
 }
 
 func blockWhileBrowserCloses(OS string) (err error){
-	existingProcess, err := getProcessList(OS)
-	for len(existingProcess) != 0 {
-		time.Sleep(100 * time.Millisecond)
+	var existingProcess []byte
+	for {
+		time.Sleep(75 * time.Millisecond)
 		existingProcess, err = getProcessList(OS)
+		if len(existingProcess) < 10 {
+			break
+		}
 	}
 	return
 }
@@ -44,10 +46,8 @@ func blockWhileBrowserCloses(OS string) (err error){
 func getProcessList(OS string) (existingProcess []byte,err error) {
 	switch OS {
 	case "Linux":
-		time.Sleep(75 * time.Millisecond)
 		existingProcess, err = exec.Command("pgrep", "chromium").CombinedOutput()		
 	case "OS X":
-		time.Sleep(75 * time.Millisecond)
 		existingProcess, err = exec.Command("pgrep", "Google Chrome").CombinedOutput()
 	}
 	return
@@ -58,10 +58,10 @@ func openBrowser(OS, url string) (err error) {
 	switch OS {
 	case "Linux":
 		fmt.Printf("Executing command: chromium --kiosk %v\n", url)
-		err = exec.Command("chromium", "--kiosk", url).Start()
+		err = exec.Command("chromium", "--kiosk", url).Run()
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
-		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Start()
+		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url, "&").Run()
 	}
 
 	if err != nil {
