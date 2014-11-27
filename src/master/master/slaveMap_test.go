@@ -12,7 +12,6 @@ import (
 	"time"
 )
 
-
 func InitializeTestSlaveMap() (slaveMap map[string]Slave) {
 	slaveMap = make(map[string]Slave)
 	slaveMap["slave1"] = Slave{URL: "http://10.0.0.122:8080", heartbeat: time.Now()}

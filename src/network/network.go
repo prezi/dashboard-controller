@@ -1,21 +1,21 @@
 package network
 
 import (
-	"net"
-	"net/url"
-	"net/http"
-	"fmt"
-	"os"
 	"flag"
-	"strings"
+	"fmt"
+	"net"
+	"net/http"
+	"net/url"
+	"os"
 	"os/exec"
 	"regexp"
+	"strings"
 )
 
 const (
-	DEFAULT_SLAVE_NAME = "SLAVE NAME UNSPECIFIED"
+	DEFAULT_SLAVE_NAME        = "SLAVE NAME UNSPECIFIED"
 	DEFAULT_MASTER_IP_ADDRESS = "localhost"
-	DEFAULT_MASTER_PORT = "5000"
+	DEFAULT_MASTER_PORT       = "5000"
 )
 
 func GetLocalIPAddress(port string) (IPAddress string) {
@@ -69,7 +69,7 @@ func GetOS() (OS string) {
 		OS = "Unknown"
 	}
 
-	if (OS == "Unknown") {
+	if OS == "Unknown" {
 		fmt.Println("ERROR: Failed to detect operating system.")
 		fmt.Println("Aborting program.")
 		os.Exit(1)
@@ -90,13 +90,13 @@ func ErrorHandler(err error, message string) (errorOccurred bool) {
 		fmt.Println("Aborting program.")
 		// os.Exit(1)
 		return true
-	}	
+	}
 	return false
 }
 
 func SetMasterUrl() (masterUrl string) {
-	masterIP:= DEFAULT_MASTER_IP_ADDRESS
-	masterPort:= DEFAULT_MASTER_PORT
+	masterIP := DEFAULT_MASTER_IP_ADDRESS
+	masterPort := DEFAULT_MASTER_PORT
 	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")
 	flag.StringVar(&masterPort, "masterPort", DEFAULT_MASTER_PORT, "master port number")
 	flag.Parse()
@@ -117,7 +117,7 @@ func sendSlaveURLToMaster(slaveName, slaveURL, masterURL string) {
 	fmt.Printf("Slave mapped to master at %v.\n", masterURL)
 	fmt.Printf("Slave Name: %v.\n", slaveName)
 	if slaveName == DEFAULT_SLAVE_NAME {
-		fmt.Println("TIP: Specify slave name at startup with the flag '-slaveName'") 
+		fmt.Println("TIP: Specify slave name at startup with the flag '-slaveName'")
 		fmt.Println("eg. -slaveName=\"Main Lobby\"")
 	}
 	fmt.Printf("\n\n")

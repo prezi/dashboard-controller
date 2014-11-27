@@ -3,15 +3,14 @@ package slave
 import (
 	"net/http"
 	"net/http/httptest"
-	"testing"
 	"net/url"
+	"testing"
 )
 
 const testURL = "http://www.placekitten.com"
-const testBrowser = false 
+const testBrowser = false
 
-// TODO: This code can be greatly improved. 
-
+// TODO: These tests can be greatly improved.
 func TestBrowserHandler(t *testing.T) {
 	OS := "Some Unknown OS"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -24,24 +23,24 @@ func TestBrowserHandler(t *testing.T) {
 
 func TestKillBrowserOS_X(t *testing.T) {
 	if testBrowser {
-	killBrowser("OS X")
+		killBrowser("OS X")
 	}
 }
 
 func TestKillBrowserLinux(t *testing.T) {
 	if testBrowser {
-	killBrowser("Linux")
+		killBrowser("Linux")
 	}
 }
 
 func TestOpenBrowserOS_X(t *testing.T) {
 	if testBrowser {
-	openBrowser("OS X", testURL)
+		openBrowser("OS X", testURL)
 	}
 }
 
 func TestOpenBrowserLinux(t *testing.T) {
 	if testBrowser {
-	openBrowser("Linux", testURL)
+		openBrowser("Linux", testURL)
 	}
 }

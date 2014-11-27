@@ -1,8 +1,8 @@
 package slave
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 	"os/exec"
 	"time"
 )
@@ -17,21 +17,21 @@ func BrowserHandler(writer http.ResponseWriter, request *http.Request, OS string
 func killBrowser(OS string) (err error) {
 	switch OS {
 	case "Linux":
-		err = exec.Command("killall", "chromium").Run() 
+		err = exec.Command("killall", "chromium").Run()
 	case "OS X":
 		fmt.Println("Executing command: killall 'Google Chrome'")
 		err = exec.Command("killall", "Google Chrome").Run()
 	}
 
 	if err != nil {
-		fmt.Printf("Error killing current browser: %v\n", err) 
+		fmt.Printf("Error killing current browser: %v\n", err)
 	} else {
-		blockWhileBrowserCloses(OS)	
+		blockWhileBrowserCloses(OS)
 	}
 	return
 }
 
-func blockWhileBrowserCloses(OS string) (err error){
+func blockWhileBrowserCloses(OS string) (err error) {
 	var existingProcess []byte
 	for {
 		time.Sleep(75 * time.Millisecond)
@@ -43,10 +43,10 @@ func blockWhileBrowserCloses(OS string) (err error){
 	return
 }
 
-func getProcessList(OS string) (existingProcess []byte,err error) {
+func getProcessList(OS string) (existingProcess []byte, err error) {
 	switch OS {
 	case "Linux":
-		existingProcess, err = exec.Command("pgrep", "chromium").CombinedOutput()		
+		existingProcess, err = exec.Command("pgrep", "chromium").CombinedOutput()
 	case "OS X":
 		existingProcess, err = exec.Command("pgrep", "Google Chrome").CombinedOutput()
 	}
@@ -66,6 +66,6 @@ func openBrowser(OS, url string) (err error) {
 
 	if err != nil {
 		fmt.Printf("Error opening URL: %v\n", err)
-	}	
+	}
 	return
 }

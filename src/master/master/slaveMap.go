@@ -2,15 +2,15 @@ package master
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 	"time"
-	"net"
-	"errors"
 )
 
-var webserverAddress = "http://localhost:4003"// TODO: make dynamic webserver address
+var webserverAddress = "http://localhost:4003" // TODO: make dynamic webserver address
 
 type Slave struct {
 	URL          string
@@ -55,11 +55,11 @@ func sendSlaveListToWebserver(webserverAddress string, slaveMap map[string]Slave
 	return err
 }
 
-func getWebserverAddress(request *http.Request) (webserverAddress string,err error) {
+func getWebserverAddress(request *http.Request) (webserverAddress string, err error) {
 	err = nil
-	slaveIP,_,_ := net.SplitHostPort(request.RemoteAddr)
+	slaveIP, _, _ := net.SplitHostPort(request.RemoteAddr)
 	webserverPort := request.PostFormValue("webserverPort")
-	if webserverPort == "" 	{
+	if webserverPort == "" {
 		err = errors.New("Cannot find sender port.")
 		return
 	}

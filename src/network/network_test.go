@@ -1,11 +1,11 @@
 package network
 
 import (
+	"errors"
 	"github.com/stretchr/testify/assert"
-	"testing"
 	"net/http"
 	"net/http/httptest"
-	"errors"
+	"testing"
 )
 
 func TestAddProtocolAndPortToIP(t *testing.T) {
@@ -20,7 +20,7 @@ func TestErrorHandler(t *testing.T) {
 
 func TestSetMasterUrl(t *testing.T) {
 	masterURL := SetMasterUrl()
-	assert.Equal(t, "http://localhost:5000", masterURL )
+	assert.Equal(t, "http://localhost:5000", masterURL)
 }
 
 func TestSendSlaveURLToMaster(t *testing.T) {

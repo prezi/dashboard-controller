@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"time"
 	"net/url"
+	"time"
 )
 
 func MonitorSlaveHeartbeats(_ http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
@@ -24,7 +24,7 @@ func processRequest(request *http.Request) (slaveName, slaveAddress string) {
 	slaveName = request.PostFormValue("slaveName")
 	slavePort := request.PostFormValue("slavePort")
 
-	slaveIP,_,_ := net.SplitHostPort(request.RemoteAddr)
+	slaveIP, _, _ := net.SplitHostPort(request.RemoteAddr)
 	slaveAddress = "http://" + slaveIP + ":" + slavePort
 	return
 }
@@ -46,10 +46,10 @@ func updateSlaveHeartbeat(slaveMap map[string]Slave, slaveAddress, slaveName str
 }
 
 func sendKillSignalToSlave(slaveAddress string) {
-	client :=  &http.Client{}
+	client := &http.Client{}
 	form := url.Values{}
 	form.Set("message", "die")
-	client.PostForm(slaveAddress+"/receive_killsignal",form)
+	client.PostForm(slaveAddress+"/receive_killsignal", form)
 }
 
 func MonitorSlaves(timeInterval int, slaveMap map[string]Slave) {
@@ -81,7 +81,7 @@ func removeDeadSlaves(deadTime int, slaveMap map[string]Slave) {
 func UpdateWebserverAddress(w http.ResponseWriter, r *http.Request) {
 	newWebserverAddress, _ := getWebserverAddress(r)
 	if webserverAddress != newWebserverAddress {
-		fmt.Println("Webserver address has changed from %v to %v",webserverAddress,newWebserverAddress)
+		fmt.Println("Webserver address has changed from %v to %v", webserverAddress, newWebserverAddress)
 		webserverAddress = newWebserverAddress
 	}
 }

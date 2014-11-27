@@ -1,8 +1,8 @@
 package slave
 
 import (
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestSetUp(t *testing.T) {

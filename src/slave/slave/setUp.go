@@ -3,15 +3,15 @@ package slave
 import (
 	"flag"
 	"fmt"
-	"os"
 	"network"
+	"os"
 )
 
 const (
-	DEFAULT_SLAVE_NAME = "SLAVE NAME UNSPECIFIED"
-	DEFAULT_LOCALHOST_PORT = "8080"
+	DEFAULT_SLAVE_NAME        = "SLAVE NAME UNSPECIFIED"
+	DEFAULT_LOCALHOST_PORT    = "8080"
 	DEFAULT_MASTER_IP_ADDRESS = "localhost"
-	DEFAULT_MASTER_PORT = "5000"
+	DEFAULT_MASTER_PORT       = "5000"
 )
 
 var err error
@@ -21,7 +21,7 @@ func SetUp() (port, slaveName, masterURL, OS string) {
 	masterURL = network.AddProtocolAndPortToIP(masterIP, masterPort)
 	OS = network.GetOS()
 	// :0.0 indicates the first screen attached to the first display in localhost
-	err = os.Setenv("DISPLAY",":0.0")
+	err = os.Setenv("DISPLAY", ":0.0")
 	if err != nil {
 		fmt.Printf("Error setting DISPLAY environment variable: %v\n", err)
 	}
@@ -47,4 +47,3 @@ func configFlags() (port, slaveName, masterIP, masterPort string) {
 	flag.Parse()
 	return port, slaveName, masterIP, masterPort
 }
-

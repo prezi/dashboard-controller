@@ -57,8 +57,8 @@ func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string) {
 	form := url.Values{}
 	form.Set("url", urlToDisplay)
 
-	response,err := client.PostForm(slaveIPAddress, form)
-	if err !=nil {
+	response, err := client.PostForm(slaveIPAddress, form)
+	if err != nil {
 		fmt.Printf("Error slave is not responding: %v\n", err)
 		return
 	}
@@ -68,5 +68,5 @@ func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string) {
 		return
 	}
 	defer response.Body.Close()
-	fmt.Printf("Slave message: %v\n",(string(body)))
+	fmt.Printf("Slave message: %v\n", (string(body)))
 }
