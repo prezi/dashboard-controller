@@ -1,14 +1,12 @@
 package network
 
 import (
-	"flag"
 	"fmt"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
 )
 
@@ -18,32 +16,9 @@ const (
 	DEFAULT_MASTER_PORT       = "5000"
 )
 
-func GetLocalIPAddress(port string) (IPAddress string) {
-	IPAddressBytes := getIPAddressBytesFromCmdLine()
-
-	return addProtocolAndPortToIp(parseIpAddress(IPAddressBytes), port)
-}
-
-func getIPAddressBytesFromCmdLine() (IPAddressWithNoise string) {
-	cmd := exec.Command("ifconfig")
-	IPAddressBytes, _ := cmd.Output()
-	IPAddressWithNoise = string(IPAddressBytes)
-	return
-}
-
-func parseIpAddress(IPAddress string) string {
-	inetAddressRegexpPattern := "inet (addr:)?([0-9]*\\.){3}[0-9]*"
-	re := regexp.MustCompile(inetAddressRegexpPattern)
-	IPAddress = re.FindAllString(IPAddress, -1)[1]
-	IPAddress = strings.Split(IPAddress, " ")[1]
-	return IPAddress
-}
-
-func addProtocolAndPortToIp(IPAddress string, port string) string {
+func AddProtocolAndPortToIP(IPAddress, port string) (url string) {
 	hostIPWithPort := net.JoinHostPort(IPAddress, port)
-	protocolWithHostIPAndPort := []string{"http://", hostIPWithPort}
-	url := strings.Join(protocolWithHostIPAndPort, "")
-	return url
+	return "http://" + hostIPWithPort
 }
 
 func GetOS() (OS string) {
@@ -58,7 +33,7 @@ func GetOS() (OS string) {
 	} else {
 		kernel = strings.Split(operatingSystemName, " ")[0]
 	}
-	fmt.Println("Kernel detected: ", kernel)
+	fmt.Println("\nKernel detected: ", kernel)
 
 	switch kernel {
 	case "Linux":
@@ -79,11 +54,6 @@ func GetOS() (OS string) {
 	return OS
 }
 
-func AddProtocolAndPortToIP(IPAddress, port string) (url string) {
-	hostIPWithPort := net.JoinHostPort(IPAddress, port)
-	return "http://" + hostIPWithPort
-}
-
 func ErrorHandler(err error, message string) (errorOccurred bool) {
 	if err != nil {
 		fmt.Printf(message, err)
@@ -92,15 +62,6 @@ func ErrorHandler(err error, message string) (errorOccurred bool) {
 		return true
 	}
 	return false
-}
-
-func SetMasterUrl() (masterUrl string) {
-	masterIP := DEFAULT_MASTER_IP_ADDRESS
-	masterPort := DEFAULT_MASTER_PORT
-	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")
-	flag.StringVar(&masterPort, "masterPort", DEFAULT_MASTER_PORT, "master port number")
-	flag.Parse()
-	return AddProtocolAndPortToIP(masterIP, masterPort)
 }
 
 func sendSlaveURLToMaster(slaveName, slaveURL, masterURL string) {

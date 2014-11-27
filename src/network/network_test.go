@@ -18,11 +18,6 @@ func TestErrorHandler(t *testing.T) {
 	assert.Equal(t, true, ErrorHandler(err, "%v"))
 }
 
-func TestSetMasterUrl(t *testing.T) {
-	masterURL := SetMasterUrl()
-	assert.Equal(t, "http://localhost:5000", masterURL)
-}
-
 func TestSendSlaveURLToMaster(t *testing.T) {
 	var numberOfMessagesSent = 0
 	handler := http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {

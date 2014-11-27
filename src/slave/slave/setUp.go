@@ -27,13 +27,7 @@ func SetUp() (port, slaveName, masterURL, OS string, browserProcess *exec.Cmd) {
 		fmt.Printf("Error setting DISPLAY environment variable: %v\n", err)
 	}
 
-	slaveIPAddress := network.GetLocalIPAddress(port)
-	slaveURL := network.AddProtocolAndPortToIP(slaveIPAddress, port)
-
-	masterURLToReceiveSlave := masterURL + "/receive_slave"
-	fmt.Print(slaveName, slaveURL, masterURLToReceiveSlave)
-
-	fmt.Printf("Listening on port: %v\n", port)
+	fmt.Printf("\nListening on port: %v\n", port)
 	fmt.Println("You can send HTTP POST requests through the command-line with a 'url' parameter to open the url in a browser.")
 	fmt.Printf("e.g.: curl localhost:%v -X POST -d \"url=http://www.google.com\"\n", port)
 

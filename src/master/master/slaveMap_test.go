@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"sort"
 	"testing"
 	"time"
@@ -46,23 +45,4 @@ func TestSendSlaveListToWebserver(t *testing.T) {
 	sort.Strings(validIdList)
 	sort.Strings(returnedIds)
 	assert.Equal(t, returnedIds, validIdList)
-}
-
-func TestWebserverRequestSlaveListAtStartUp(t *testing.T) {
-	slaveMap := initializeSlaveMap()
-	WebserverRequestSlaveIdsHandler := func(w http.ResponseWriter, r *http.Request) {
-		WebserverRequestSlaveListAtStartUp(w, r, slaveMap)
-	}
-
-	testServer := httptest.NewServer(http.HandlerFunc(WebserverRequestSlaveIdsHandler))
-
-	client := &http.Client{}
-	form := url.Values{}
-	form.Set("webserverPort", "5000")
-	resp, err := client.PostForm(testServer.URL, form)
-	assert.Equal(t, 200, resp.StatusCode)
-	assert.Equal(t, nil, err)
-	form.Set("webserverPort", "")
-	resp, err = client.PostForm(testServer.URL, form)
-	assert.Equal(t, 500, resp.StatusCode)
 }
