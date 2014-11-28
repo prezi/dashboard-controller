@@ -72,7 +72,7 @@ func openBrowser(OS, url string) (browserProcess *exec.Cmd, err error) {
 		err = browserProcess.Start()
 	case "OS X":
 		fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
-		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url, "&").Run()
+		err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()
 	}
 	if err != nil {
 		fmt.Printf("Error opening URL: %v\n", err)
