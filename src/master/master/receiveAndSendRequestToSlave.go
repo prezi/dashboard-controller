@@ -17,15 +17,15 @@ func ReceiveRequestAndSendToSlave(_ http.ResponseWriter, request *http.Request, 
 	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
 	defer request.Body.Close()
 
-	slave, _ := parseJson(POSTRequestBody)
-	destinationSlaveAddress := destinationSlaveAddress(slave.DestinationSlaveName, slaveMap)
+	incomingRequest, _ := parseJson(POSTRequestBody)
+	destinationSlaveAddress := destinationSlaveAddress(incomingRequest.DestinationSlaveName, slaveMap)
 	if destinationSlaveAddress == "" {
 		fmt.Println("Abandoning request.")
 		return
 	}
 
-	fmt.Printf("\nSending %v to %v at %v\n", slave.URLToLoadInBrowser, slave.DestinationSlaveName, destinationSlaveAddress)
-	sendUrlValueMessageToSlave(destinationSlaveAddress, slave.URLToLoadInBrowser)
+	fmt.Printf("\nSending %v to %v at %v\n", incomingRequest.URLToLoadInBrowser, incomingRequest.DestinationSlaveName, destinationSlaveAddress)
+	sendUrlValueMessageToSlave(destinationSlaveAddress, incomingRequest.URLToLoadInBrowser)
 }
 
 func parseJson(input []byte) (request PostURLRequest, err error) {

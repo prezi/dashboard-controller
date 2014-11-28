@@ -49,7 +49,7 @@ type IdList struct {
 }
 
 var id_list = IdList{
-	Id: []string{"slave1", "slave2"},
+	Id: []string{},
 }
 
 func main() {
