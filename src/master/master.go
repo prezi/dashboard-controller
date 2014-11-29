@@ -12,10 +12,10 @@ func main() {
 		master.ReceiveRequestAndSendToSlave(w, r, slaveMap)
 	})
 	http.HandleFunc("/receive_heartbeat", func(_ http.ResponseWriter, r *http.Request) {
-		master.MonitorSlaveHeartbeats(r, slaveMap)
+		master.ReceiveSlaveHeartbeat(r, slaveMap)
 	})
-	http.HandleFunc("/webserver_heartbeat", func(w http.ResponseWriter, r *http.Request) {
-		master.UpdateWebserverAddress(w, r)
+	http.HandleFunc("/webserver_heartbeat", func(_ http.ResponseWriter, r *http.Request) {
+		master.UpdateWebserverAddress(r)
 	})
 	http.HandleFunc("/webserver_init", func(w http.ResponseWriter, r *http.Request) {
 

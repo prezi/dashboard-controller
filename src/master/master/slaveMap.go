@@ -2,7 +2,6 @@ package master
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -10,7 +9,7 @@ import (
 	"time"
 )
 
-var webserverAddress = "http://localhost:4003" // TODO: make dynamic webserver address
+var webServerAddress = "http://localhost:4003" // TODO: make dynamic webserver address
 
 type Slave struct {
 	URL          string
@@ -42,34 +41,42 @@ func printServerResponse(error error, slaveName string) {
 	}
 }
 
-func sendSlaveListToWebserver(webserverAddress string, slaveMap map[string]Slave) (err error) {
+func sendSlaveListToWebserver(webServerAddress string, slaveMap map[string]Slave) (err error) {
 	err = nil
 	client := &http.Client{}
-	webserverAddress = webserverAddress + "/receive_slave"
+	webServerAddress = webServerAddress + "/receive_slave"
 	var idList IdList
 	for slaveName := range slaveMap {
 		idList.Id = append(idList.Id, slaveName)
 	}
 	jsonMessage, err := json.Marshal(idList)
-	_, err = client.Post(webserverAddress, "application/json", strings.NewReader(string(jsonMessage)))
+	_, err = client.Post(webServerAddress, "application/json", strings.NewReader(string(jsonMessage)))
 	return err
 }
 
-func getWebserverAddress(request *http.Request) (webserverAddress string, err error) {
-	err = nil
-	slaveIP, _, _ := net.SplitHostPort(request.RemoteAddr)
-	webserverPort := request.PostFormValue("webserverPort")
-	if webserverPort == "" {
-		err = errors.New("Cannot find sender port.")
+func getWebserverAddress(request *http.Request) (webServerAddress string, err error) {
+	slaveIP, _, err := net.SplitHostPort(request.RemoteAddr)
+
+	if err != nil {
+		fmt.Printf("Error: %v\n",err)
 		return
 	}
-	webserverAddress = "http://" + slaveIP + ":" + webserverPort
+	webServerAddress = "http://" + slaveIP
+
+	webServerPort := request.PostFormValue("webserverPort")
+	if webServerPort != "" {
+		webServerAddress += ":" + webServerPort
+	} else {
+		fmt.Println("port number not found.")
+		return
+	}
+
 	return
 }
 
 func SendWebserverInit(w http.ResponseWriter, r *http.Request, slaveMap map[string]Slave) {
 	if r.FormValue("message") == "update me!" {
-		webserverAddress, _ = getWebserverAddress(r)
-		fmt.Println(sendSlaveListToWebserver(webserverAddress, slaveMap))
+		webServerAddress, _ = getWebserverAddress(r)
+		fmt.Println(sendSlaveListToWebserver(webServerAddress, slaveMap))
 	}
 }
