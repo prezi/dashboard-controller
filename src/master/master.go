@@ -11,8 +11,8 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		master.ReceiveRequestAndSendToSlave(w, r, slaveMap)
 	})
-	http.HandleFunc("/receive_heartbeat", func(w http.ResponseWriter, r *http.Request) {
-		master.MonitorSlaveHeartbeats(w, r, slaveMap)
+	http.HandleFunc("/receive_heartbeat", func(_ http.ResponseWriter, r *http.Request) {
+		master.MonitorSlaveHeartbeats(r, slaveMap)
 	})
 	http.HandleFunc("/webserver_heartbeat", func(w http.ResponseWriter, r *http.Request) {
 		master.UpdateWebserverAddress(w, r)

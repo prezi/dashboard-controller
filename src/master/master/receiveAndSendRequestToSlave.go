@@ -13,7 +13,7 @@ type PostURLRequest struct {
 	URLToLoadInBrowser   string
 }
 
-func ReceiveRequestAndSendToSlave(_ http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
+func ReceiveRequestAndSendToSlave(writer http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
 	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
 	defer request.Body.Close()
 
@@ -21,6 +21,7 @@ func ReceiveRequestAndSendToSlave(_ http.ResponseWriter, request *http.Request, 
 	destinationSlaveAddress := destinationSlaveAddress(incomingRequest.DestinationSlaveName, slaveMap)
 	if destinationSlaveAddress == "" {
 		fmt.Println("Abandoning request.")
+		fmt.Fprintf(writer, "FAILED to send url to slave. Slave URL is empty for some reason.")
 		return
 	}
 
@@ -51,7 +52,7 @@ func destinationSlaveAddress(slaveName string, slaveMap map[string]Slave) (slave
 	return slaveAddress
 }
 
-func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string) {
+func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string)(err error) {
 	client := &http.Client{}
 
 	form := url.Values{}
@@ -62,11 +63,9 @@ func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string) {
 		fmt.Printf("Error slave is not responding: %v\n", err)
 		return
 	}
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		fmt.Printf("Error reading slave response: %v\n", err)
-		return
-	}
+	body, _ := ioutil.ReadAll(response.Body)
+
 	defer response.Body.Close()
-	fmt.Printf("Slave message: %v\n", (string(body)))
+	fmt.Printf("Slave message: %v\n", (string(body[:])))
+	return
 }

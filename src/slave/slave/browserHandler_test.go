@@ -18,6 +18,7 @@ func TestBrowserHandler(t *testing.T) {
 	OS := "Some Unknown OS"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		BrowserHandler(w, r, OS, browserProcess)
+
 	}))
 
 	client := &http.Client{}

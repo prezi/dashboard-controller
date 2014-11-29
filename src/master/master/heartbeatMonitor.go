@@ -8,11 +8,11 @@ import (
 	"time"
 )
 
-func MonitorSlaveHeartbeats(_ http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
+func MonitorSlaveHeartbeats(request *http.Request, slaveMap map[string]Slave) {
 	slaveName, slaveAddress := processRequest(request)
 
 	if _, existsInMap := slaveMap[slaveName]; existsInMap {
-		slaveMap = updateSlaveHeartbeat(slaveMap, slaveAddress, slaveName)
+		updateSlaveHeartbeat(slaveMap, slaveAddress, slaveName)
 	} else {
 		fmt.Printf("Slave added with name \"%v\", IP %v", slaveName, slaveAddress)
 		slaveMap[slaveName] = Slave{URL: slaveAddress, heartbeat: time.Now()}
@@ -29,7 +29,9 @@ func processRequest(request *http.Request) (slaveName, slaveAddress string) {
 	return
 }
 
-func updateSlaveHeartbeat(slaveMap map[string]Slave, slaveAddress, slaveName string) map[string]Slave {
+//TO DO DoI need to return slaveMap? Maybe it changed its value even if i'm not returning it..
+//Then simplify error
+func updateSlaveHeartbeat(slaveMap map[string]Slave, slaveAddress, slaveName string) ( err error){
 	slaveInstance := slaveMap[slaveName]
 	if slaveInstance.URL != slaveAddress {
 		fmt.Printf(`WARNING: Slave with name \"%v\"
@@ -37,19 +39,20 @@ func updateSlaveHeartbeat(slaveMap map[string]Slave, slaveAddress, slaveName str
 			kill signal sent to slave with name \"%v\"
 			with IP address: %v`,
 			slaveName, slaveInstance.URL, slaveName, slaveAddress)
-		sendKillSignalToSlave(slaveAddress)
+		err = sendKillSignalToSlave(slaveAddress)
 	} else {
 		slaveInstance.heartbeat = time.Now()
 		slaveMap[slaveName] = slaveInstance
 	}
-	return slaveMap
+	return
 }
 
-func sendKillSignalToSlave(slaveAddress string) {
+func sendKillSignalToSlave(slaveAddress string) (err error) {
 	client := &http.Client{}
 	form := url.Values{}
 	form.Set("message", "die")
-	client.PostForm(slaveAddress+"/receive_killsignal", form)
+	_, err = client.PostForm(slaveAddress+"/receive_killsignal", form)
+	return
 }
 
 func MonitorSlaves(timeInterval int, slaveMap map[string]Slave) {
