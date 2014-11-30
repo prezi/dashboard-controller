@@ -23,13 +23,10 @@ type IdList struct {
 
 // TODO: Allow user to input names of currently running slaves at master startup.
 // Alternatively, allow to manually add names of currently running slave while the master is running.
+// I don't think this should be in the scope.. Renaming the slave is laborious, and the user could easily restart it..
 func SetUp() (slaveMap map[string]Slave) {
-	return initializeSlaveMap()
-}
-
-func initializeSlaveMap() (slaveMap map[string]Slave) {
 	slaveMap = make(map[string]Slave)
-	return slaveMap
+	return
 }
 
 func printServerResponse(error error, slaveName string) {
@@ -74,7 +71,7 @@ func getWebserverAddress(request *http.Request) (webServerAddress string, err er
 	return
 }
 
-func SendWebserverInit(w http.ResponseWriter, r *http.Request, slaveMap map[string]Slave) {
+func SendWebserverInit(r *http.Request, slaveMap map[string]Slave) {
 	if r.FormValue("message") == "update me!" {
 		webServerAddress, _ = getWebserverAddress(r)
 		fmt.Println(sendSlaveListToWebserver(webServerAddress, slaveMap))

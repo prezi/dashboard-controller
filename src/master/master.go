@@ -17,9 +17,9 @@ func main() {
 	http.HandleFunc("/webserver_heartbeat", func(_ http.ResponseWriter, r *http.Request) {
 		master.UpdateWebserverAddress(r)
 	})
-	http.HandleFunc("/webserver_init", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/webserver_init", func(_ http.ResponseWriter, r *http.Request) {
 
-		master.SendWebserverInit(w, r, slaveMap)
+		master.SendWebserverInit(r, slaveMap)
 	})
 	go master.MonitorSlaves(3, slaveMap)
 	log.Fatal(http.ListenAndServe(":5000", nil))
