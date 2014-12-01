@@ -17,11 +17,10 @@ import (
 	"time"
 )
 
-var MASTER_URL = "http://localhost:5000"
-var WEBSERVER_PORT = "4003"
 var VIEWS_PATH = "src/webserver/views/"
 
 const (
+	DEFAULT_MASTER_URL = "http://localhost:5000"
 	DEFAULT_MASTER_IP_ADDRESS = "localhost"
 	DEFAULT_MASTER_PORT       = "5000"
 	DEFAULT_WEBSERVER_PORT    = "4003"
@@ -55,44 +54,46 @@ var id_list = IdList{
 }
 
 func main() {
-	MASTER_URL = setMasterAddress()
+	masterIP, masterPort, webserverPort := configFlags()
+	masterUrl := network.AddProtocolAndPortToIP(masterIP, masterPort)
 	http.Handle("/assets/images/", http.StripPrefix("/assets/images/", http.FileServer(http.Dir(IMAGES_PATH))))
 	http.Handle("/assets/javascripts/", http.StripPrefix("/assets/javascripts/", http.FileServer(http.Dir(JAVASCRIPTS_PATH))))
 	http.Handle("/assets/stylesheets/", http.StripPrefix("/assets/stylesheets/", http.FileServer(http.Dir(STYLESHEETS_PATH))))
 	http.HandleFunc("/", formHandler)
 	http.HandleFunc("/form-submit", submitHandler)
 	http.HandleFunc("/receive_slave", receiveAndMapSlaveAddress)
-	go sendInitToMaster(MASTER_URL, "/webserver_init")
-	go startWebserverHeartbeats(5, MASTER_URL, "/webserver_heartbeat")
-	http.ListenAndServe(":"+WEBSERVER_PORT, nil)
+	go sendInitToMaster(masterUrl, webserverPort, "/webserver_init")
+	go startWebserverHeartbeats(5, masterUrl, webserverPort, "/webserver_heartbeat")
+	http.ListenAndServe(":" + webserverPort, nil)
 }
 
-func setMasterAddress() (masterUrl string) {
-	masterIP, masterPort := configFlags()
-	masterUrl = network.AddProtocolAndPortToIP(masterIP, masterPort)
-	return
-}
-
-func configFlags() (masterIP, masterPort string) {
+func configFlags() (masterIP, masterPort, webserverPort string) {
 	flag.StringVar(&masterIP, "masterIP", DEFAULT_MASTER_IP_ADDRESS, "master IP address")
 	flag.StringVar(&masterPort, "masterPort", DEFAULT_MASTER_PORT, "master port number")
-	flag.StringVar(&WEBSERVER_PORT, "webserverPort", DEFAULT_WEBSERVER_PORT, "webserver port number")
+	flag.StringVar(&webserverPort, "webserverPort", DEFAULT_WEBSERVER_PORT, "webserver port number")
 	flag.Parse()
-	return masterIP, masterPort
+	return masterIP, masterPort, webserverPort
 }
 
-func formHandler(response_writer http.ResponseWriter, request *http.Request) {
+func formHandler(responseWriter http.ResponseWriter, request *http.Request) {
 	if request.Method == "GET" {
 		if request.URL.Path != "/" {
-			http.Redirect(response_writer, request, "/", 301)
+			http.Redirect(responseWriter, request, "/", 301)
 		}
-		template, err := template.ParseFiles(path.Join(VIEWS_PATH, "form.html"))
-		if err != nil {
-			fmt.Println("Html files not found. Please restart from the root folder.")
-			os.Exit(1)
-		} else {
-			template.Execute(response_writer, id_list)
-		}
+		parseAndExecuteTemplate(responseWriter)
+	}
+}
+
+func parseAndExecuteTemplate(responseWriter http.ResponseWriter) {
+	template, err := template.ParseFiles(path.Join(VIEWS_PATH, "form.html"))
+	handleTemplateParseError(err)
+	template.Execute(responseWriter, id_list)
+}
+
+func handleTemplateParseError(err error) {
+	if err != nil {
+		fmt.Println("Html files not found. Please restart from the root folder.")
+		os.Exit(1)
 	}
 }
 
@@ -106,7 +107,7 @@ func submitHandler(response_writer http.ResponseWriter, request *http.Request) {
 		}
 		sendConfirmationMessageToUser(response_writer, returnStatusMessageFrom(url), url, name, slaveError)
 		if isUrlValid(url) == true {
-			sendUrlAndIdToMaster(MASTER_URL, url, name)
+			sendUrlAndIdToMaster(DEFAULT_MASTER_URL, url, name)
 		}
 	}
 }
@@ -204,23 +205,23 @@ func receiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 	fmt.Println("Slave Name: ", id_list.Id)
 }
 
-func sendInitToMaster(masterUrl, pattern string) {
+func sendInitToMaster(masterUrl, webserverPort, pattern string) {
 	postRequestUrl := masterUrl
 	postRequestUrl += pattern
 	client := &http.Client{}
 	form := url.Values{}
 	form.Set("message", "update me!")
-	form.Set("webserverPort", WEBSERVER_PORT)
+	form.Set("webserverPort", webserverPort)
 	client.PostForm(postRequestUrl, form)
 }
 
-func startWebserverHeartbeats(heartbeatInterval int, masterUrl, pattern string) {
+func startWebserverHeartbeats(heartbeatInterval int, masterUrl, webserverPort, pattern string) {
 	var err error
 	postRequestUrl := masterUrl
 	postRequestUrl += pattern
 	client := &http.Client{}
 	form := url.Values{}
-	form.Set("webserverPort", WEBSERVER_PORT)
+	form.Set("webserverPort", webserverPort)
 	beat := time.Tick(time.Duration(heartbeatInterval) * time.Second)
 	for _ = range beat {
 		_, err = client.PostForm(postRequestUrl, form)

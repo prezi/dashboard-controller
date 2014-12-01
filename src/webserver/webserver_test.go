@@ -17,11 +17,6 @@ type PostURLRequest struct {
 	URLToLoadInBrowser   string
 }
 
-func TestFormHandler(t *testing.T) {
-	assert.Equal(t, 200, sendGetToFormHandler("/"))
-	assert.Equal(t, 301, sendGetToFormHandler("addfs"))
-}
-
 func parseJsonSlave(input []byte) (slave PostURLRequest) {
 	err := json.Unmarshal(input, &slave)
 	if err != nil {
@@ -51,10 +46,9 @@ func sendGetToFormHandler(URL string) int {
 	return resp.StatusCode
 }
 
-func TestSetDefaultMasterAddress(t *testing.T) {
-	defaultUrl := setMasterAddress()
-
-	assert.Equal(t, "http://localhost:5000", defaultUrl)
+func TestFormHandler(t *testing.T) {
+	assert.Equal(t, 200, sendGetToFormHandler("/"))
+	assert.Equal(t, 301, sendGetToFormHandler("addfs"))
 }
 
 func TestSubmitHandler(t *testing.T) {
@@ -73,7 +67,6 @@ func TestSubmitHandler(t *testing.T) {
 }
 
 func TestSendConfirmationMessageToUser(t *testing.T) {
-	VIEWS_PATH = "views/"
 	var responseHeader string
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		sendConfirmationMessageToUser(w, "aaaa", "bbbb", "cccc", "hello")
@@ -163,7 +156,6 @@ func TestReceiveAndMapSlaveAddress(t *testing.T) {
 }
 
 func TestConfirmationMessage(t *testing.T) {
-	VIEWS_PATH = "views/"
 	answer_string := parseJsonReply(confirmationMessage("aaaa", "bbbb", "cccc", "hello")).HTML
 	assert.Equal(t, true, strings.Contains(answer_string, "aaaa"))
 	assert.Equal(t, true, strings.Contains(answer_string, "bbbb"))
