@@ -17,7 +17,7 @@ func main() {
 	})
 	http.HandleFunc("/receive_killsignal", func(_ http.ResponseWriter, request *http.Request) {
 		if "die" == request.FormValue("message") {
-			fmt.Println("Master refused slave. Please restart slave with a different name.")
+			fmt.Println("Slave with this name already exists. Please restart slave with a different name.")
 			os.Exit(1)
 		}
 	})

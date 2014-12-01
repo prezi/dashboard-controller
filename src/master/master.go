@@ -18,7 +18,6 @@ func main() {
 		master.UpdateWebserverAddress(r)
 	})
 	http.HandleFunc("/webserver_init", func(_ http.ResponseWriter, r *http.Request) {
-
 		master.SendWebserverInit(r, slaveMap)
 	})
 	go master.MonitorSlaves(3, slaveMap)

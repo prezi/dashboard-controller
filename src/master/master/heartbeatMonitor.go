@@ -11,7 +11,7 @@ import (
 var test_mode = false
 
 func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]Slave) {
-	slaveName, slaveAddress := processRequest(request)
+	slaveName, slaveAddress := processSlaveHeartbeatRequest(request)
 
 	if _, existsInMap := slaveMap[slaveName]; existsInMap {
 		updateSlaveHeartbeat(slaveMap, slaveAddress, slaveName)
@@ -22,7 +22,7 @@ func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]Slave) {
 	}
 }
 
-func processRequest(request *http.Request) (slaveName, slaveAddress string) {
+func processSlaveHeartbeatRequest(request *http.Request) (slaveName, slaveAddress string) {
 	slaveName = request.PostFormValue("slaveName")
 	slavePort := request.PostFormValue("slavePort")
 
@@ -31,7 +31,7 @@ func processRequest(request *http.Request) (slaveName, slaveAddress string) {
 	return
 }
 
-func updateSlaveHeartbeat(slaveMap map[string]Slave, slaveAddress, slaveName string) ( err error){
+func updateSlaveHeartbeat(slaveMap map[string]Slave, slaveAddress, slaveName string) (err error) {
 	slaveInstance := slaveMap[slaveName]
 	if slaveInstance.URL != slaveAddress {
 		fmt.Printf(`WARNING: Slave with name \"%v\"
@@ -66,33 +66,41 @@ func MonitorSlaves(timeInterval int, slaveMap map[string]Slave) {
 }
 
 func removeDeadSlaves(deadTime int, slaveMap map[string]Slave) {
-	slavesToRemove := make([]string,0,len(slaveMap))
-	remainingSlaves := make([]string,0,len(slaveMap))
-	for slaveName, slave := range slaveMap {
-		timeDifference := time.Now().Sub(slave.heartbeat)
-		timeThreshold := time.Duration(deadTime)*time.Second
-		if timeDifference > timeThreshold {
-			slavesToRemove = append(slavesToRemove, slaveName)
-		} else {
-			remainingSlaves = append(remainingSlaves,slaveName)
-		}
-	}
+	slavesToRemove := getDeadSlaves(deadTime, slaveMap)
 	if len(slavesToRemove) > 0 {
 		fmt.Printf("\nREMOVING DEAD SLAVES: %v\n", slavesToRemove)
 		for _, deadSlaveName := range slavesToRemove {
 			delete(slaveMap, deadSlaveName)
 		}
+		printSlavesNamesInMap(slaveMap)
 		sendSlaveListToWebserver(webServerAddress, slaveMap)
-		if len(remainingSlaves) >0 {
-			fmt.Printf("Current slaves are: %v\n",remainingSlaves)
-		} else {
-			fmt.Println("No slaves available.\n")
-		}
 	}
-
 }
 
-func UpdateWebserverAddress(r *http.Request)(err error) {
+func getDeadSlaves(deadTime int, slaveMap map[string]Slave) (deadSlaves []string) {
+	for slaveName, slave := range slaveMap {
+		timeDifference := time.Now().Sub(slave.heartbeat)
+		timeThreshold := time.Duration(deadTime) * time.Second
+
+		if timeDifference > timeThreshold {
+			deadSlaves = append(deadSlaves, slaveName)
+		}
+	}
+	return
+}
+
+func printSlavesNamesInMap(slaveMap map[string]Slave) {
+	fmt.Println("Current slaves are: ")
+	if len(slaveMap) == 0 {
+		fmt.Println("No slaves available.")
+	} else {
+		for slaveName, _ := range slaveMap {
+			fmt.Println(slaveName)
+		}
+	}
+}
+
+func UpdateWebserverAddress(r *http.Request) (err error) {
 	newWebServerAddress, err := getWebserverAddress(r)
 	if webServerAddress != newWebServerAddress {
 		fmt.Printf("Webserver address has changed from %v to %v\n", webServerAddress, newWebServerAddress)
@@ -100,4 +108,3 @@ func UpdateWebserverAddress(r *http.Request)(err error) {
 	}
 	return
 }
-
