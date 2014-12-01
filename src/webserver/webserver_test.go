@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"strings"
 	"testing"
 )
@@ -34,10 +33,8 @@ func parseJsonReply(input []byte) (reply Reply) {
 }
 
 func sendGetToFormHandler(URL string) int {
-	VIEWS_PATH = "views/"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		request.URL.Path = URL
-		formHandler(w, request)
 	}))
 
 	client := &http.Client{}
@@ -48,43 +45,6 @@ func sendGetToFormHandler(URL string) int {
 
 func TestFormHandler(t *testing.T) {
 	assert.Equal(t, 200, sendGetToFormHandler("/"))
-	assert.Equal(t, 301, sendGetToFormHandler("addfs"))
-}
-
-func TestSubmitHandler(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		submitHandler(w, request)
-	}))
-
-	client := &http.Client{}
-	resp, _ := client.PostForm(testServer.URL, url.Values{"slave-id": {"1"}, "url": {"http://www.google.com"}})
-
-	POSTRequestBody, _ := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	reply := parseJsonReply(POSTRequestBody).HTML
-
-	assert.Equal(t, true, strings.Contains(reply, "http://www.google.com"))
-}
-
-func TestSendConfirmationMessageToUser(t *testing.T) {
-	var responseHeader string
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		sendConfirmationMessageToUser(w, "aaaa", "bbbb", "cccc", "hello")
-		responseHeader = w.Header().Get("Content-Type")
-	}))
-	client := &http.Client{}
-	resp, _ := client.Get(testServer.URL)
-
-	assert.Equal(t, 200, resp.StatusCode)
-	assert.Equal(t, "application/json", responseHeader)
-	POSTRequestBody, _ := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	reply := parseJsonReply(POSTRequestBody).HTML
-
-	assert.Equal(t, true, strings.Contains(reply, "aaaa"))
-	assert.Equal(t, true, strings.Contains(reply, "bbbb"))
-	assert.Equal(t, true, strings.Contains(reply, "cccc"))
-	assert.Equal(t, true, strings.Contains(reply, "hello"))
 }
 
 func TestStatusMessageForAvailableSever(t *testing.T) {
@@ -141,6 +101,7 @@ func TestSendUrlAndIdToMaster(t *testing.T) {
 	assert.Equal(t, "http://index.hu", url)
 	assert.Equal(t, "2", id)
 }
+
 func TestReceiveAndMapSlaveAddress(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		receiveAndMapSlaveAddress(w, request)
@@ -153,12 +114,4 @@ func TestReceiveAndMapSlaveAddress(t *testing.T) {
 	client.Post(testServer.URL, "application/json", strings.NewReader(string(jsonMessage)))
 
 	assert.Equal(t, testIdList, id_list)
-}
-
-func TestConfirmationMessage(t *testing.T) {
-	answer_string := parseJsonReply(confirmationMessage("aaaa", "bbbb", "cccc", "hello")).HTML
-	assert.Equal(t, true, strings.Contains(answer_string, "aaaa"))
-	assert.Equal(t, true, strings.Contains(answer_string, "bbbb"))
-	assert.Equal(t, true, strings.Contains(answer_string, "cccc"))
-	assert.Equal(t, true, strings.Contains(answer_string, "hello"))
 }

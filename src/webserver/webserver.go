@@ -17,16 +17,16 @@ import (
 	"time"
 )
 
-var VIEWS_PATH = "src/webserver/views/"
 
 const (
 	DEFAULT_MASTER_URL = "http://localhost:5000"
 	DEFAULT_MASTER_IP_ADDRESS = "localhost"
 	DEFAULT_MASTER_PORT       = "5000"
 	DEFAULT_WEBSERVER_PORT    = "4003"
-	IMAGES_PATH               = "src/webserver/assets/images"
-	JAVASCRIPTS_PATH          = "src/webserver/assets/javascripts"
-	STYLESHEETS_PATH          = "src/webserver/assets/stylesheets"
+	IMAGES_PATH = "src/webserver/assets/images"
+	JAVASCRIPTS_PATH = "src/webserver/assets/javascripts"
+	STYLESHEETS_PATH = "src/webserver/assets/stylesheets"
+	VIEWS_PATH = "src/webserver/views/"
 )
 
 type Message struct {
