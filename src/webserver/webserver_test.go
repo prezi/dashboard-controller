@@ -39,7 +39,7 @@ func parseJsonReply(input []byte) (reply Reply) {
 }
 
 func sendGetToFormHandler(URL string) int {
-	TEMPLATE_PATH = "templates/"
+	VIEWS_PATH = "views/"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		request.URL.Path = URL
 		formHandler(w, request)
@@ -73,7 +73,7 @@ func TestSubmitHandler(t *testing.T) {
 }
 
 func TestSendConfirmationMessageToUser(t *testing.T) {
-	TEMPLATE_PATH = "templates/"
+	VIEWS_PATH = "views/"
 	var responseHeader string
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		sendConfirmationMessageToUser(w, "aaaa", "bbbb", "cccc", "hello")
@@ -163,7 +163,7 @@ func TestReceiveAndMapSlaveAddress(t *testing.T) {
 }
 
 func TestConfirmationMessage(t *testing.T) {
-	TEMPLATE_PATH = "templates/"
+	VIEWS_PATH = "views/"
 	answer_string := parseJsonReply(confirmationMessage("aaaa", "bbbb", "cccc", "hello")).HTML
 	assert.Equal(t, true, strings.Contains(answer_string, "aaaa"))
 	assert.Equal(t, true, strings.Contains(answer_string, "bbbb"))

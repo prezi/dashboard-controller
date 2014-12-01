@@ -1,4 +1,4 @@
-body{
+body {
 	font-family:verdana;
     background-image: url('http://a1star.com/images/star--background-seamless-repeating8.jpg');
     background-color: #cccccc;
@@ -36,6 +36,7 @@ label {
   -webkit-box-shadow: inset 0 -2px #e8930c;
   box-shadow: inset 0 -2px #e8930c;
 }
+
 .form-box {
     width: 400px;
     margin: auto;
@@ -43,10 +44,9 @@ label {
     border: 1px solid black;
     opacity: 0.8;
     padding: 1cm;
-
 }
 
-.title{
+.title {
     text-align: center;
     color: black;
 
@@ -59,10 +59,9 @@ label {
 
 .inputbutton {
     text-align: center;
-
 }
 
-.big-frame{
+.big-frame {
 	margin-top: 2cm;
 }
 

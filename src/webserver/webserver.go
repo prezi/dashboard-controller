@@ -18,14 +18,16 @@ import (
 )
 
 var MASTER_URL = "http://localhost:5000"
-var TEMPLATE_PATH = "src/webserver/templates/"
-var STATIC_PATH = "src/webserver/static"
 var WEBSERVER_PORT = "4003"
+var VIEWS_PATH = "src/webserver/views/"
 
 const (
 	DEFAULT_MASTER_IP_ADDRESS = "localhost"
 	DEFAULT_MASTER_PORT       = "5000"
 	DEFAULT_WEBSERVER_PORT    = "4003"
+	IMAGES_PATH = "src/webserver/assets/images"
+	JAVASCRIPTS_PATH = "src/webserver/assets/javascripts"
+	STYLESHEETS_PATH = "src/webserver/assets/stylesheets"
 )
 
 type Message struct {
@@ -53,9 +55,10 @@ var id_list = IdList{
 }
 
 func main() {
-	fs := http.FileServer(http.Dir(STATIC_PATH))
 	MASTER_URL = setMasterAddress()
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	http.Handle("/assets/images/", http.StripPrefix("/assets/images/", http.FileServer(http.Dir(IMAGES_PATH))))
+	http.Handle("/assets/javascripts/", http.StripPrefix("/assets/javascripts/", http.FileServer(http.Dir(JAVASCRIPTS_PATH))))
+	http.Handle("/assets/stylesheets/", http.StripPrefix("/assets/stylesheets/", http.FileServer(http.Dir(STYLESHEETS_PATH))))
 	http.HandleFunc("/", formHandler)
 	http.HandleFunc("/form-submit", submitHandler)
 	http.HandleFunc("/receive_slave", receiveAndMapSlaveAddress)
@@ -83,7 +86,7 @@ func formHandler(response_writer http.ResponseWriter, request *http.Request) {
 		if request.URL.Path != "/" {
 			http.Redirect(response_writer, request, "/", 301)
 		}
-		template, err := template.ParseFiles(path.Join(TEMPLATE_PATH, "form.html"))
+		template, err := template.ParseFiles(path.Join(VIEWS_PATH, "form.html"))
 		if err != nil {
 			fmt.Println("Html files not found. Please restart from the root folder.")
 			os.Exit(1)
@@ -126,7 +129,7 @@ func sendConfirmationMessageToUser(response_writer http.ResponseWriter, status_c
 }
 
 func confirmationMessage(URL, status_code, slave_ID, slaveError string) []byte {
-	t, err := template.ParseFiles(path.Join(TEMPLATE_PATH, "infobox.html"))
+	t, err := template.ParseFiles(path.Join(VIEWS_PATH, "infobox.html"))
 	if err != nil {
 		fmt.Println(err)
 	}
