@@ -7,7 +7,7 @@ $(document).ready(function() {
             type: "POST",
             data: postData,
             success: function(data, textStatus, jqXHR) {
-                $(".info").html(data.HTML);
+                $(".info").html(data.StatusMessage);
                 $(".info").show("slow");
                 setTimeout(function() {
                     $(".info").hide("slow");

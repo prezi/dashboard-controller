@@ -30,7 +30,7 @@ func parseJsonSlave(input []byte) (slave PostURLRequest) {
 	return
 }
 
-func parseJsonReply(input []byte) (reply Reply) {
+func parseJsonReply(input []byte) (reply StatusMessage) {
 	err := json.Unmarshal(input, &reply)
 	if err != nil {
 		fmt.Println("error:", err)
@@ -59,7 +59,8 @@ func TestSetDefaultMasterAddress(t *testing.T) {
 
 func TestSubmitHandler(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		submitHandler(w, request)
+		id_list = IdList{Id: []string{"testSlave1", "testSlave2"}}
+		submitHandler(w, request, true)
 	}))
 
 	client := &http.Client{}
@@ -67,16 +68,30 @@ func TestSubmitHandler(t *testing.T) {
 
 	POSTRequestBody, _ := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
-	reply := parseJsonReply(POSTRequestBody).HTML
+	reply := parseJsonReply(POSTRequestBody).StatusMessage
 
-	assert.Equal(t, true, strings.Contains(reply, "http://www.google.com"))
+	assert.Equal(t, true, strings.Contains(reply, "1 is offline, please refresh your browser to see available screens."))
+
+	resp, _ = client.PostForm(testServer.URL, url.Values{"slave-id": {"testSlave1"}, "url": {"http://www.google.com"}})
+	POSTRequestBody, _ = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	reply = parseJsonReply(POSTRequestBody).StatusMessage
+
+	assert.Equal(t, true, strings.Contains(reply, "Success! http://www.google.com is being displayed on testSlave1"))
+
+	resp, _ = client.PostForm(testServer.URL, url.Values{"slave-id": {"testSlave1"}, "url": {"blablawrongurlhere"}})
+	POSTRequestBody, _ = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	reply = parseJsonReply(POSTRequestBody).StatusMessage
+
+	assert.Equal(t, true, strings.Contains(reply, "blablawrongurlhere cannot be opened. Try a different one. Sadpanda."))
 }
 
 func TestSendConfirmationMessageToUser(t *testing.T) {
 	VIEWS_PATH = "views/"
 	var responseHeader string
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		sendConfirmationMessageToUser(w, "aaaa", "bbbb", "cccc", "hello")
+		sendConfirmationMessageToUser(w, "hello")
 		responseHeader = w.Header().Get("Content-Type")
 	}))
 	client := &http.Client{}
@@ -86,26 +101,23 @@ func TestSendConfirmationMessageToUser(t *testing.T) {
 	assert.Equal(t, "application/json", responseHeader)
 	POSTRequestBody, _ := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
-	reply := parseJsonReply(POSTRequestBody).HTML
+	reply := parseJsonReply(POSTRequestBody).StatusMessage
 
-	assert.Equal(t, true, strings.Contains(reply, "aaaa"))
-	assert.Equal(t, true, strings.Contains(reply, "bbbb"))
-	assert.Equal(t, true, strings.Contains(reply, "cccc"))
 	assert.Equal(t, true, strings.Contains(reply, "hello"))
 }
 
 func TestStatusMessageForAvailableSever(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 	}))
-	statusMessage := returnStatusMessageFrom(testServer.URL)
+	statusMessage := isUrlValid(testServer.URL)
 
-	assert.Equal(t, "Success!", statusMessage)
+	assert.Equal(t, true, statusMessage)
 }
 
 func TestStatusMessageForUnavailableServer(t *testing.T) {
-	statusMessage := returnStatusMessageFrom("")
+	statusMessage := isUrlValid("")
 
-	assert.Equal(t, "URL cannot be open :( (HTTP status code 0)", statusMessage)
+	assert.Equal(t, false, statusMessage)
 }
 
 func TestCheckStatusCode(t *testing.T) {
@@ -162,11 +174,8 @@ func TestReceiveAndMapSlaveAddress(t *testing.T) {
 	assert.Equal(t, testIdList, id_list)
 }
 
-func TestConfirmationMessage(t *testing.T) {
+func TestCreateConfirmationMessage(t *testing.T) {
 	VIEWS_PATH = "views/"
-	answer_string := parseJsonReply(confirmationMessage("aaaa", "bbbb", "cccc", "hello")).HTML
-	assert.Equal(t, true, strings.Contains(answer_string, "aaaa"))
-	assert.Equal(t, true, strings.Contains(answer_string, "bbbb"))
-	assert.Equal(t, true, strings.Contains(answer_string, "cccc"))
+	answer_string := parseJsonReply(createConfirmationMessage("hello")).StatusMessage
 	assert.Equal(t, true, strings.Contains(answer_string, "hello"))
 }

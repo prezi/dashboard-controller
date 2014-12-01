@@ -12,7 +12,6 @@ import (
 	"network"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -25,9 +24,9 @@ const (
 	DEFAULT_MASTER_IP_ADDRESS = "localhost"
 	DEFAULT_MASTER_PORT       = "5000"
 	DEFAULT_WEBSERVER_PORT    = "4003"
-	IMAGES_PATH = "src/webserver/assets/images"
-	JAVASCRIPTS_PATH = "src/webserver/assets/javascripts"
-	STYLESHEETS_PATH = "src/webserver/assets/stylesheets"
+	IMAGES_PATH               = "src/webserver/assets/images"
+	JAVASCRIPTS_PATH          = "src/webserver/assets/javascripts"
+	STYLESHEETS_PATH          = "src/webserver/assets/stylesheets"
 )
 
 type Message struct {
@@ -36,14 +35,7 @@ type Message struct {
 }
 
 type StatusMessage struct {
-	Code       string
-	URL        string
-	ID         string
-	SlaveError string
-}
-
-type Reply struct {
-	HTML string
+	StatusMessage string
 }
 
 type IdList struct {
@@ -55,15 +47,20 @@ var id_list = IdList{
 }
 
 func main() {
+	isMasterAlive := true
 	MASTER_URL = setMasterAddress()
 	http.Handle("/assets/images/", http.StripPrefix("/assets/images/", http.FileServer(http.Dir(IMAGES_PATH))))
 	http.Handle("/assets/javascripts/", http.StripPrefix("/assets/javascripts/", http.FileServer(http.Dir(JAVASCRIPTS_PATH))))
 	http.Handle("/assets/stylesheets/", http.StripPrefix("/assets/stylesheets/", http.FileServer(http.Dir(STYLESHEETS_PATH))))
 	http.HandleFunc("/", formHandler)
-	http.HandleFunc("/form-submit", submitHandler)
+	// http.HandleFunc("/form-submit", submitHandler)
+
+	http.HandleFunc("/form-submit", func(w http.ResponseWriter, r *http.Request) {
+		submitHandler(w, r, isMasterAlive)
+	})
 	http.HandleFunc("/receive_slave", receiveAndMapSlaveAddress)
 	go sendInitToMaster(MASTER_URL, "/webserver_init")
-	go startWebserverHeartbeats(5, MASTER_URL, "/webserver_heartbeat")
+	go startWebserverHeartbeats(5, MASTER_URL, "/webserver_heartbeat", &isMasterAlive)
 	http.ListenAndServe(":"+WEBSERVER_PORT, nil)
 }
 
@@ -96,17 +93,25 @@ func formHandler(response_writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func submitHandler(response_writer http.ResponseWriter, request *http.Request) {
+func submitHandler(response_writer http.ResponseWriter, request *http.Request, isMasterAlive bool) {
 	if request.Method == "POST" {
-		slaveError := ""
 		url := request.FormValue("url")
 		name := request.FormValue("slave-id")
-		if slaveInSlaveList(name, id_list.Id) == false {
-			slaveError = "This slave does not exist, please refresh your browser."
-		}
-		sendConfirmationMessageToUser(response_writer, returnStatusMessageFrom(url), url, name, slaveError)
-		if isUrlValid(url) == true {
-			sendUrlAndIdToMaster(MASTER_URL, url, name)
+		if isMasterAlive == false {
+			statusMessage := "Master offline."
+			sendConfirmationMessageToUser(response_writer, statusMessage)
+		} else if slaveInSlaveList(name, id_list.Id) == false {
+			statusMessage := name + " is offline, please refresh your browser to see available screens."
+			sendConfirmationMessageToUser(response_writer, statusMessage)
+		} else {
+			if isUrlValid(url) == true {
+				statusMessage := "Success! " + url + " is being displayed on " + name
+				sendUrlAndIdToMaster(MASTER_URL, url, name)
+				sendConfirmationMessageToUser(response_writer, statusMessage)
+			} else {
+				statusMessage := url + " cannot be opened. Try a different one. Sadpanda."
+				sendConfirmationMessageToUser(response_writer, statusMessage)
+			}
 		}
 	}
 }
@@ -120,38 +125,28 @@ func slaveInSlaveList(slaveName string, slaveIdList []string) bool {
 	return false
 }
 
-func sendConfirmationMessageToUser(response_writer http.ResponseWriter, status_code, URL, slave_ID, slaveError string) {
-	confirmationMessage := confirmationMessage(URL, status_code, slave_ID, slaveError)
+func sendConfirmationMessageToUser(response_writer http.ResponseWriter, statusMessage string) {
+	confirmationMessage := createConfirmationMessage(statusMessage)
 
 	header := response_writer.Header()
 	header.Set("Content-Type", "application/json")
 	response_writer.Write(confirmationMessage)
 }
 
-func confirmationMessage(URL, status_code, slave_ID, slaveError string) []byte {
+func createConfirmationMessage(statusMessage string) []byte {
 	t, err := template.ParseFiles(path.Join(VIEWS_PATH, "infobox.html"))
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	buf := new(bytes.Buffer)
-	t.ExecuteTemplate(buf, "T", StatusMessage{status_code, URL, slave_ID, slaveError})
+	t.ExecuteTemplate(buf, "T", StatusMessage{statusMessage})
 
-	jsonMessage, err := json.Marshal(Reply{HTML: buf.String()})
+	jsonMessage, err := json.Marshal(StatusMessage{StatusMessage: buf.String()})
 	if err != nil {
 		fmt.Println(err)
 	}
 	return jsonMessage
-}
-
-func returnStatusMessageFrom(url string) (statusMessage string) {
-	statusCode := checkStatusCode(url)
-	if 400 <= statusCode || statusCode == 0 {
-		statusMessage = "URL cannot be open :( (HTTP status code " + strconv.Itoa(statusCode) + ")"
-	} else {
-		statusMessage = "Success!"
-	}
-	return
 }
 
 func checkStatusCode(urlToDisplay string) int {
@@ -214,8 +209,7 @@ func sendInitToMaster(masterUrl, pattern string) {
 	client.PostForm(postRequestUrl, form)
 }
 
-func startWebserverHeartbeats(heartbeatInterval int, masterUrl, pattern string) {
-	var err error
+func startWebserverHeartbeats(heartbeatInterval int, masterUrl, pattern string, isMasterAlive *bool) {
 	postRequestUrl := masterUrl
 	postRequestUrl += pattern
 	client := &http.Client{}
@@ -223,7 +217,13 @@ func startWebserverHeartbeats(heartbeatInterval int, masterUrl, pattern string) 
 	form.Set("webserverPort", WEBSERVER_PORT)
 	beat := time.Tick(time.Duration(heartbeatInterval) * time.Second)
 	for _ = range beat {
-		_, err = client.PostForm(postRequestUrl, form)
-		network.ErrorHandler(err, "Error communicating with master: %v\n")
+		_, err := client.PostForm(postRequestUrl, form)
+		if err != nil {
+			id_list.Id = id_list.Id[:0]
+			fmt.Printf("Error communicating with master: %v\n", err)
+			*isMasterAlive = false
+		} else {
+			*isMasterAlive = true
+		}
 	}
 }
