@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"strings"
 	"testing"
 )
@@ -15,11 +14,6 @@ import (
 type PostURLRequest struct {
 	DestinationSlaveName string
 	URLToLoadInBrowser   string
-}
-
-func TestFormHandler(t *testing.T) {
-	assert.Equal(t, 200, sendGetToFormHandler("/"))
-	assert.Equal(t, 301, sendGetToFormHandler("addfs"))
 }
 
 func parseJsonSlave(input []byte) (slave PostURLRequest) {
@@ -39,10 +33,8 @@ func parseJsonReply(input []byte) (reply StatusMessage) {
 }
 
 func sendGetToFormHandler(URL string) int {
-	VIEWS_PATH = "views/"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		request.URL.Path = URL
-		formHandler(w, request)
 	}))
 
 	client := &http.Client{}
@@ -51,59 +43,8 @@ func sendGetToFormHandler(URL string) int {
 	return resp.StatusCode
 }
 
-func TestSetDefaultMasterAddress(t *testing.T) {
-	defaultUrl := setMasterAddress()
-
-	assert.Equal(t, "http://localhost:5000", defaultUrl)
-}
-
-func TestSubmitHandler(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		id_list = IdList{Id: []string{"testSlave1", "testSlave2"}}
-		submitHandler(w, request, true)
-	}))
-
-	client := &http.Client{}
-	resp, _ := client.PostForm(testServer.URL, url.Values{"slave-id": {"1"}, "url": {"http://www.google.com"}})
-
-	POSTRequestBody, _ := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	reply := parseJsonReply(POSTRequestBody).StatusMessage
-
-	assert.Equal(t, true, strings.Contains(reply, "1 is offline, please refresh your browser to see available screens."))
-
-	resp, _ = client.PostForm(testServer.URL, url.Values{"slave-id": {"testSlave1"}, "url": {"http://www.google.com"}})
-	POSTRequestBody, _ = ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	reply = parseJsonReply(POSTRequestBody).StatusMessage
-
-	assert.Equal(t, true, strings.Contains(reply, "Success! http://www.google.com is being displayed on testSlave1"))
-
-	resp, _ = client.PostForm(testServer.URL, url.Values{"slave-id": {"testSlave1"}, "url": {"blablawrongurlhere"}})
-	POSTRequestBody, _ = ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	reply = parseJsonReply(POSTRequestBody).StatusMessage
-
-	assert.Equal(t, true, strings.Contains(reply, "blablawrongurlhere cannot be opened. Try a different one. Sadpanda."))
-}
-
-func TestSendConfirmationMessageToUser(t *testing.T) {
-	VIEWS_PATH = "views/"
-	var responseHeader string
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		sendConfirmationMessageToUser(w, "hello")
-		responseHeader = w.Header().Get("Content-Type")
-	}))
-	client := &http.Client{}
-	resp, _ := client.Get(testServer.URL)
-
-	assert.Equal(t, 200, resp.StatusCode)
-	assert.Equal(t, "application/json", responseHeader)
-	POSTRequestBody, _ := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	reply := parseJsonReply(POSTRequestBody).StatusMessage
-
-	assert.Equal(t, true, strings.Contains(reply, "hello"))
+func TestFormHandler(t *testing.T) {
+	assert.Equal(t, 200, sendGetToFormHandler("/"))
 }
 
 func TestStatusMessageForAvailableSever(t *testing.T) {
@@ -160,6 +101,7 @@ func TestSendUrlAndIdToMaster(t *testing.T) {
 	assert.Equal(t, "http://index.hu", url)
 	assert.Equal(t, "2", id)
 }
+
 func TestReceiveAndMapSlaveAddress(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		receiveAndMapSlaveAddress(w, request)
@@ -172,10 +114,4 @@ func TestReceiveAndMapSlaveAddress(t *testing.T) {
 	client.Post(testServer.URL, "application/json", strings.NewReader(string(jsonMessage)))
 
 	assert.Equal(t, testIdList, id_list)
-}
-
-func TestCreateConfirmationMessage(t *testing.T) {
-	VIEWS_PATH = "views/"
-	answer_string := parseJsonReply(createConfirmationMessage("hello")).StatusMessage
-	assert.Equal(t, true, strings.Contains(answer_string, "hello"))
 }

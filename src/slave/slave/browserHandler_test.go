@@ -9,6 +9,8 @@ import (
 )
 
 const testURL = "http://www.placekitten.com"
+
+// set testBrowser to true for testing
 const testBrowser = false
 
 var browserProcess *exec.Cmd
