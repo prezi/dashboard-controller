@@ -1,7 +1,9 @@
-package master
+package slaveMonitor
 
 import (
 	"fmt"
+	"master/master"
+	"master/master/webserverCommunication"
 	"net"
 	"net/http"
 	"net/url"
@@ -10,27 +12,17 @@ import (
 
 var test_mode = false
 
-type Slave struct {
-	URL          string
-	heartbeat    time.Time
-	displayedURL string // TODO: store currently displayed URL for each slave
-}
-
-func SetUp() (slaveMap map[string]Slave) {
-	slaveMap = make(map[string]Slave)
-	return
-}
-
-func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]Slave) {
+func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]master.Slave, webServerAddress string) (updatedSlaveMap map[string]master.Slave) {
 	slaveName, slaveAddress := processSlaveHeartbeatRequest(request)
 
 	if _, existsInMap := slaveMap[slaveName]; existsInMap {
 		updateSlaveHeartbeat(slaveMap, slaveAddress, slaveName)
 	} else {
 		fmt.Printf("Slave added with name \"%v\", URL %v.\n\n", slaveName, slaveAddress)
-		slaveMap[slaveName] = Slave{URL: slaveAddress, heartbeat: time.Now()}
-		sendSlaveListToWebserver(webServerAddress, slaveMap)
+		slaveMap[slaveName] = master.Slave{URL: slaveAddress, Heartbeat: time.Now()}
+		webserverCommunication.SendSlaveListToWebserver(webServerAddress, slaveMap)
 	}
+	return slaveMap
 }
 
 func processSlaveHeartbeatRequest(request *http.Request) (slaveName, slaveAddress string) {
@@ -42,7 +34,7 @@ func processSlaveHeartbeatRequest(request *http.Request) (slaveName, slaveAddres
 	return
 }
 
-func updateSlaveHeartbeat(slaveMap map[string]Slave, slaveAddress, slaveName string) (err error) {
+func updateSlaveHeartbeat(slaveMap map[string]master.Slave, slaveAddress, slaveName string) (err error) {
 	slaveInstance := slaveMap[slaveName]
 	if slaveInstance.URL != slaveAddress {
 		fmt.Println("WARNING: Received signal from slave with duplicate name.")
@@ -50,7 +42,7 @@ func updateSlaveHeartbeat(slaveMap map[string]Slave, slaveAddress, slaveName str
 		fmt.Printf("Sending kill signal to duplicate slave at URL %v.\n\n", slaveAddress)
 		err = sendKillSignalToSlave(slaveAddress)
 	} else {
-		slaveInstance.heartbeat = time.Now()
+		slaveInstance.Heartbeat = time.Now()
 		slaveMap[slaveName] = slaveInstance
 	}
 	return
@@ -64,17 +56,17 @@ func sendKillSignalToSlave(slaveAddress string) (err error) {
 	return
 }
 
-func MonitorSlaves(timeInterval int, slaveMap map[string]Slave) {
+func MonitorSlaves(timeInterval int, slaveMap map[string]master.Slave, webServerAddress string) {
 	timer := time.Tick(time.Duration(timeInterval) * time.Second)
 	for _ = range timer {
-		removeDeadSlaves(timeInterval, slaveMap)
+		removeDeadSlaves(timeInterval, slaveMap, webServerAddress)
 		if test_mode {
 			break
 		}
 	}
 }
 
-func removeDeadSlaves(deadTime int, slaveMap map[string]Slave) {
+func removeDeadSlaves(deadTime int, slaveMap map[string]master.Slave, webServerAddress string) {
 	slavesToRemove := getDeadSlaves(deadTime, slaveMap)
 	if len(slavesToRemove) > 0 {
 		fmt.Printf("\nREMOVING DEAD SLAVES: %v\n", slavesToRemove)
@@ -82,13 +74,13 @@ func removeDeadSlaves(deadTime int, slaveMap map[string]Slave) {
 			delete(slaveMap, deadSlaveName)
 		}
 		printSlaveNamesInMap(slaveMap)
-		sendSlaveListToWebserver(webServerAddress, slaveMap)
+		webserverCommunication.SendSlaveListToWebserver(webServerAddress, slaveMap)
 	}
 }
 
-func getDeadSlaves(deadTime int, slaveMap map[string]Slave) (deadSlaves []string) {
+func getDeadSlaves(deadTime int, slaveMap map[string]master.Slave) (deadSlaves []string) {
 	for slaveName, slave := range slaveMap {
-		timeDifference := time.Now().Sub(slave.heartbeat)
+		timeDifference := time.Now().Sub(slave.Heartbeat)
 		timeThreshold := time.Duration(deadTime) * time.Second
 
 		if timeDifference > timeThreshold {
@@ -98,10 +90,10 @@ func getDeadSlaves(deadTime int, slaveMap map[string]Slave) (deadSlaves []string
 	return
 }
 
-func printSlaveNamesInMap(slaveMap map[string]Slave) {
+func printSlaveNamesInMap(slaveMap map[string]master.Slave) {
 	fmt.Println("Current slaves are: ")
 	if len(slaveMap) == 0 {
-		fmt.Println("No slaves available.")
+		fmt.Println("No slaves available.\n")
 	} else {
 		for slaveName, _ := range slaveMap {
 			fmt.Println(slaveName)

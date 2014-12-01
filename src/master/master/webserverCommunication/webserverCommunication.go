@@ -1,21 +1,23 @@
-package master
+package webserverCommunication
 
 import (
 	"encoding/json"
 	"fmt"
+	"master/master"
 	"net"
 	"net/http"
+	"network"
 	"strings"
 )
-
-var webServerAddress = "http://localhost:4003"
 
 type IdList struct {
 	Id []string
 }
 
-func UpdateWebserverAddress(r *http.Request) (err error) {
-	newWebServerAddress, err := getWebserverAddress(r)
+// If webserver address updates, will the slave map update properly as well?
+// What if we have more than one webserver pinging the master?
+func UpdateWebserverAddress(r *http.Request, webServerAddress string) (newWebServerAddress string, err error) {
+	newWebServerAddress, err = getWebserverAddress(r)
 	if webServerAddress != newWebServerAddress {
 		fmt.Printf("Webserver address has changed from %v to %v.\n", webServerAddress, newWebServerAddress)
 		webServerAddress = newWebServerAddress
@@ -42,18 +44,16 @@ func getWebserverAddress(request *http.Request) (webServerAddress string, err er
 	return
 }
 
-func SendWebserverInit(r *http.Request, slaveMap map[string]Slave) {
+func SendWebserverInit(r *http.Request, slaveMap map[string]master.Slave) (UpdatedWebServerAddress string) {
 	if r.FormValue("message") == "update me!" {
-		webServerAddress, _ = getWebserverAddress(r)
-		fmt.Printf("\nWeb server attached on address: %v\n",webServerAddress)
-		err := sendSlaveListToWebserver(webServerAddress, slaveMap)
-		if err != nil {
-			fmt.Printf("Error: %v\n",err)
-		}
+		UpdatedWebServerAddress, _ = getWebserverAddress(r)
+		err := SendSlaveListToWebserver(UpdatedWebServerAddress, slaveMap)
+		network.ErrorHandler(err, "Error: %v\n")
 	}
+	return
 }
 
-func sendSlaveListToWebserver(webServerAddress string, slaveMap map[string]Slave) (err error) {
+func SendSlaveListToWebserver(webServerAddress string, slaveMap map[string]master.Slave) (err error) {
 	err = nil
 	client := &http.Client{}
 	webServerAddress = webServerAddress + "/receive_slave"

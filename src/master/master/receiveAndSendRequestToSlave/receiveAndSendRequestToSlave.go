@@ -1,9 +1,10 @@
-package master
+package receiveAndSendRequestToSlave
 
 import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"master/master"
 	"net/http"
 	"net/url"
 )
@@ -13,7 +14,7 @@ type PostURLRequest struct {
 	URLToLoadInBrowser   string
 }
 
-func ReceiveRequestAndSendToSlave(writer http.ResponseWriter, request *http.Request, slaveMap map[string]Slave) {
+func ReceiveRequestAndSendToSlave(writer http.ResponseWriter, request *http.Request, slaveMap map[string]master.Slave) {
 	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
 	defer request.Body.Close()
 
@@ -21,7 +22,7 @@ func ReceiveRequestAndSendToSlave(writer http.ResponseWriter, request *http.Requ
 	destinationSlaveAddress := destinationSlaveAddress(incomingRequest.DestinationSlaveName, slaveMap)
 	if destinationSlaveAddress == "" {
 		fmt.Println("Abandoning request.")
-		fmt.Fprintf(writer, "FAILED to send url to slave. Slave URL is empty for some reason.")
+		fmt.Fprintf(writer, "ERROR: Failed to contact slave. Slave has no URL stored.")
 		return
 	}
 
@@ -37,7 +38,7 @@ func parseJson(input []byte) (request PostURLRequest, err error) {
 	return request, err
 }
 
-func destinationSlaveAddress(slaveName string, slaveMap map[string]Slave) (slaveAddress string) {
+func destinationSlaveAddress(slaveName string, slaveMap map[string]master.Slave) (slaveAddress string) {
 	if len(slaveMap) == 0 {
 		fmt.Println("ERROR: No slaves available.")
 		return
@@ -52,7 +53,7 @@ func destinationSlaveAddress(slaveName string, slaveMap map[string]Slave) (slave
 	return slaveAddress
 }
 
-func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string)(err error) {
+func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string) (err error) {
 	client := &http.Client{}
 
 	form := url.Values{}

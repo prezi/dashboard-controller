@@ -1,9 +1,10 @@
-package master
+package slaveMonitor
 
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"master/master"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -12,20 +13,15 @@ import (
 	"time"
 )
 
-func InitializeTestSlaveMap() (slaveMap map[string]Slave) {
-	slaveMap = make(map[string]Slave)
-	slaveMap["slave1"] = Slave{URL: "http://10.0.0.122:8080", heartbeat: time.Now()}
-	slaveMap["slave2"] = Slave{URL: "http://10.0.1.11:8080", heartbeat: time.Now()}
-	return slaveMap
-}
+const TEST_WEB_SERVER_ADDRESS = "http://localhost:4003"
 
 func TestSetUp(t *testing.T) {
-	slaveMap := SetUp()
+	slaveMap, _ := master.SetUp()
 	assert.Equal(t, 0, len(slaveMap))
 }
 
 func TestReceiveSlaveHeartbeat(t *testing.T) {
-	testSlaveMap := make(map[string]Slave)
+	testSlaveMap := make(map[string]master.Slave)
 	testSlaveName := "testSlaveName"
 	longForm := "Jan 2, 2006 at 3:04pm (MST)"
 	beginningOfTime, err := time.Parse(longForm, "Jan 1, 0000 at 01:01am (PST)")
@@ -38,10 +34,10 @@ func TestReceiveSlaveHeartbeat(t *testing.T) {
 	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
 		slaveIP, _, _ := net.SplitHostPort(request.RemoteAddr)
 		slaveUrl := "http://" + slaveIP + ":" + slavePort
-		testSlaveMap[testSlaveName] = Slave{slaveUrl, beginningOfTime, ""}
-		ReceiveSlaveHeartbeat(request, testSlaveMap)
+		testSlaveMap[testSlaveName] = master.Slave{slaveUrl, beginningOfTime, ""}
+		ReceiveSlaveHeartbeat(request, testSlaveMap, TEST_WEB_SERVER_ADDRESS)
 		changedSlave := testSlaveMap[testSlaveName]
-		newTime = changedSlave.heartbeat
+		newTime = changedSlave.Heartbeat
 	}))
 
 	client := &http.Client{}
@@ -54,7 +50,8 @@ func TestReceiveSlaveHeartbeat(t *testing.T) {
 }
 
 func TestReceiveSlaveHeartbeatsWithDifferentAddress(t *testing.T) {
-	testSlaveMap := make(map[string]Slave)
+	TestWebServerAddress := "http://localhost:4003"
+	testSlaveMap := make(map[string]master.Slave)
 	testSlaveName := "testSlaveName"
 	longForm := "Jan 2, 2006 at 3:04pm (MST)"
 	beginningOfTime, _ := time.Parse(longForm, "Jan 1, 0000 at 01:01am (PST)")
@@ -68,8 +65,8 @@ func TestReceiveSlaveHeartbeatsWithDifferentAddress(t *testing.T) {
 	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
 		request.URL.Host = slaveIP
 		slaveUrl := "not a URL"
-		testSlaveMap[testSlaveName] = Slave{slaveUrl, beginningOfTime, ""}
-		ReceiveSlaveHeartbeat(request, testSlaveMap)
+		testSlaveMap[testSlaveName] = master.Slave{slaveUrl, beginningOfTime, ""}
+		ReceiveSlaveHeartbeat(request, testSlaveMap, TestWebServerAddress)
 	}))
 
 	client := &http.Client{}
@@ -82,13 +79,14 @@ func TestReceiveSlaveHeartbeatsWithDifferentAddress(t *testing.T) {
 }
 
 func TestReceiveSlaveHeartbeatsNewSlaveName(t *testing.T) {
-	testSlaveMap := make(map[string]Slave)
+	TestWebServerAddress := "http://localhost:4003"
+	testSlaveMap := make(map[string]master.Slave)
 	testSlaveName := "testSlaveName"
 	testSlavePort := "4006"
 	exists := false
 
 	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
-		ReceiveSlaveHeartbeat(request, testSlaveMap)
+		ReceiveSlaveHeartbeat(request, testSlaveMap, TestWebServerAddress)
 		_, exists = testSlaveMap[testSlaveName]
 	}))
 
@@ -144,23 +142,23 @@ func TestMonitorSlaves(t *testing.T) {
 		contentLength = len(POSTRequestBody)
 	}))
 
-	webServerAddress = testWebServer.URL
-	testSlaveMap := make(map[string]Slave)
-	testSlaveMap[testSlaveName] = Slave{"Dummy", beginningOfTime, ""}
-	MonitorSlaves(1, testSlaveMap)
+	webServerAddress := testWebServer.URL
+	testSlaveMap := make(map[string]master.Slave)
+	testSlaveMap[testSlaveName] = master.Slave{"Dummy", beginningOfTime, ""}
+	MonitorSlaves(1, testSlaveMap, webServerAddress)
 
 	assert.NotEqual(t, 0, contentLength)
 }
 
 func TestRemoveDeadSlaves(t *testing.T) {
-	testSlaveMap := make(map[string]Slave)
+	testSlaveMap := make(map[string]master.Slave)
 	longForm := "Jan 2, 2006 at 3:04pm (MST)"
 	beginningOfTime, _ := time.Parse(longForm, "Jan 1, 0000 at 01:01am (PST)")
-	testSlaveMap["slave1"] = Slave{"-", beginningOfTime, ""}
-	testSlaveMap["slave2"] = Slave{"-", beginningOfTime, ""}
-	testSlaveMap["slave3"] = Slave{"-", time.Now(), ""}
-	testSlaveMap["slave4"] = Slave{"-", time.Now(), ""}
-	removeDeadSlaves(3, testSlaveMap)
+	testSlaveMap["slave1"] = master.Slave{"-", beginningOfTime, ""}
+	testSlaveMap["slave2"] = master.Slave{"-", beginningOfTime, ""}
+	testSlaveMap["slave3"] = master.Slave{"-", time.Now(), ""}
+	testSlaveMap["slave4"] = master.Slave{"-", time.Now(), ""}
+	removeDeadSlaves(3, testSlaveMap, TEST_WEB_SERVER_ADDRESS)
 	_, sl1 := testSlaveMap["slave1"]
 	_, sl2 := testSlaveMap["slave2"]
 	_, sl3 := testSlaveMap["slave3"]
@@ -172,33 +170,15 @@ func TestRemoveDeadSlaves(t *testing.T) {
 }
 
 func TestRemoveDeadSlavesRemoveAll(t *testing.T) {
-	testSlaveMap := make(map[string]Slave)
+	testSlaveMap := make(map[string]master.Slave)
 	longForm := "Jan 2, 2006 at 3:04pm (MST)"
 	beginningOfTime, _ := time.Parse(longForm, "Jan 1, 0000 at 01:01am (PST)")
-	testSlaveMap["slave1"] = Slave{"-", beginningOfTime, ""}
-	testSlaveMap["slave2"] = Slave{"-", beginningOfTime, ""}
-	removeDeadSlaves(3, testSlaveMap)
+	testSlaveMap["slave1"] = master.Slave{"-", beginningOfTime, ""}
+	testSlaveMap["slave2"] = master.Slave{"-", beginningOfTime, ""}
+	removeDeadSlaves(3, testSlaveMap, TEST_WEB_SERVER_ADDRESS)
 	_, sl1 := testSlaveMap["slave1"]
 	_, sl2 := testSlaveMap["slave2"]
 	assert.False(t, sl1)
 	assert.False(t, sl2)
 	assert.Equal(t, 0, len(testSlaveMap))
-}
-
-func TestUpdateWebserverAddress(t *testing.T) {
-	webServerAddress = "Dummy"
-	webServerIP := ""
-	webServerPort := "7777"
-
-	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
-		webServerIP, _, _ = net.SplitHostPort(request.RemoteAddr)
-		UpdateWebserverAddress(request)
-	}))
-
-	client := &http.Client{}
-	form := url.Values{}
-	form.Set("message", "update me!")
-	form.Set("webserverPort", webServerPort)
-	_, _ = client.PostForm(testMaster.URL, form)
-	assert.Equal(t, "http://"+webServerIP+":"+webServerPort, webServerAddress)
 }

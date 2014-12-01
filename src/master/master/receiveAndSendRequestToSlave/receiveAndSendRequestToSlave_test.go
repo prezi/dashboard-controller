@@ -1,27 +1,35 @@
-package master
+package receiveAndSendRequestToSlave
 
 import (
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"master/master"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
-	"encoding/json"
-	"strings"
-	"io/ioutil"
 )
 
-func TestReceiveRequestAndSendToSlave(t *testing.T) {
-	testSlaveMap := make(map[string]Slave)
-	var receivedUrl string
-	testMaster:= httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-			ReceiveRequestAndSendToSlave(writer, request, testSlaveMap)
-		}))
+func InitializeTestSlaveMap() (slaveMap map[string]master.Slave) {
+	slaveMap = make(map[string]master.Slave)
+	slaveMap["slave1"] = master.Slave{URL: "http://10.0.0.122:8080", Heartbeat: time.Now()}
+	slaveMap["slave2"] = master.Slave{URL: "http://10.0.1.11:8080", Heartbeat: time.Now()}
+	return slaveMap
+}
 
-	testSlave:= httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+func TestReceiveRequestAndSendToSlave(t *testing.T) {
+	testSlaveMap := make(map[string]master.Slave)
+	var receivedUrl string
+	testMaster := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		ReceiveRequestAndSendToSlave(writer, request, testSlaveMap)
+	}))
+
+	testSlave := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		receivedUrl = request.PostFormValue("url")
-		}))
-	testSlaveMap["testSlaveName"] = Slave{testSlave.URL, time.Now(), ""}
+	}))
+	testSlaveMap["testSlaveName"] = master.Slave{testSlave.URL, time.Now(), ""}
 
 	m := PostURLRequest{"testSlaveName", "testURL"}
 	json_message, _ := json.Marshal(m)
@@ -33,13 +41,13 @@ func TestReceiveRequestAndSendToSlave(t *testing.T) {
 }
 
 func TestReceiveRequestAndSendToSlaveWithEmptySlaveAddress(t *testing.T) {
-	testSlaveMap := make(map[string]Slave)
+	testSlaveMap := make(map[string]master.Slave)
 
-	testMaster:= httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+	testMaster := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		ReceiveRequestAndSendToSlave(writer, request, testSlaveMap)
 	}))
 
-	testSlaveMap["testSlaveName"] = Slave{"", time.Now(), ""}
+	testSlaveMap["testSlaveName"] = master.Slave{"", time.Now(), ""}
 
 	m := PostURLRequest{"testSlaveName", "testURL"}
 	json_message, _ := json.Marshal(m)
@@ -48,7 +56,7 @@ func TestReceiveRequestAndSendToSlaveWithEmptySlaveAddress(t *testing.T) {
 	body, err := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
 	receivedResponse := string(body[:])
-	assert.Equal(t, "FAILED to send url to slave. Slave URL is empty for some reason.", receivedResponse)
+	assert.Equal(t, "ERROR: Failed to contact slave. Slave has no URL stored.", receivedResponse)
 	assert.Nil(t, err)
 }
 
@@ -85,10 +93,10 @@ func TestDestinationAddressSlave(t *testing.T) {
 }
 
 func TestDestinationAddressSlaveForEmptySlaveMap(t *testing.T) {
-	slaveMap :=  make(map[string]Slave)
+	slaveMap := make(map[string]master.Slave)
 	destinationURL := destinationSlaveAddress("slave2", slaveMap)
 
-	assert.Equal(t,"", destinationURL)
+	assert.Equal(t, "", destinationURL)
 }
 
 func TestSendUrlValueMessageToSlave(t *testing.T) {
@@ -104,7 +112,7 @@ func TestSendUrlValueMessageToSlave(t *testing.T) {
 
 	assert.Equal(t, 1, numberOfMessagesSent)
 	assert.Equal(t, "http://index.hu", url)
-	assert.Nil(t,err)
+	assert.Nil(t, err)
 }
 
 func TestSendUrlValueMessageToSlaveSlaveDoesNotRespond(t *testing.T) {
@@ -112,5 +120,5 @@ func TestSendUrlValueMessageToSlaveSlaveDoesNotRespond(t *testing.T) {
 	}))
 	testServer.Close()
 	err := sendUrlValueMessageToSlave(testServer.URL, "http://index.hu")
-	assert.NotNil(t,err)
+	assert.NotNil(t, err)
 }

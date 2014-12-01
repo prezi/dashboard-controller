@@ -1,9 +1,10 @@
-package master
+package webserverCommunication
 
 import (
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"master/master"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -11,7 +12,33 @@ import (
 	"sort"
 	"strings"
 	"testing"
+	"time"
 )
+
+func InitializeTestSlaveMap() (slaveMap map[string]master.Slave) {
+	slaveMap = make(map[string]master.Slave)
+	slaveMap["slave1"] = master.Slave{URL: "http://10.0.0.122:8080", Heartbeat: time.Now()}
+	slaveMap["slave2"] = master.Slave{URL: "http://10.0.1.11:8080", Heartbeat: time.Now()}
+	return slaveMap
+}
+
+func TestUpdateWebserverAddress(t *testing.T) {
+	webServerAddress := "Dummy"
+	webServerIP := ""
+	webServerPort := "7777"
+
+	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
+		webServerIP, _, _ = net.SplitHostPort(request.RemoteAddr)
+		webServerAddress, _ = UpdateWebserverAddress(request, webServerAddress)
+	}))
+
+	client := &http.Client{}
+	form := url.Values{}
+	form.Set("message", "update me!")
+	form.Set("webserverPort", webServerPort)
+	_, _ = client.PostForm(testMaster.URL, form)
+	assert.Equal(t, "http://"+webServerIP+":"+webServerPort, webServerAddress)
+}
 
 func TestSendSlaveListToWebserver(t *testing.T) {
 	returnedIds := []string{"slave1", "slave2"}
@@ -24,7 +51,7 @@ func TestSendSlaveListToWebserver(t *testing.T) {
 
 	}))
 	slaveIPs := InitializeTestSlaveMap()
-	sendSlaveListToWebserver(testServer.URL, slaveIPs)
+	SendSlaveListToWebserver(testServer.URL, slaveIPs)
 	validIdList := []string{"slave1", "slave2"}
 	sort.Strings(validIdList)
 	sort.Strings(returnedIds)
@@ -48,7 +75,7 @@ func TestGetWebserverAddressWithEmptyPort(t *testing.T) {
 }
 
 func TestSendWebserverInit(t *testing.T) {
-	testSlaveMap := make(map[string]Slave)
+	testSlaveMap := make(map[string]master.Slave)
 
 	request := &http.Request{}
 	request.RemoteAddr = "127.0.0.1:3423"
@@ -58,13 +85,15 @@ func TestSendWebserverInit(t *testing.T) {
 
 	request.Form = form
 
-	SendWebserverInit(request, testSlaveMap)
+	TestWebServerAddress := "http://1as;dlkfjdkls;j"
+	TestWebServerAddress = SendWebserverInit(request, testSlaveMap)
 
-	assert.Equal(t, "http://127.0.0.1", webServerAddress)
+	assert.Equal(t, "http://127.0.0.1", TestWebServerAddress)
 }
 
 func TestSendWebserverInitOnWebsite(t *testing.T) {
 	testSlaveMap := InitializeTestSlaveMap()
+	TestWebServerAddress := "http://localhost:4003"
 	slave1exists := false
 	slave2exists := false
 
@@ -78,8 +107,8 @@ func TestSendWebserverInitOnWebsite(t *testing.T) {
 	}))
 
 	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
-		SendWebserverInit(request, testSlaveMap)
 
+		TestWebServerAddress = SendWebserverInit(request, testSlaveMap)
 	}))
 
 	webServerIp, _, _ := net.SplitHostPort(testWebServer.URL)
@@ -95,7 +124,7 @@ func TestSendWebserverInitOnWebsite(t *testing.T) {
 	client := &http.Client{}
 	client.PostForm(testMaster.URL, form)
 
-	assert.Equal(t, webServerIp+":"+webServerPort, webServerAddress)
+	assert.Equal(t, webServerIp+":"+webServerPort, TestWebServerAddress)
 	assert.True(t, slave1exists)
 	assert.True(t, slave2exists)
 }
