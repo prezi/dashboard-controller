@@ -11,3 +11,4 @@ src/code.google.com
 dashboard-controller.iml
 src/bitbucket.org/
 start_service.sh
+cover.sh

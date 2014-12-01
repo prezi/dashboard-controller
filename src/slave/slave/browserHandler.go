@@ -46,7 +46,7 @@ func blockWhileBrowserCloses(OS string) (err error) {
 	for {
 		time.Sleep(75 * time.Millisecond)
 		existingProcess, err = getProcessList(OS)
-		if len(existingProcess) < 10 {
+		if len(existingProcess) == 0 {
 			break
 		}
 	}
