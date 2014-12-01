@@ -10,13 +10,24 @@ import (
 
 var test_mode = false
 
+type Slave struct {
+	URL          string
+	heartbeat    time.Time
+	displayedURL string // TODO: store currently displayed URL for each slave
+}
+
+func SetUp() (slaveMap map[string]Slave) {
+	slaveMap = make(map[string]Slave)
+	return
+}
+
 func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]Slave) {
 	slaveName, slaveAddress := processSlaveHeartbeatRequest(request)
 
 	if _, existsInMap := slaveMap[slaveName]; existsInMap {
 		updateSlaveHeartbeat(slaveMap, slaveAddress, slaveName)
 	} else {
-		fmt.Printf("Slave added with name \"%v\", IP %v", slaveName, slaveAddress)
+		fmt.Printf("Slave added with name \"%v\", URL %v.\n\n", slaveName, slaveAddress)
 		slaveMap[slaveName] = Slave{URL: slaveAddress, heartbeat: time.Now()}
 		sendSlaveListToWebserver(webServerAddress, slaveMap)
 	}
@@ -34,11 +45,9 @@ func processSlaveHeartbeatRequest(request *http.Request) (slaveName, slaveAddres
 func updateSlaveHeartbeat(slaveMap map[string]Slave, slaveAddress, slaveName string) (err error) {
 	slaveInstance := slaveMap[slaveName]
 	if slaveInstance.URL != slaveAddress {
-		fmt.Printf(`WARNING: Slave with name \"%v\"
-			already exists with the IP address: %v. \n
-			kill signal sent to slave with name \"%v\"
-			with IP address: %v`,
-			slaveName, slaveInstance.URL, slaveName, slaveAddress)
+		fmt.Println("WARNING: Received signal from slave with duplicate name.")
+		fmt.Printf("Slave with name \"%v\" already exists.\n", slaveName)
+		fmt.Printf("Sending kill signal to duplicate slave at URL %v.\n\n", slaveAddress)
 		err = sendKillSignalToSlave(slaveAddress)
 	} else {
 		slaveInstance.heartbeat = time.Now()
@@ -72,7 +81,7 @@ func removeDeadSlaves(deadTime int, slaveMap map[string]Slave) {
 		for _, deadSlaveName := range slavesToRemove {
 			delete(slaveMap, deadSlaveName)
 		}
-		printSlavesNamesInMap(slaveMap)
+		printSlaveNamesInMap(slaveMap)
 		sendSlaveListToWebserver(webServerAddress, slaveMap)
 	}
 }
@@ -89,7 +98,7 @@ func getDeadSlaves(deadTime int, slaveMap map[string]Slave) (deadSlaves []string
 	return
 }
 
-func printSlavesNamesInMap(slaveMap map[string]Slave) {
+func printSlaveNamesInMap(slaveMap map[string]Slave) {
 	fmt.Println("Current slaves are: ")
 	if len(slaveMap) == 0 {
 		fmt.Println("No slaves available.")
@@ -98,13 +107,4 @@ func printSlavesNamesInMap(slaveMap map[string]Slave) {
 			fmt.Println(slaveName)
 		}
 	}
-}
-
-func UpdateWebserverAddress(r *http.Request) (err error) {
-	newWebServerAddress, err := getWebserverAddress(r)
-	if webServerAddress != newWebServerAddress {
-		fmt.Printf("Webserver address has changed from %v to %v\n", webServerAddress, newWebServerAddress)
-		webServerAddress = newWebServerAddress
-	}
-	return
 }

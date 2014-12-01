@@ -24,9 +24,9 @@ const (
 	DEFAULT_MASTER_IP_ADDRESS = "localhost"
 	DEFAULT_MASTER_PORT       = "5000"
 	DEFAULT_WEBSERVER_PORT    = "4003"
-	IMAGES_PATH = "src/webserver/assets/images"
-	JAVASCRIPTS_PATH = "src/webserver/assets/javascripts"
-	STYLESHEETS_PATH = "src/webserver/assets/stylesheets"
+	IMAGES_PATH               = "src/webserver/assets/images"
+	JAVASCRIPTS_PATH          = "src/webserver/assets/javascripts"
+	STYLESHEETS_PATH          = "src/webserver/assets/stylesheets"
 )
 
 type Message struct {
@@ -202,7 +202,7 @@ func receiveAndMapSlaveAddress(_ http.ResponseWriter, request *http.Request) {
 		fmt.Println("error:", err)
 	}
 	fmt.Printf("\nSLAVE LIST UPDATED.\n")
-	fmt.Println("Slave Name: ", id_list.Id)
+	fmt.Println("Slave Names: ", id_list.Id)
 }
 
 func sendInitToMaster(masterUrl, webserverPort, pattern string) {
