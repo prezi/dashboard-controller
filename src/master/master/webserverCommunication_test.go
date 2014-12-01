@@ -33,7 +33,6 @@ func TestSendSlaveListToWebserver(t *testing.T) {
 
 func TestGetWebserverAddressWithEmptyRequest(t *testing.T) {
 	request := &http.Request{}
-	request.RemoteAddr = "Dummy"
 	webServerAddress, err := getWebserverAddress(request)
 	assert.NotNil(t, err)
 	assert.Equal(t, "", webServerAddress)
