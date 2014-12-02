@@ -8,7 +8,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
+	"network"
 	"sort"
 	"strings"
 	"testing"
@@ -33,9 +33,7 @@ func TestUpdateWebserverAddress(t *testing.T) {
 	}))
 
 	client := &http.Client{}
-	form := url.Values{}
-	form.Set("message", "update me!")
-	form.Set("webserverPort", webServerPort)
+	form := network.CreateFormWithInitialValues(map[string]string{"message": "update me!", "webserverPort": webServerPort})
 	_, _ = client.PostForm(testMaster.URL, form)
 	assert.Equal(t, "http://"+webServerIP+":"+webServerPort, webServerAddress)
 }
@@ -80,8 +78,7 @@ func TestSendWebserverInit(t *testing.T) {
 	request := &http.Request{}
 	request.RemoteAddr = "127.0.0.1:3423"
 
-	form := url.Values{}
-	form.Set("message", "update me!")
+	form := network.CreateFormWithInitialValues(map[string]string{"message": "update me!"})
 
 	request.Form = form
 
@@ -117,9 +114,7 @@ func TestSendWebserverInitOnWebsite(t *testing.T) {
 	request := &http.Request{}
 	request.RemoteAddr = webServerIp + ":" + webServerPort
 
-	form := url.Values{}
-	form.Set("webserverPort", webServerPort)
-	form.Set("message", "update me!")
+	form := network.CreateFormWithInitialValues(map[string]string{"message": "update me!", "webserverPort": webServerPort})
 
 	client := &http.Client{}
 	client.PostForm(testMaster.URL, form)

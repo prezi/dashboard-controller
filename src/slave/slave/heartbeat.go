@@ -2,7 +2,6 @@ package slave
 
 import (
 	"net/http"
-	"net/url"
 	"network"
 	"time"
 )
@@ -13,9 +12,7 @@ func Heartbeat(heartbeatInterval int, slaveName, ownPort, masterURL string) (err
 	beat := time.Tick(time.Duration(heartbeatInterval) * time.Second)
 
 	client := &http.Client{}
-	form := url.Values{}
-	form.Set("slaveName", slaveName)
-	form.Set("slavePort", ownPort)
+	form := network.CreateFormWithInitialValues(map[string]string{"slaveName": slaveName, "slavePort": ownPort})
 
 	for _ = range beat {
 		_, err = client.PostForm(masterURLForHeartbeat, form)

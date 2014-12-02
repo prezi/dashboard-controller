@@ -10,6 +10,6 @@ type Slave struct {
 
 func SetUp() (slaveMap map[string]Slave, webServerAddress string) {
 	slaveMap = make(map[string]Slave)
-	webServerAddress = "http://localhost:4003"
+	webServerAddress = "EMPTY"
 	return
 }

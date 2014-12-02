@@ -3,7 +3,6 @@ package network
 import (
 	"fmt"
 	"net"
-	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
@@ -57,29 +56,16 @@ func GetOS() (OS string) {
 func ErrorHandler(err error, message string) (errorOccurred bool) {
 	if err != nil {
 		fmt.Printf(message, err)
-		fmt.Println("Aborting program.")
 		// os.Exit(1)
 		return true
 	}
 	return false
 }
 
-func sendSlaveURLToMaster(slaveName, slaveURL, masterURL string) {
-	client := &http.Client{}
-	form := url.Values{}
-	form.Set("slaveName", slaveName)
-	form.Set("slaveURL", slaveURL)
-	fmt.Println("slaveURL: ", slaveURL)
-
-	_, err := client.PostForm(masterURL, form)
-
-	ErrorHandler(err, "Error communicating with master: %v\n")
-
-	fmt.Printf("Slave mapped to master at %v.\n", masterURL)
-	fmt.Printf("Slave Name: %v.\n", slaveName)
-	if slaveName == DEFAULT_SLAVE_NAME {
-		fmt.Println("TIP: Specify slave name at startup with the flag '-slaveName'")
-		fmt.Println("eg. -slaveName=\"Main Lobby\"")
+func CreateFormWithInitialValues(formEntries map[string]string) (form url.Values) {
+	form = url.Values{}
+	for key, value := range formEntries {
+		form.Set(key, value)
 	}
-	fmt.Printf("\n\n")
+	return
 }

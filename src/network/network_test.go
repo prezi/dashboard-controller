@@ -3,8 +3,7 @@ package network
 import (
 	"errors"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
+	"net/url"
 	"testing"
 )
 
@@ -18,24 +17,13 @@ func TestErrorHandler(t *testing.T) {
 	assert.Equal(t, true, ErrorHandler(err, "%v"))
 }
 
-func TestSendSlaveURLToMaster(t *testing.T) {
-	var numberOfMessagesSent = 0
-	handler := http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		numberOfMessagesSent++
-	})
-	testServer := httptest.NewServer(handler)
-
-	sendSlaveURLToMaster("testSlaveName", "http://localhost:8080", testServer.URL)
-	assert.Equal(t, 1, numberOfMessagesSent)
+func TestGetOS(t *testing.T) {
+	OS := GetOS()
+	assert.IsType(t, "Some OS Name", OS)
 }
 
-func TestSendSlaveURLToMaster_DEFAULT_SLAVE_NAME(t *testing.T) {
-	var numberOfMessagesSent = 0
-	handler := http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		numberOfMessagesSent++
-	})
-	testServer := httptest.NewServer(handler)
-
-	sendSlaveURLToMaster("DEFAULT_SLAVE_NAME", "http://localhost:8080", testServer.URL)
-	assert.Equal(t, 1, numberOfMessagesSent)
+func TestCreateFormWithInitialValues(t *testing.T) {
+	urlToDisplay := "some valid url"
+	form := CreateFormWithInitialValues(map[string]string{"url": urlToDisplay})
+	assert.Equal(t, form, url.Values{"url": []string{"some valid url"}})
 }

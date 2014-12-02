@@ -8,7 +8,6 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"network"
 	"os"
 	"path"
@@ -201,9 +200,7 @@ func sendInitToMaster(masterUrl, webserverPort, pattern string) {
 	postRequestUrl := masterUrl
 	postRequestUrl += pattern
 	client := &http.Client{}
-	form := url.Values{}
-	form.Set("message", "update me!")
-	form.Set("webserverPort", webserverPort)
+	form := network.CreateFormWithInitialValues(map[string]string{"message": "update me!", "webserverPort": webserverPort})
 	client.PostForm(postRequestUrl, form)
 }
 
@@ -211,8 +208,7 @@ func startWebserverHeartbeats(heartbeatInterval int, masterUrl, webserverPort, p
 	postRequestUrl := masterUrl
 	postRequestUrl += pattern
 	client := &http.Client{}
-	form := url.Values{}
-	form.Set("webserverPort", webserverPort)
+	form := network.CreateFormWithInitialValues(map[string]string{"webserverPort": webserverPort})
 	beat := time.Tick(time.Duration(heartbeatInterval) * time.Second)
 	for _ = range beat {
 		_, err := client.PostForm(postRequestUrl, form)

@@ -9,11 +9,16 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"network"
 	"testing"
 	"time"
 )
 
-const TEST_WEB_SERVER_ADDRESS = "http://localhost:4003"
+const (
+	TEST_WEB_SERVER_ADDRESS = "http://localhost:4003"
+	TEST_SLAVE_NAME         = "testSlaveName"
+	TEST_SLAVE_PORT         = "0000"
+)
 
 func TestSetUp(t *testing.T) {
 	slaveMap, _ := master.SetUp()
@@ -22,10 +27,8 @@ func TestSetUp(t *testing.T) {
 
 func TestReceiveSlaveHeartbeat(t *testing.T) {
 	testSlaveMap := make(map[string]master.Slave)
-	testSlaveName := "testSlaveName"
 	longForm := "Jan 2, 2006 at 3:04pm (MST)"
 	beginningOfTime, err := time.Parse(longForm, "Jan 1, 0000 at 01:01am (PST)")
-	slavePort := "0000"
 	newTime, _ := time.Parse(longForm, "Jan 1, 0000 at 01:01am (PST)")
 
 	if err != nil {
@@ -33,26 +36,22 @@ func TestReceiveSlaveHeartbeat(t *testing.T) {
 	}
 	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
 		slaveIP, _, _ := net.SplitHostPort(request.RemoteAddr)
-		slaveUrl := "http://" + slaveIP + ":" + slavePort
-		testSlaveMap[testSlaveName] = master.Slave{slaveUrl, beginningOfTime, ""}
+		slaveURL := "http://" + slaveIP + ":" + TEST_SLAVE_PORT
+		testSlaveMap[TEST_SLAVE_NAME] = master.Slave{slaveURL, beginningOfTime, ""}
 		ReceiveSlaveHeartbeat(request, testSlaveMap, TEST_WEB_SERVER_ADDRESS)
-		changedSlave := testSlaveMap[testSlaveName]
+		changedSlave := testSlaveMap[TEST_SLAVE_NAME]
 		newTime = changedSlave.Heartbeat
 	}))
 
 	client := &http.Client{}
-	form := url.Values{}
-	form.Set("slaveName", testSlaveName)
-	form.Set("slavePort", slavePort)
-	_, err = client.PostForm(testMaster.URL, form)
+	testForm := network.CreateFormWithInitialValues(map[string]string{"slaveName": TEST_SLAVE_NAME, "slavePort": TEST_SLAVE_PORT})
+	_, err = client.PostForm(testMaster.URL, testForm)
 
 	assert.NotEqual(t, beginningOfTime, newTime)
 }
 
 func TestReceiveSlaveHeartbeatsWithDifferentAddress(t *testing.T) {
-	TestWebServerAddress := "http://localhost:4003"
 	testSlaveMap := make(map[string]master.Slave)
-	testSlaveName := "testSlaveName"
 	longForm := "Jan 2, 2006 at 3:04pm (MST)"
 	beginningOfTime, _ := time.Parse(longForm, "Jan 1, 0000 at 01:01am (PST)")
 	sentMessage := ""
@@ -64,16 +63,14 @@ func TestReceiveSlaveHeartbeatsWithDifferentAddress(t *testing.T) {
 	slaveIP, slavePort, _ := net.SplitHostPort(slaveURL.Host)
 	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
 		request.URL.Host = slaveIP
-		slaveUrl := "not a URL"
-		testSlaveMap[testSlaveName] = master.Slave{slaveUrl, beginningOfTime, ""}
-		ReceiveSlaveHeartbeat(request, testSlaveMap, TestWebServerAddress)
+		slaveURL := "not a URL"
+		testSlaveMap[TEST_SLAVE_NAME] = master.Slave{slaveURL, beginningOfTime, ""}
+		ReceiveSlaveHeartbeat(request, testSlaveMap, TEST_WEB_SERVER_ADDRESS)
 	}))
 
 	client := &http.Client{}
-	form := url.Values{}
-	form.Set("slaveName", testSlaveName)
-	form.Set("slavePort", slavePort)
-	_, _ = client.PostForm(testMaster.URL, form)
+	testForm := network.CreateFormWithInitialValues(map[string]string{"slaveName": TEST_SLAVE_NAME, "slavePort": slavePort})
+	_, _ = client.PostForm(testMaster.URL, testForm)
 
 	assert.Equal(t, "die", sentMessage)
 }
@@ -81,26 +78,21 @@ func TestReceiveSlaveHeartbeatsWithDifferentAddress(t *testing.T) {
 func TestReceiveSlaveHeartbeatsNewSlaveName(t *testing.T) {
 	TestWebServerAddress := "http://localhost:4003"
 	testSlaveMap := make(map[string]master.Slave)
-	testSlaveName := "testSlaveName"
-	testSlavePort := "4006"
 	exists := false
 
 	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
 		ReceiveSlaveHeartbeat(request, testSlaveMap, TestWebServerAddress)
-		_, exists = testSlaveMap[testSlaveName]
+		_, exists = testSlaveMap[TEST_SLAVE_NAME]
 	}))
 
 	client := &http.Client{}
-	form := url.Values{}
-	form.Set("slaveName", testSlaveName)
-	form.Set("slavePort", testSlavePort) //testSlave.URL[len(testSlave.URL)-5:])
-	_, _ = client.PostForm(testMaster.URL, form)
+	testForm := network.CreateFormWithInitialValues(map[string]string{"slaveName": TEST_SLAVE_NAME, "slavePort": TEST_SLAVE_PORT})
+	_, _ = client.PostForm(testMaster.URL, testForm)
 
 	assert.True(t, exists)
 }
 
 func TestProcessRequest(t *testing.T) {
-	testSlaveName := "testSlaveName"
 	returnedSlaveName := ""
 	returnedAddress := ""
 	remoteHost := ""
@@ -110,12 +102,10 @@ func TestProcessRequest(t *testing.T) {
 		returnedSlaveName, returnedAddress = processSlaveHeartbeatRequest(request)
 	}))
 	client := &http.Client{}
-	form := url.Values{}
-	form.Set("slaveName", testSlaveName)
-	form.Set("slavePort", "Test")
-	_, _ = client.PostForm(testServer.URL, form)
-	assert.Equal(t, returnedSlaveName, testSlaveName)
-	assert.Equal(t, "http://"+remoteHost+":Test", returnedAddress)
+	testForm := network.CreateFormWithInitialValues(map[string]string{"slaveName": TEST_SLAVE_NAME, "slavePort": TEST_SLAVE_PORT})
+	_, _ = client.PostForm(testServer.URL, testForm)
+	assert.Equal(t, returnedSlaveName, TEST_SLAVE_NAME)
+	assert.Equal(t, "http://"+remoteHost+":0000", returnedAddress)
 }
 
 func TestSendKillSignalToSlave(t *testing.T) {

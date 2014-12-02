@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"master/master"
 	"net/http"
-	"net/url"
+	"network"
 )
 
 type PostURLRequest struct {
@@ -27,7 +27,7 @@ func ReceiveRequestAndSendToSlave(writer http.ResponseWriter, request *http.Requ
 	}
 
 	fmt.Printf("\nSending %v to %v at %v\n", incomingRequest.URLToLoadInBrowser, incomingRequest.DestinationSlaveName, destinationSlaveAddress)
-	sendUrlValueMessageToSlave(destinationSlaveAddress, incomingRequest.URLToLoadInBrowser)
+	sendURLValueMessageToSlave(destinationSlaveAddress, incomingRequest.URLToLoadInBrowser)
 }
 
 func parseJSON(input []byte) (request PostURLRequest, err error) {
@@ -53,12 +53,9 @@ func destinationSlaveAddress(slaveName string, slaveMap map[string]master.Slave)
 	return slaveAddress
 }
 
-func sendUrlValueMessageToSlave(slaveIPAddress string, urlToDisplay string) (err error) {
+func sendURLValueMessageToSlave(slaveIPAddress string, urlToDisplay string) (err error) {
 	client := &http.Client{}
-
-	form := url.Values{}
-	form.Set("url", urlToDisplay)
-
+	form := network.CreateFormWithInitialValues(map[string]string{"url": urlToDisplay})
 	response, err := client.PostForm(slaveIPAddress, form)
 	if err != nil {
 		fmt.Printf("Error slave is not responding: %v\n", err)

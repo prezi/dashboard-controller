@@ -99,7 +99,7 @@ func TestDestinationAddressSlaveForEmptySlaveMap(t *testing.T) {
 	assert.Equal(t, "", destinationURL)
 }
 
-func TestSendUrlValueMessageToSlave(t *testing.T) {
+func TestSendURLValueMessageToSlave(t *testing.T) {
 	var numberOfMessagesSent = 0
 	var url = ""
 
@@ -108,17 +108,17 @@ func TestSendUrlValueMessageToSlave(t *testing.T) {
 		url = request.PostFormValue("url")
 	}))
 
-	err := sendUrlValueMessageToSlave(testServer.URL, "http://index.hu")
+	err := sendURLValueMessageToSlave(testServer.URL, "http://index.hu")
 
 	assert.Equal(t, 1, numberOfMessagesSent)
 	assert.Equal(t, "http://index.hu", url)
 	assert.Nil(t, err)
 }
 
-func TestSendUrlValueMessageToSlaveSlaveDoesNotRespond(t *testing.T) {
+func TestSendURLValueMessageToSlaveSlaveDoesNotRespond(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 	}))
 	testServer.Close()
-	err := sendUrlValueMessageToSlave(testServer.URL, "http://index.hu")
+	err := sendURLValueMessageToSlave(testServer.URL, "http://index.hu")
 	assert.NotNil(t, err)
 }

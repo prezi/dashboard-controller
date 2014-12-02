@@ -6,7 +6,6 @@ import (
 	"master/master/webserverCommunication"
 	"net"
 	"net/http"
-	"net/url"
 	"network"
 	"time"
 )
@@ -19,9 +18,7 @@ func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]master.Sla
 	if _, existsInMap := slaveMap[slaveName]; existsInMap {
 		updateSlaveHeartbeat(slaveMap, slaveAddress, slaveName)
 	} else {
-		fmt.Printf("Slave added with name \"%v\", URL %v.\n\n", slaveName, slaveAddress)
-		slaveMap[slaveName] = master.Slave{URL: slaveAddress, Heartbeat: time.Now()}
-		webserverCommunication.SendSlaveListToWebserver(webServerAddress, slaveMap)
+		addNewSlaveToMap(slaveMap, slaveAddress, slaveName, webServerAddress)
 	}
 	return slaveMap
 }
@@ -29,7 +26,6 @@ func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]master.Sla
 func processSlaveHeartbeatRequest(request *http.Request) (slaveName, slaveAddress string) {
 	slaveName = request.PostFormValue("slaveName")
 	slavePort := request.PostFormValue("slavePort")
-
 	slaveIP, _, _ := net.SplitHostPort(request.RemoteAddr)
 	slaveAddress = "http://" + slaveIP + ":" + slavePort
 	return
@@ -38,23 +34,32 @@ func processSlaveHeartbeatRequest(request *http.Request) (slaveName, slaveAddres
 func updateSlaveHeartbeat(slaveMap map[string]master.Slave, slaveAddress, slaveName string) {
 	slaveInstance := slaveMap[slaveName]
 	if slaveInstance.URL != slaveAddress {
-		fmt.Println("WARNING: Received signal from slave with duplicate name.")
-		fmt.Printf("Slave with name \"%v\" already exists.\n", slaveName)
-		fmt.Printf("Sending kill signal to duplicate slave at URL %v.\n\n", slaveAddress)
-		err := sendKillSignalToSlave(slaveAddress)
-		network.ErrorHandler(err, "Error encountered killing slave: %v\n")
+		killDuplicateSlave(slaveName, slaveAddress)
 	} else {
 		slaveInstance.Heartbeat = time.Now()
 		slaveMap[slaveName] = slaveInstance
 	}
 }
 
+func killDuplicateSlave(slaveName, slaveAddress string) {
+	fmt.Println("WARNING: Received signal from slave with duplicate name.")
+	fmt.Printf("Slave with name \"%v\" already exists.\n", slaveName)
+	fmt.Printf("Sending kill signal to duplicate slave at URL %v.\n\n", slaveAddress)
+	err := sendKillSignalToSlave(slaveAddress)
+	network.ErrorHandler(err, "Error encountered killing slave: %v\n")
+}
+
 func sendKillSignalToSlave(slaveAddress string) (err error) {
 	client := &http.Client{}
-	form := url.Values{}
-	form.Set("message", "die")
+	form := network.CreateFormWithInitialValues(map[string]string{"message": "die"})
 	_, err = client.PostForm(slaveAddress+"/receive_killsignal", form)
 	return
+}
+
+func addNewSlaveToMap(slaveMap map[string]master.Slave, slaveAddress, slaveName, webServerAddress string) {
+	fmt.Printf("Slave added with name \"%v\", URL %v.\n\n", slaveName, slaveAddress)
+	slaveMap[slaveName] = master.Slave{URL: slaveAddress, Heartbeat: time.Now()}
+	webserverCommunication.SendSlaveListToWebserver(webServerAddress, slaveMap)
 }
 
 func MonitorSlaves(timeInterval int, slaveMap map[string]master.Slave, webServerAddress string) {
