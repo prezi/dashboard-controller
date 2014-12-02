@@ -1,13 +1,11 @@
-package main
+package website
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 )
 
@@ -47,7 +45,7 @@ func TestFormHandler(t *testing.T) {
 	assert.Equal(t, 200, sendGetToFormHandler("/"))
 }
 
-func TestStatusMessageForAvailableSever(t *testing.T) {
+func TestStatusMessageForAvailableServer(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 	}))
 	statusMessage := isUrlValid(testServer.URL)
@@ -80,38 +78,4 @@ func TestIfUrlIsValid(t *testing.T) {
 
 func TestIfUrlIsInvalid(t *testing.T) {
 	assert.False(t, isUrlValid(""))
-}
-
-func TestSendUrlAndIdToMaster(t *testing.T) {
-	var numberOfMessagesSent = 0
-	var url = ""
-	var id = ""
-
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		numberOfMessagesSent++
-		POSTRequestBody, _ := ioutil.ReadAll(request.Body)
-		defer request.Body.Close()
-		slave := parseJsonSlave(POSTRequestBody)
-		url = slave.URLToLoadInBrowser
-		id = slave.DestinationSlaveName
-	}))
-
-	sendUrlAndIdToMaster(testServer.URL, "http://index.hu", "2")
-	assert.Equal(t, 1, numberOfMessagesSent)
-	assert.Equal(t, "http://index.hu", url)
-	assert.Equal(t, "2", id)
-}
-
-func TestReceiveAndMapSlaveAddress(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-		receiveAndMapSlaveAddress(w, request)
-	}))
-
-	client := &http.Client{}
-	var testIdList IdList
-	testIdList.Id = append(testIdList.Id, "testSlaveId")
-	jsonMessage, _ := json.Marshal(testIdList)
-	client.Post(testServer.URL, "application/json", strings.NewReader(string(jsonMessage)))
-
-	assert.Equal(t, testIdList, id_list)
 }
