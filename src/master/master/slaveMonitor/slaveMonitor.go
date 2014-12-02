@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-
 func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]master.Slave) (updatedSlaveMap map[string]master.Slave) {
 	slaveName, slaveAddress := processSlaveHeartbeatRequest(request)
 

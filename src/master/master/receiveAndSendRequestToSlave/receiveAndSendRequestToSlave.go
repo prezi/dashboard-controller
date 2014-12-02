@@ -1,7 +1,6 @@
 package receiveAndSendRequestToSlave
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"master/master"
@@ -14,24 +13,16 @@ type PostURLRequest struct {
 	URLToLoadInBrowser   string
 }
 
-func ReceiveRequestAndSendToSlave(writer http.ResponseWriter, request *http.Request, slaveMap map[string]master.Slave, slaveName string, url string) {
+func ReceiveRequestAndSendToSlave(slaveMap map[string]master.Slave, slaveName, urlToLoadInBrowser string) {
 	destinationSlaveAddress := destinationSlaveAddress(slaveName, slaveMap)
 	if destinationSlaveAddress == "" {
 		fmt.Println("Abandoning request.")
-		fmt.Fprintf(writer, "ERROR: Failed to contact slave. Slave has no URL stored.")
+		// fmt.Fprintf(writer, "ERROR: Failed to contact slave. Slave has no URL stored.")
 		return
 	}
 
-	fmt.Printf("\nSending %v to %v at %v\n", url, slaveName, destinationSlaveAddress)
-	sendURLValueMessageToSlave(destinationSlaveAddress, url)
-}
-
-func parseJSON(input []byte) (request PostURLRequest, err error) {
-	err = json.Unmarshal(input, &request)
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	return request, err
+	fmt.Printf("\nSending %v to %v at %v\n", urlToLoadInBrowser, slaveName, destinationSlaveAddress)
+	sendURLValueMessageToSlave(destinationSlaveAddress, urlToLoadInBrowser)
 }
 
 func destinationSlaveAddress(slaveName string, slaveMap map[string]master.Slave) (slaveAddress string) {

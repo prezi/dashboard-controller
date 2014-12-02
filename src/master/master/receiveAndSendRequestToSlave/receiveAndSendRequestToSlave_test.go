@@ -3,7 +3,7 @@ package receiveAndSendRequestToSlave
 import (
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
+	// "io/ioutil"
 	"master/master"
 	"net/http"
 	"net/http/httptest"
@@ -23,7 +23,7 @@ func TestReceiveRequestAndSendToSlave(t *testing.T) {
 	testSlaveMap := make(map[string]master.Slave)
 	var receivedUrl string
 	testMaster := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		ReceiveRequestAndSendToSlave(writer, request, testSlaveMap)
+		ReceiveRequestAndSendToSlave(testSlaveMap, "testSlaveName", "testURL")
 	}))
 
 	testSlave := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
@@ -44,7 +44,7 @@ func TestReceiveRequestAndSendToSlaveWithEmptySlaveAddress(t *testing.T) {
 	testSlaveMap := make(map[string]master.Slave)
 
 	testMaster := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		ReceiveRequestAndSendToSlave(writer, request, testSlaveMap)
+		ReceiveRequestAndSendToSlave(testSlaveMap, "testSlaveName", "someurl")
 	}))
 
 	testSlaveMap["testSlaveName"] = master.Slave{"", time.Now(), ""}
@@ -52,37 +52,12 @@ func TestReceiveRequestAndSendToSlaveWithEmptySlaveAddress(t *testing.T) {
 	m := PostURLRequest{"testSlaveName", "testURL"}
 	json_message, _ := json.Marshal(m)
 	client := &http.Client{}
-	response, err := client.Post(testMaster.URL, "application/json", strings.NewReader(string(json_message)))
-	body, err := ioutil.ReadAll(response.Body)
-	defer response.Body.Close()
-	receivedResponse := string(body[:])
-	assert.Equal(t, "ERROR: Failed to contact slave. Slave has no URL stored.", receivedResponse)
+	_, err := client.Post(testMaster.URL, "application/json", strings.NewReader(string(json_message)))
+	// body, err := ioutil.ReadAll(response.Body)
+	// defer response.Body.Close()
+	// receivedResponse := string(body[:])
+	// assert.Equal(t, "ERROR: Failed to contact slave. Slave has no URL stored.", receivedResponse)
 	assert.Nil(t, err)
-}
-
-func TestParseJson(t *testing.T) {
-	inputJSON := []byte(`{"DestinationSlaveName": "LeftScreen", "URLToLoadInBrowser": "http://google.com"}`)
-
-	parsedJSON, err := parseJSON(inputJSON)
-	assert.Equal(t, "LeftScreen", parsedJSON.DestinationSlaveName)
-	assert.Equal(t, "http://google.com", parsedJSON.URLToLoadInBrowser)
-	assert.Nil(t, err)
-}
-
-func TestParseJSONForEmptyInput(t *testing.T) {
-	var inputJSON = []byte(`{}`)
-
-	parsedJson, err := parseJSON(inputJSON)
-
-	assert.Equal(t, "", parsedJson.DestinationSlaveName)
-	assert.Equal(t, "", parsedJson.URLToLoadInBrowser)
-	assert.Nil(t, err)
-}
-
-func TestParseJsonForNilInput(t *testing.T) {
-	_, err := parseJSON(nil)
-
-	assert.NotNil(t, err)
 }
 
 func TestDestinationAddressSlave(t *testing.T) {

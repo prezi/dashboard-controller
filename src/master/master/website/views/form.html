@@ -18,7 +18,7 @@
             <div class='inputfield'>
                 <label for="Slave Name">Destination:</label>
                 <select name="slave-id">
-                {{range .Id}}
+                {{range .SlaveNames}}
                     <option value="{{.}}">{{.}}</option>
                 {{end}}   
                 </select>

@@ -1,8 +1,6 @@
 package website
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -14,20 +12,10 @@ type PostURLRequest struct {
 	URLToLoadInBrowser   string
 }
 
-func parseJsonSlave(input []byte) (slave PostURLRequest) {
-	err := json.Unmarshal(input, &slave)
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	return
-}
+func TestGetRelativeFilePath(t *testing.T) {
+	filepath := getRelativeFilePath("assets/images")
+	assert.IsType(t, "some/filepath", filepath)
 
-func parseJsonReply(input []byte) (reply StatusMessage) {
-	err := json.Unmarshal(input, &reply)
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	return
 }
 
 func sendGetToFormHandler(URL string) int {
@@ -48,13 +36,13 @@ func TestFormHandler(t *testing.T) {
 func TestStatusMessageForAvailableServer(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 	}))
-	statusMessage := isUrlValid(testServer.URL)
+	statusMessage := isURLValid(testServer.URL)
 
 	assert.Equal(t, true, statusMessage)
 }
 
 func TestStatusMessageForUnavailableServer(t *testing.T) {
-	statusMessage := isUrlValid("")
+	statusMessage := isURLValid("")
 
 	assert.Equal(t, false, statusMessage)
 }
@@ -69,13 +57,13 @@ func TestCheckStatusCode(t *testing.T) {
 	assert.Equal(t, 0, responseStatusCode)
 }
 
-func TestIfUrlIsValid(t *testing.T) {
+func TestIfURLIsValid(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 	}))
 
-	assert.True(t, isUrlValid(testServer.URL))
+	assert.True(t, isURLValid(testServer.URL))
 }
 
-func TestIfUrlIsInvalid(t *testing.T) {
-	assert.False(t, isUrlValid(""))
+func TestIfURLIsInvalid(t *testing.T) {
+	assert.False(t, isURLValid(""))
 }
