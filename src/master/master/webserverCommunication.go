@@ -39,14 +39,17 @@ func getWebserverAddress(request *http.Request) (webServerAddress string, err er
 		fmt.Println("port number not found.")
 		return
 	}
-
 	return
 }
 
 func SendWebserverInit(r *http.Request, slaveMap map[string]Slave) {
 	if r.FormValue("message") == "update me!" {
 		webServerAddress, _ = getWebserverAddress(r)
-		fmt.Println(sendSlaveListToWebserver(webServerAddress, slaveMap))
+		fmt.Printf("\nWeb server attached on address: %v\n",webServerAddress)
+		err := sendSlaveListToWebserver(webServerAddress, slaveMap)
+		if err != nil {
+			fmt.Printf("Error: %v\n",err)
+		}
 	}
 }
 
