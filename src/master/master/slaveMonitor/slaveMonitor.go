@@ -3,22 +3,20 @@ package slaveMonitor
 import (
 	"fmt"
 	"master/master"
-	"master/master/webserverCommunication"
 	"net"
 	"net/http"
 	"network"
 	"time"
 )
 
-var test_mode = false
 
-func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]master.Slave, webServerAddress string) (updatedSlaveMap map[string]master.Slave) {
+func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]master.Slave) (updatedSlaveMap map[string]master.Slave) {
 	slaveName, slaveAddress := processSlaveHeartbeatRequest(request)
 
 	if _, existsInMap := slaveMap[slaveName]; existsInMap {
 		updateSlaveHeartbeat(slaveMap, slaveAddress, slaveName)
 	} else {
-		addNewSlaveToMap(slaveMap, slaveAddress, slaveName, webServerAddress)
+		addNewSlaveToMap(slaveMap, slaveAddress, slaveName)
 	}
 	return slaveMap
 }
@@ -56,23 +54,19 @@ func sendKillSignalToSlave(slaveAddress string) (err error) {
 	return
 }
 
-func addNewSlaveToMap(slaveMap map[string]master.Slave, slaveAddress, slaveName, webServerAddress string) {
+func addNewSlaveToMap(slaveMap map[string]master.Slave, slaveAddress, slaveName string) {
 	fmt.Printf("Slave added with name \"%v\", URL %v.\n\n", slaveName, slaveAddress)
 	slaveMap[slaveName] = master.Slave{URL: slaveAddress, Heartbeat: time.Now()}
-	webserverCommunication.SendSlaveListToWebserver(webServerAddress, slaveMap)
 }
 
-func MonitorSlaves(timeInterval int, slaveMap map[string]master.Slave, webServerAddress string) {
+func MonitorSlaves(timeInterval int, slaveMap map[string]master.Slave) {
 	timer := time.Tick(time.Duration(timeInterval) * time.Second)
 	for _ = range timer {
-		removeDeadSlaves(timeInterval, slaveMap, webServerAddress)
-		if test_mode {
-			break
-		}
+		removeDeadSlaves(timeInterval, slaveMap)
 	}
 }
 
-func removeDeadSlaves(deadTime int, slaveMap map[string]master.Slave, webServerAddress string) {
+func removeDeadSlaves(deadTime int, slaveMap map[string]master.Slave) {
 	slavesToRemove := getDeadSlaves(deadTime, slaveMap)
 	if len(slavesToRemove) > 0 {
 		fmt.Printf("\nREMOVING DEAD SLAVES: %v\n", slavesToRemove)
@@ -80,7 +74,6 @@ func removeDeadSlaves(deadTime int, slaveMap map[string]master.Slave, webServerA
 			delete(slaveMap, deadSlaveName)
 		}
 		printSlaveNamesInMap(slaveMap)
-		webserverCommunication.SendSlaveListToWebserver(webServerAddress, slaveMap)
 	}
 }
 

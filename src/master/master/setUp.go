@@ -8,8 +8,7 @@ type Slave struct {
 	DisplayedURL string // TODO: store currently displayed URL for each slave
 }
 
-func SetUp() (slaveMap map[string]Slave, webServerAddress string) {
+func SetUp() (slaveMap map[string]Slave) {
 	slaveMap = make(map[string]Slave)
-	webServerAddress = "EMPTY"
 	return
 }
