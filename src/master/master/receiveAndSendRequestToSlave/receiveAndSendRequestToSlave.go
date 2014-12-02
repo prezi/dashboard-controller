@@ -14,20 +14,16 @@ type PostURLRequest struct {
 	URLToLoadInBrowser   string
 }
 
-func ReceiveRequestAndSendToSlave(writer http.ResponseWriter, request *http.Request, slaveMap map[string]master.Slave) {
-	POSTRequestBody, _ := ioutil.ReadAll(request.Body)
-	defer request.Body.Close()
-
-	incomingRequest, _ := parseJSON(POSTRequestBody)
-	destinationSlaveAddress := destinationSlaveAddress(incomingRequest.DestinationSlaveName, slaveMap)
+func ReceiveRequestAndSendToSlave(writer http.ResponseWriter, request *http.Request, slaveMap map[string]master.Slave, slaveName string, url string) {
+	destinationSlaveAddress := destinationSlaveAddress(slaveName, slaveMap)
 	if destinationSlaveAddress == "" {
 		fmt.Println("Abandoning request.")
 		fmt.Fprintf(writer, "ERROR: Failed to contact slave. Slave has no URL stored.")
 		return
 	}
 
-	fmt.Printf("\nSending %v to %v at %v\n", incomingRequest.URLToLoadInBrowser, incomingRequest.DestinationSlaveName, destinationSlaveAddress)
-	sendURLValueMessageToSlave(destinationSlaveAddress, incomingRequest.URLToLoadInBrowser)
+	fmt.Printf("\nSending %v to %v at %v\n", url, slaveName, destinationSlaveAddress)
+	sendURLValueMessageToSlave(destinationSlaveAddress, url)
 }
 
 func parseJSON(input []byte) (request PostURLRequest, err error) {

@@ -99,3 +99,11 @@ func printSlaveNamesInMap(slaveMap map[string]master.Slave) {
 		}
 	}
 }
+
+func ListSlaveNames(slaveMap map[string]master.Slave) (slaveNames []string) {
+	slaveNames = make([]string, 0, len(slaveMap))
+	for k := range slaveMap {
+		slaveNames = append(slaveNames, k)
+	}
+	return slaveNames
+}

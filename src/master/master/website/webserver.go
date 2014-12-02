@@ -8,6 +8,9 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"master/master/receiveAndSendRequestToSlave"
+	"master/master/slaveMonitor"
+	"master/master"
 )
 
 const (
@@ -58,20 +61,26 @@ func handleTemplateParseError(err error) {
 	}
 }
 
-func SubmitHandler(response_writer http.ResponseWriter, request *http.Request) {
+func SubmitHandler(responseWriter http.ResponseWriter, request *http.Request, slaveMap map[string]master.Slave) {
 	if request.Method == "POST" {
 		url := request.FormValue("url")
-		name := request.FormValue("slave-id")
-		if slaveInSlaveList(name, id_list.Id) == false {
-			statusMessage := name + " is offline, please refresh your browser to see available screens."
-			sendConfirmationMessageToUser(response_writer, statusMessage)
+		fmt.Println("###############")
+		fmt.Println("url: ", url)
+		slaveName := request.FormValue("slave-id")
+		fmt.Println("name: ", slaveName)
+		slaveNames := slaveMonitor.ListSlaveNames(slaveMap)
+		id_list := IdList{Id: slaveNames}
+		if slaveInSlaveList(slaveName, id_list.Id) == false {
+			statusMessage := slaveName + " is offline, please refresh your browser to see available screens."
+			sendConfirmationMessageToUser(responseWriter, statusMessage)
 		} else {
 			if isUrlValid(url) == true {
-				statusMessage := "Success! " + url + " is being displayed on " + name
-				sendConfirmationMessageToUser(response_writer, statusMessage)
+				statusMessage := "Success! " + url + " is being displayed on " + slaveName
+				sendConfirmationMessageToUser(responseWriter, statusMessage)
+				receiveAndSendRequestToSlave.ReceiveRequestAndSendToSlave(responseWriter, request, slaveMap, slaveName, url)
 			} else {
 				statusMessage := url + " cannot be opened. Try a different one. Sadpanda."
-				sendConfirmationMessageToUser(response_writer, statusMessage)
+				sendConfirmationMessageToUser(responseWriter, statusMessage)
 			}
 		}
 	}
