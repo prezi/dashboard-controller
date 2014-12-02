@@ -35,18 +35,19 @@ var id_list = IdList{
 }
 
 
-func FormHandler(responseWriter http.ResponseWriter, request *http.Request) {
+func FormHandler(responseWriter http.ResponseWriter, request *http.Request, slaveNames []string) {
 	if request.Method == "GET" {
 		if request.URL.Path != "/" {
 			http.Redirect(responseWriter, request, "/", 301)
 		}
-		parseAndExecuteTemplate(responseWriter)
+		parseAndExecuteTemplate(responseWriter, slaveNames)
 	}
 }
 
-func parseAndExecuteTemplate(responseWriter http.ResponseWriter) {
+func parseAndExecuteTemplate(responseWriter http.ResponseWriter, slaveNames []string) {
 	template, err := template.ParseFiles(path.Join(VIEWS_PATH, "form.html"))
 	handleTemplateParseError(err)
+	id_list := IdList{Id: slaveNames}
 	template.Execute(responseWriter, id_list)
 }
 

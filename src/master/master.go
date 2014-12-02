@@ -15,7 +15,13 @@ func main() {
 	http.Handle("/assets/images/", http.StripPrefix("/assets/images/", http.FileServer(http.Dir(website.IMAGES_PATH))))
 	http.Handle("/assets/javascripts/", http.StripPrefix("/assets/javascripts/", http.FileServer(http.Dir(website.JAVASCRIPTS_PATH))))
 	http.Handle("/assets/stylesheets/", http.StripPrefix("/assets/stylesheets/", http.FileServer(http.Dir(website.STYLESHEETS_PATH))))
-	http.HandleFunc("/", website.FormHandler)
+	http.HandleFunc("/",  func(w http.ResponseWriter, r *http.Request) {
+		slaveNames := make([]string, 0, len(slaveMap))
+		for k := range slaveMap {
+			slaveNames = append(slaveNames, k)
+		}
+			website.FormHandler(w, r, slaveNames)
+		})
 	http.HandleFunc("/form-submit", func(w http.ResponseWriter, r *http.Request) {
 			website.SubmitHandler(w, r)
 		})
