@@ -16,8 +16,9 @@ type IdList struct {
 
 // If webserver address updates, will the slave map update properly as well?
 // What if we have more than one webserver pinging the master?
-func UpdateWebserverAddress(r *http.Request, webServerAddress string) (newWebServerAddress string, err error) {
-	newWebServerAddress, err = getWebserverAddress(r)
+func UpdateWebserverAddress(r *http.Request, webServerAddress string) (newWebServerAddress string) {
+	newWebServerAddress, err := getWebserverAddress(r)
+	network.ErrorHandler(err, "Error getting web server address: %v")
 	if webServerAddress != newWebServerAddress {
 		fmt.Printf("Webserver address has changed from %v to %v.\n", webServerAddress, newWebServerAddress)
 		webServerAddress = newWebServerAddress

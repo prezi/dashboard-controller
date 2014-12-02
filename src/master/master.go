@@ -19,7 +19,7 @@ func main() {
 		receiveAndSendRequestToSlave.ReceiveRequestAndSendToSlave(w, r, slaveMap)
 	})
 	http.HandleFunc("/webserver_heartbeat", func(_ http.ResponseWriter, r *http.Request) {
-		webServerAddress, _ = webserverCommunication.UpdateWebserverAddress(r, webServerAddress)
+		webServerAddress = webserverCommunication.UpdateWebserverAddress(r, webServerAddress)
 	})
 	http.HandleFunc("/webserver_init", func(_ http.ResponseWriter, r *http.Request) {
 		webServerAddress = webserverCommunication.SendWebserverInit(r, slaveMap)

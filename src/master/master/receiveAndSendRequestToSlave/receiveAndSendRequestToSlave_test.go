@@ -63,16 +63,16 @@ func TestReceiveRequestAndSendToSlaveWithEmptySlaveAddress(t *testing.T) {
 func TestParseJson(t *testing.T) {
 	inputJSON := []byte(`{"DestinationSlaveName": "LeftScreen", "URLToLoadInBrowser": "http://google.com"}`)
 
-	parsedJson, err := parseJson(inputJSON)
-	assert.Equal(t, "LeftScreen", parsedJson.DestinationSlaveName)
-	assert.Equal(t, "http://google.com", parsedJson.URLToLoadInBrowser)
+	parsedJSON, err := parseJSON(inputJSON)
+	assert.Equal(t, "LeftScreen", parsedJSON.DestinationSlaveName)
+	assert.Equal(t, "http://google.com", parsedJSON.URLToLoadInBrowser)
 	assert.Nil(t, err)
 }
 
-func TestParseJsonForEmptyInput(t *testing.T) {
+func TestParseJSONForEmptyInput(t *testing.T) {
 	var inputJSON = []byte(`{}`)
 
-	parsedJson, err := parseJson(inputJSON)
+	parsedJson, err := parseJSON(inputJSON)
 
 	assert.Equal(t, "", parsedJson.DestinationSlaveName)
 	assert.Equal(t, "", parsedJson.URLToLoadInBrowser)
@@ -80,7 +80,7 @@ func TestParseJsonForEmptyInput(t *testing.T) {
 }
 
 func TestParseJsonForNilInput(t *testing.T) {
-	_, err := parseJson(nil)
+	_, err := parseJSON(nil)
 
 	assert.NotNil(t, err)
 }

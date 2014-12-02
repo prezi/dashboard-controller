@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"network"
 	"time"
 )
 
@@ -34,18 +35,18 @@ func processSlaveHeartbeatRequest(request *http.Request) (slaveName, slaveAddres
 	return
 }
 
-func updateSlaveHeartbeat(slaveMap map[string]master.Slave, slaveAddress, slaveName string) (err error) {
+func updateSlaveHeartbeat(slaveMap map[string]master.Slave, slaveAddress, slaveName string) {
 	slaveInstance := slaveMap[slaveName]
 	if slaveInstance.URL != slaveAddress {
 		fmt.Println("WARNING: Received signal from slave with duplicate name.")
 		fmt.Printf("Slave with name \"%v\" already exists.\n", slaveName)
 		fmt.Printf("Sending kill signal to duplicate slave at URL %v.\n\n", slaveAddress)
-		err = sendKillSignalToSlave(slaveAddress)
+		err := sendKillSignalToSlave(slaveAddress)
+		network.ErrorHandler(err, "Error encountered killing slave: %v\n")
 	} else {
 		slaveInstance.Heartbeat = time.Now()
 		slaveMap[slaveName] = slaveInstance
 	}
-	return
 }
 
 func sendKillSignalToSlave(slaveAddress string) (err error) {

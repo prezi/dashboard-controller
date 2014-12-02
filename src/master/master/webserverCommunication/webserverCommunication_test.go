@@ -29,7 +29,7 @@ func TestUpdateWebserverAddress(t *testing.T) {
 
 	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
 		webServerIP, _, _ = net.SplitHostPort(request.RemoteAddr)
-		webServerAddress, _ = UpdateWebserverAddress(request, webServerAddress)
+		webServerAddress = UpdateWebserverAddress(request, webServerAddress)
 	}))
 
 	client := &http.Client{}
