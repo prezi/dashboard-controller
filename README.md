@@ -6,8 +6,9 @@ Dashboard Controller
 Contents
  - [Introduction](https://github.com/prezi/dashboard-controller#introduction)
  - [Architecture](https://github.com/prezi/dashboard-controller#architecture)
- - [Set Up](https://github.com/prezi/dashboard-controller#getting-started)
+ - [Set Up](https://github.com/prezi/dashboard-controller#set-up)
  - [Posting a URL](https://github.com/prezi/dashboard-controller#posting-a-url)
+ - [Tests](https://github.com/prezi/dashboard-controller#tests)
 
 Introduction
 ------------------
@@ -71,7 +72,7 @@ The slave will automatically map itself to the master and periodically emit hear
 Posting a URL
 ------------------
 
-Access the website running on your [localhost](https://github.com/prezi/dashboard-controller/blob/master/src/webserver/webserver.go#L126). Fill in the text fields, submit, and see your url post on the indicated slave. :) 
+Access the website running on your localhost. Fill in the text fields, submit, and see your url post on the indicated slave. :) 
 
 Tests
 ------------------
