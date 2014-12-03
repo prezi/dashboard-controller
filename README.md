@@ -15,8 +15,8 @@ Introduction
 Use the Dashboard Controller program to remotely open urls on browser windows.
 
 Our implemented system uses [Google Chrome](http://www.google.com/chrome/) web browser. 
-Slave runs on Raspberry Pis connected to monitors. 
-The webserver and master both run on one Apple Mac Mini. 
+Slave runs on Raspberry Pis or Mac Minis connected to monitors. 
+The master runs on one Raspberry Pi or Apple Mac Mini. 
 
 Together, they make a delicious Apple-Raspberry-Pi system. 
 
@@ -27,33 +27,26 @@ Architecture
   - Receives url from master and loads url in a browser. 
   - Compatible with OS X and Linux operating systems with Google Chrome installed. 
  - master
-  - Receives JSON from the webserver and passes JSON to proper slave. 
+  - Receives JSON from the user input.
+  - Parses the input and passes JSON to proper slave. 
   - Compatible with OS X. 
- - webserver
-  - Receives JSON from user input and passes JSON to master. 
-  - Compatible with OS X. 
-
 
 Set Up
 ------------------
 
 If you are not familiar with Go and run into trouble with the following instructions, please visit  ["How to Write Go Code"](https://golang.org/doc/code.html) for more details. In particular, pay attention to the GOPATH environment variable. 
 
-####Webserver and Master
+####Master
 ------------------
 
 You will need [Go](https://golang.org/) installed to run and/or compile the source code. 
-Clone this repository to the machine(s) that will run the master and/or webserver. 
+Clone this repository to the machine that will run the master. 
 
 To run the code from the cloned repository directory, 
 
     dashboard-controller$ go run src/master/master.go
 
-And for the webserver, 
-
-    dashboard-controller$ go run src/webserver/webserver.go 
-
-(There is currently a bug where the webserver must be run from the root directory to ensure the correct path to "form.html".)
+(There is currently a bug where the master must be run from the root directory to ensure the correct path to "form.html".)
 
 ####Slave
 ------------------
@@ -87,10 +80,14 @@ In order to run the tests, first install [Go](https://golang.org/)'s [testify](h
 
     dashboard-controller$ go get github.com/stretchr/testify
 
-Navigate into the directory where the test file is located, and run the tests with 'go test'. For example, in the master directory that contains master.go and master_test.go, run
+There are two ways to run the unit tests. In case you wish to run only one test file, then navigate into the directory where the test file is located, and run the tests with 'go test'. For example, in the master directory that contains master.go and master_test.go, run
 
     dashboard-controller/src/master$ go test 
+ 
+You can also run the tests from the root directory by specifying the package name after 'go test'. 
 
+    dashboard-controller$ go test master
+ 
 The -cover flag will output the test coverage %. 
 
     dashboard-controller/src/master$ go test -cover
