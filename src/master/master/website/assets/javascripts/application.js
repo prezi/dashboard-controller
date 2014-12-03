@@ -11,9 +11,9 @@ $(document).ready(function() {
             timeout: 8000,
             cache: false,
             success: function(data, textStatus, jqXHR) {
-                var newInfoBoxContent = data.HTML;
+                var newInfoBoxContent = data.StatusMessage;
                 var isPersistent = data.IsPersistent == "true";
-                $(".info").html(data.HTML);
+                $(".info").html(data.StatusMessage);
                 if (!isPersistent) {
                     $(".info").show("slow");
                     setTimeout(function() {

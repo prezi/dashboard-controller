@@ -20,11 +20,6 @@ var (
 	VIEWS_PATH       = getRelativeFilePath("views")
 )
 
-type Message struct {
-	DestinationSlaveName string
-	URLToLoadInBrowser   string
-}
-
 type StatusMessage struct {
 	StatusMessage string
 }
