@@ -47,8 +47,6 @@ To run the code from the cloned repository directory,
 
     dashboard-controller$ go run src/master/master.go
 
-(There is currently a bug where the master must be run from the root directory to ensure the correct path to "form.html".)
-
 ####Slave
 ------------------
 
