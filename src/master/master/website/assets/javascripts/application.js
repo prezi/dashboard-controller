@@ -2,7 +2,12 @@
 
 $(document).ready(function() {
     $("#mainform").submit(function(e) {
-        var postData = $(this).serializeArray();
+        var selectedSlave = $('.slave-selector a').filter('.strongSelect').html();
+        var usrToDisplay = $('.form-control').val();
+        var postData = {
+            'url':usrToDisplay,
+            'slave-id': selectedSlave
+        };
         var formURL = $(this).attr("action");
         $.ajax({
             url: formURL,
@@ -28,5 +33,13 @@ $(document).ready(function() {
             }
         });
         e.preventDefault();
+    });
+    $('.slave-selector a').on('click', function (e) {
+        if ($(this).hasClass('strongSelect')) {
+            $(this).removeClass('strongSelect');
+        } else {
+            $('.slave-selector a').filter('.strongSelect').removeClass('strongSelect');
+            $(this).addClass('strongSelect');
+        }
     });
 });

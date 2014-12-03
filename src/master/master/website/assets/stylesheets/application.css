@@ -1,46 +1,22 @@
 body {
 	font-family:verdana;
-    background-image: url('http://a1star.com/images/star--background-seamless-repeating8.jpg');
-    background-color: #cccccc;
+  background-color: #FFFFFF;
+  padding-top: 50px;
 }
 
-h1 {
-	width: 400px;
-	background-color: yellow;
-	opacity: 0.8;
-	margin: 1cm auto;
-	padding: 1cm 0.3cm;
-}
-
-label {
-	clear: left;
-	float: left;
-	width: 50%;
-}
 
 .button {
-	margin: 0.5cm auto;
-  position: relative;
-  vertical-align: top;
-  width: 100%;
-  height: 60px;
-  padding: 0;
-  font-size: 22px;
-  color: white;
-  text-align: center;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-  background: #f39c12;
-  border: 0;
-  border-bottom: 2px solid #e8930c;
-  cursor: pointer;
-  -webkit-box-shadow: inset 0 -2px #e8930c;
-  box-shadow: inset 0 -2px #e8930c;
+
+}
+
+.custom-input-field {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
 }
 
 .form-box {
     width: 400px;
     margin: auto;
-    background-color: yellow;
     border: 1px solid black;
     opacity: 0.8;
     padding: 1cm;
@@ -67,4 +43,46 @@ label {
 
 .info {
   display:none;
+}
+
+
+.slave-selector li {
+    margin: 0px 0;
+    list-style-type: none;
+    position: relative;
+    padding: 5px 5px 0px 0px;
+}
+.slave-selector ul {
+  padding-left: 0px;
+  /*cursor:default;*/
+}
+.slave-selector ul li a {
+  cursor:pointer;
+}
+.slave-selector li a {
+    display: inline-block;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #666;
+    font-family: arial, verdana, tahoma;
+    font-size: 11px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+/*Remove connectors before root*/
+ .slave-selector > ul > li::before, .tree > ul > li::after {
+    border: 0;
+}
+/*Remove connectors after last child*/
+ .slave-selector li:last-child::before {
+    height: 30px;
+}
+
+.strongSelect {
+    background: #3ACFCF;
+    color: #000;
+    border: 1px solid #94a0b4;
+    border-color: #94a0b4;
 }

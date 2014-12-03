@@ -1,41 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashing Pi!</title>
-    <link rel="stylesheet" type="text/css" href="/assets/stylesheets/application.css">
+    <title>Dashing Control</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script type="text/javascript" src="/assets/javascripts/application.js"></script>
-    <link rel="shortcut icon" type="image/icon" href="/assets/images/favicon.ico"/>
-    <link rel="icon" type="image/icon" href="/assets/images/favicon.ico"/>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+    
+    <link rel="stylesheet" type="text/css" href="/assets/stylesheets/application.css">
+    <script type="text/javascript" src="/assets/javascripts/application.js?id=1234"></script>
+<!--     <link rel="shortcut icon" type="image/icon" href="/assets/images/favicon.ico"/>
+    <link rel="icon" type="image/icon" href="/assets/images/favicon.ico"/> -->
 </head>
 <body>
-<div class='big-frame'>
-    <h1 class='title'>Dashing-Pi</h1>
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Dashboard control</a>
+        </div>
+      </div>
+    </nav>
 
     <div class='form-box'>
-
-        <form action="/form-submit" id="mainform" method="post">
-            <div class='inputfield'>
-                <label for="Slave Name">Destination:</label>
-                <select name="slave-id">
-                {{range .SlaveNames}}
-                    <option value="{{.}}">{{.}}</option>
-                {{end}}   
-                </select>
-            </div>
-            <div class='inputfield'>
-                <label for="URL">URL:</label>
-                <input type="text" name="url"/>
-            </div>
-
-            <div class='inputbutton'>
-                <input class='button' type='submit' name='Send URL!' value='Send'/>
+        <form class="form-inline" action="/form-submit" id="mainform" method="post">
+            <div class="input">
+              <input type="text" class="form-control" placeholder="URL">
+              <input class="btn btn-default" type='submit' name='Send URL!' value='Send'/>
             </div>
         </form>
+        <div class='slave-selector'>
+            <ul>
+            {{range .SlaveNames}}
+                <li ><a>{{.}}</a></li>
+<!--                 <li><a class='strongSelect'>Slave 1</a></li>
+                <li><a>Slave 2</a></li>
+                <li><a>Slave 3</a></li>
+                <li><a>Slave 4</a></li> -->
+            {{end}} 
+            </ul>
+        </div>
         <div class="info">
         </div>
     </div>
-</div>
 
 </body>
 </html>
