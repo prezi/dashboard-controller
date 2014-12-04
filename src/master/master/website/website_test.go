@@ -12,12 +12,6 @@ type PostURLRequest struct {
 	URLToLoadInBrowser   string
 }
 
-func TestGetRelativeFilePath(t *testing.T) {
-	filepath := getRelativeFilePath("assets/images")
-	assert.IsType(t, "some/filepath", filepath)
-
-}
-
 func sendGetToFormHandler(URL string) int {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		request.URL.Path = URL

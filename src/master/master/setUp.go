@@ -1,6 +1,10 @@
 package master
 
-import "time"
+import (
+	"path"
+	"runtime"
+	"time"
+)
 
 type Slave struct {
 	URL          string
@@ -10,5 +14,11 @@ type Slave struct {
 
 func SetUp() (slaveMap map[string]Slave) {
 	slaveMap = make(map[string]Slave)
+	return
+}
+
+func GetRelativeFilePath(relativeFileName string) (filePath string) {
+	_, filename, _, _ := runtime.Caller(1)
+	filePath = path.Join(path.Dir(filename), relativeFileName)
 	return
 }
