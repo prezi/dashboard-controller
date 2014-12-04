@@ -32,6 +32,11 @@
       </div>
     </nav>
 
+    <small>User: {{.UserName}}</small>
+    <form method="post" action="/logout">
+        <button type="submit">Logout</button>
+    </form>
+
     <div class='form-box'>
         <form class="form-inline" action="/form-submit" id="mainform" method="post">
             <div class="input">

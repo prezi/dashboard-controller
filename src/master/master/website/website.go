@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"master/master"
 	"master/master/receiveAndSendRequestToSlave"
+	"master/master/website/session"
 	"net/http"
 	"network"
 	"path"
@@ -30,38 +31,50 @@ func getRelativeFilePath(relativeFileName string) (filePath string) {
 	return
 }
 
-func LoginHandler(responseWriter http.ResponseWriter, request *http.Request) {
-	if request.Method == "GET" {
-		template, err := template.ParseFiles(path.Join(VIEWS_PATH, "login.html"))
-		network.ErrorHandler(err, "Error encountered while parsing website template files: %v.")
-		template.Execute(responseWriter, "future errormessage when login failed")
-	}
-	if request.Method == "POST" {
-		username := request.FormValue("username")
-		password := request.FormValue("password")
-		fmt.Println(username, password)
-		http.Redirect(responseWriter, request, "/", 301)
-	}
+// func LoginHandler(responseWriter http.ResponseWriter, request *http.Request) {
+// 	if request.Method == "GET" {
+// 		template, err := template.ParseFiles(path.Join(VIEWS_PATH, "login.html"))
+// 		network.ErrorHandler(err, "Error encountered while parsing website template files: %v.")
+// 		template.Execute(responseWriter, "future errormessage when login failed")
+// 	}
+// 	if request.Method == "POST" {
+// 		username := request.FormValue("username")
+// 		password := request.FormValue("password")
+// 		fmt.Println(username, password)
+// 		http.Redirect(responseWriter, request, "/", 301)
+// 	}
+// }
+
+func IndexPageHandler(w http.ResponseWriter, r *http.Request) {
+
+	template, err := template.ParseFiles(path.Join(VIEWS_PATH, "login.html"))
+	network.ErrorHandler(err, "Error encountered while parsing website template files: %v.")
+	template.Execute(w, "Login Error Message Here.")
+	// fmt.Fprintf(w, indexPage)
 }
 
-func FormHandler(responseWriter http.ResponseWriter, request *http.Request, slaveNames []string) {
-	if request.Method == "GET" {
-		if request.URL.Path != "/login" && request.URL.Path != "/" {
-			http.Redirect(responseWriter, request, "/login", 301)
+func FormHandler(w http.ResponseWriter, r *http.Request, slaveNames []string) {
+	if r.Method == "GET" {
+		userName := session.GetUserName(r)
+		if userName != "" {
+			displayFormPage(w, slaveNames, userName)
+		} else {
+			http.Redirect(w, r, "/", 302)
 		}
-		parseAndExecuteTemplate(responseWriter, slaveNames)
 	}
 }
 
-func parseAndExecuteTemplate(responseWriter http.ResponseWriter, slaveNames []string) {
-	type SlaveNameList struct {
+func displayFormPage(responseWriter http.ResponseWriter, slaveNames []string, userName string) {
+	type HTMLData struct {
+		UserName   string
 		SlaveNames []string
 	}
 
 	template, err := template.ParseFiles(path.Join(VIEWS_PATH, "form.html"))
 	network.ErrorHandler(err, "Error encountered while parsing website template files: %v.")
-	slaveNameList := SlaveNameList{SlaveNames: slaveNames}
-	template.Execute(responseWriter, slaveNameList)
+	dataForTemplate := HTMLData{UserName: userName, SlaveNames: slaveNames}
+
+	template.Execute(responseWriter, dataForTemplate)
 }
 
 func SubmitHandler(response_writer http.ResponseWriter, request *http.Request, slaveMap map[string]master.Slave) {
