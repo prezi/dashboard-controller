@@ -18,9 +18,7 @@ func main() {
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		website.LoginHandler(w, r)
 	})
-	http.HandleFunc("/login-data", func(w http.ResponseWriter, r *http.Request) {
-		website.LoginHandler(w, r)
-	})
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		slaveNames := getSlaveNamesFromMap(slaveMap)
 		website.FormHandler(w, r, slaveNames)
