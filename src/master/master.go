@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/securecookie"
 	"log"
 	"master/master"
 	"master/master/slaveMonitor"
@@ -12,12 +10,6 @@ import (
 	"net/http"
 )
 
-var cookieHandler = securecookie.New(
-	securecookie.GenerateRandomKey(64),
-	securecookie.GenerateRandomKey(32))
-
-var router = mux.NewRouter()
-
 func main() {
 	slaveMap := master.SetUp()
 
@@ -25,16 +17,13 @@ func main() {
 	http.Handle("/assets/javascripts/", http.StripPrefix("/assets/javascripts/", http.FileServer(http.Dir(website.JAVASCRIPTS_PATH))))
 	http.Handle("/assets/stylesheets/", http.StripPrefix("/assets/stylesheets/", http.FileServer(http.Dir(website.STYLESHEETS_PATH))))
 
+	router := mux.NewRouter()
 	router.HandleFunc("/", session.IndexPageHandler)
-	http.Handle("/", router)
 	router.HandleFunc("/login", session.LoginHandler).Methods("POST")
 	router.HandleFunc("/logout", session.LogoutHandler).Methods("POST")
-	// http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-	// 	website.LoginHandler(w, r)
-	// })
+	http.Handle("/", router)
 
 	router.HandleFunc("/internal", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("YOYOYO")
 		slaveNames := getSlaveNamesFromMap(slaveMap)
 		website.FormHandler(w, r, slaveNames)
 	})

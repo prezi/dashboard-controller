@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"master/master"
 	"master/master/receiveAndSendRequestToSlave"
+	"master/master/website/session"
 	"net/http"
 	"network"
 	"path"
@@ -44,34 +45,28 @@ func LoginHandler(responseWriter http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func FormHandler(responseWriter http.ResponseWriter, request *http.Request, slaveNames []string) {
-	if request.Method == "GET" {
-		// if request.URL.Path != "/login" && request.URL.Path != "/" {
-		// 	http.Redirect(responseWriter, request, "/login", 301)
-		// }
-		fmt.Println("EXECUTING TEMPLATE YO")
-		parseAndExecuteTemplate(responseWriter, slaveNames)
+func FormHandler(w http.ResponseWriter, r *http.Request, slaveNames []string) {
+	if r.Method == "GET" {
+		userName := session.GetUserName(r)
+		if userName != "" {
+			displayFormPage(w, slaveNames, userName)
+		} else {
+			http.Redirect(w, r, "/", 302)
+		}
 	}
 }
 
-// func internalPageHandler(w http.ResponseWriter, r *http.Request) {
-// 	userName := getUserName(r)
-// 	if userName != "" {
-// 		fmt.Fprintf(w, internalPage, userName)
-// 	} else {
-// 		http.Redirect(w, r, "/", 302)
-// 	}
-// }
-
-func parseAndExecuteTemplate(responseWriter http.ResponseWriter, slaveNames []string) {
-	type SlaveNameList struct {
+func displayFormPage(responseWriter http.ResponseWriter, slaveNames []string, userName string) {
+	type HTMLData struct {
+		UserName   string
 		SlaveNames []string
 	}
 
 	template, err := template.ParseFiles(path.Join(VIEWS_PATH, "form.html"))
 	network.ErrorHandler(err, "Error encountered while parsing website template files: %v.")
-	slaveNameList := SlaveNameList{SlaveNames: slaveNames}
-	template.Execute(responseWriter, slaveNameList)
+	dataForTemplate := HTMLData{UserName: userName, SlaveNames: slaveNames}
+
+	template.Execute(responseWriter, dataForTemplate)
 }
 
 func SubmitHandler(response_writer http.ResponseWriter, request *http.Request, slaveMap map[string]master.Slave) {
