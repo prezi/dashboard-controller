@@ -11,51 +11,28 @@ import (
 	"net/http"
 	"network"
 	"path"
-	"runtime"
 )
 
 var (
-	IMAGES_PATH      = getRelativeFilePath("assets/images")
-	JAVASCRIPTS_PATH = getRelativeFilePath("assets/javascripts")
-	STYLESHEETS_PATH = getRelativeFilePath("assets/stylesheets")
-	VIEWS_PATH       = getRelativeFilePath("views")
+	IMAGES_PATH      = master.GetRelativeFilePath("assets/images")
+	JAVASCRIPTS_PATH = master.GetRelativeFilePath("assets/javascripts")
+	STYLESHEETS_PATH = master.GetRelativeFilePath("assets/stylesheets")
+	VIEWS_PATH       = master.GetRelativeFilePath("views")
 )
 
 type StatusMessage struct {
 	StatusMessage string
 }
 
-func getRelativeFilePath(relativeFileName string) (filePath string) {
-	_, filename, _, _ := runtime.Caller(1)
-	filePath = path.Join(path.Dir(filename), relativeFileName)
-	return
-}
-
-// func LoginHandler(responseWriter http.ResponseWriter, request *http.Request) {
-// 	if request.Method == "GET" {
-// 		template, err := template.ParseFiles(path.Join(VIEWS_PATH, "login.html"))
-// 		network.ErrorHandler(err, "Error encountered while parsing website template files: %v.")
-// 		template.Execute(responseWriter, "future errormessage when login failed")
-// 	}
-// 	if request.Method == "POST" {
-// 		username := request.FormValue("username")
-// 		password := request.FormValue("password")
-// 		fmt.Println(username, password)
-// 		http.Redirect(responseWriter, request, "/", 301)
-// 	}
-// }
-
 func IndexPageHandler(w http.ResponseWriter, r *http.Request) {
-
 	template, err := template.ParseFiles(path.Join(VIEWS_PATH, "login.html"))
 	network.ErrorHandler(err, "Error encountered while parsing website template files: %v.")
 	template.Execute(w, "Login Error Message Here.")
-	// fmt.Fprintf(w, indexPage)
 }
 
 func FormHandler(w http.ResponseWriter, r *http.Request, slaveNames []string) {
 	if r.Method == "GET" {
-		userName := session.GetUserName(r)
+		userName := session.GetUsername(r)
 		if userName != "" {
 			displayFormPage(w, slaveNames, userName)
 		} else {
