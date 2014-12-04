@@ -46,12 +46,22 @@ func LoginHandler(responseWriter http.ResponseWriter, request *http.Request) {
 
 func FormHandler(responseWriter http.ResponseWriter, request *http.Request, slaveNames []string) {
 	if request.Method == "GET" {
-		if request.URL.Path != "/login" && request.URL.Path != "/" {
-			http.Redirect(responseWriter, request, "/login", 301)
-		}
+		// if request.URL.Path != "/login" && request.URL.Path != "/" {
+		// 	http.Redirect(responseWriter, request, "/login", 301)
+		// }
+		fmt.Println("EXECUTING TEMPLATE YO")
 		parseAndExecuteTemplate(responseWriter, slaveNames)
 	}
 }
+
+// func internalPageHandler(w http.ResponseWriter, r *http.Request) {
+// 	userName := getUserName(r)
+// 	if userName != "" {
+// 		fmt.Fprintf(w, internalPage, userName)
+// 	} else {
+// 		http.Redirect(w, r, "/", 302)
+// 	}
+// }
 
 func parseAndExecuteTemplate(responseWriter http.ResponseWriter, slaveNames []string) {
 	type SlaveNameList struct {
