@@ -15,6 +15,12 @@ func main() {
 	http.Handle("/assets/javascripts/", http.StripPrefix("/assets/javascripts/", http.FileServer(http.Dir(website.JAVASCRIPTS_PATH))))
 	http.Handle("/assets/stylesheets/", http.StripPrefix("/assets/stylesheets/", http.FileServer(http.Dir(website.STYLESHEETS_PATH))))
 
+	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		website.LoginHandler(w, r)
+	})
+	http.HandleFunc("/login-data", func(w http.ResponseWriter, r *http.Request) {
+		website.LoginHandler(w, r)
+	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		slaveNames := getSlaveNamesFromMap(slaveMap)
 		website.FormHandler(w, r, slaveNames)

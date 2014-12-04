@@ -30,10 +30,24 @@ func getRelativeFilePath(relativeFileName string) (filePath string) {
 	return
 }
 
+func LoginHandler(responseWriter http.ResponseWriter, request *http.Request) {
+	if request.Method == "GET" {
+		template, err := template.ParseFiles(path.Join(VIEWS_PATH, "login.html"))
+		network.ErrorHandler(err, "Error encountered while parsing website template files: %v.")
+		template.Execute(responseWriter, "future errormessage when login failed")
+	}
+	if request.Method == "POST" {
+		username := request.FormValue("username")
+		password := request.FormValue("password")
+		fmt.Println(username, password)
+		http.Redirect(responseWriter, request, "/", 301)
+	}
+}
+
 func FormHandler(responseWriter http.ResponseWriter, request *http.Request, slaveNames []string) {
 	if request.Method == "GET" {
-		if request.URL.Path != "/" {
-			http.Redirect(responseWriter, request, "/", 301)
+		if request.URL.Path != "/login" && request.URL.Path != "/" {
+			http.Redirect(responseWriter, request, "/login", 301)
 		}
 		parseAndExecuteTemplate(responseWriter, slaveNames)
 	}
