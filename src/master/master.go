@@ -18,7 +18,7 @@ func main() {
 	http.Handle("/assets/stylesheets/", http.StripPrefix("/assets/stylesheets/", http.FileServer(http.Dir(website.STYLESHEETS_PATH))))
 
 	router := mux.NewRouter()
-	router.HandleFunc("/", session.IndexPageHandler)
+	router.HandleFunc("/", website.IndexPageHandler)
 	router.HandleFunc("/login", session.LoginHandler).Methods("POST")
 	router.HandleFunc("/logout", session.LogoutHandler).Methods("POST")
 	http.Handle("/", router)

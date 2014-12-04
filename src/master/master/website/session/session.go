@@ -1,7 +1,7 @@
 package session
 
 import (
-	"fmt"
+	// "fmt"
 	"github.com/gorilla/securecookie"
 	"net/http"
 )
@@ -26,12 +26,16 @@ const indexPage = `
 </form>
 `
 
-func IndexPageHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, indexPage)
-}
+// func IndexPageHandler(w http.ResponseWriter, r *http.Request) {
+
+// 	template, err := template.ParseFiles(path.Join(VIEWS_PATH, "login.html"))
+// 	network.ErrorHandler(err, "Error encountered while parsing website template files: %v.")
+// 	template.Execute(w, "Login Error Message Here.")
+// 	// fmt.Fprintf(w, indexPage)
+// }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("name")
+	name := r.FormValue("username")
 	password := r.FormValue("password")
 	redirectTarget := "/"
 
@@ -43,6 +47,20 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, redirectTarget, 302)
 }
+
+// func LoginHandler(responseWriter http.ResponseWriter, request *http.Request) {
+// 	if request.Method == "GET" {
+// 		template, err := template.ParseFiles(path.Join(VIEWS_PATH, "login.html"))
+// 		network.ErrorHandler(err, "Error encountered while parsing website template files: %v.")
+// 		template.Execute(responseWriter, "Login Error Message Here.")
+// 	}
+// 	if request.Method == "POST" {
+// 		username := request.FormValue("username")
+// 		password := request.FormValue("password")
+// 		fmt.Println(username, password)
+// 		http.Redirect(responseWriter, request, "/", 301)
+// 	}
+// }
 
 func setSession(userName string, response http.ResponseWriter) {
 	value := map[string]string{
