@@ -12,3 +12,4 @@ dashboard-controller.iml
 src/bitbucket.org/
 start_service.sh
 cover.sh
+src/dashboard-hubot/node_modules
