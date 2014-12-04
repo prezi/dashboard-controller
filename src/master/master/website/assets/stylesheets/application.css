@@ -1,16 +1,12 @@
-.custom-input-field {
-  border-top-left-radius: 6px;
-  border-bottom-left-radius: 6px;
-}
 
-.form-box {
+.form-horizontal {
   position:absolute;
   margin: auto;
   left: 0;
   right: 0;
   top: 20%;
+  bottom: 0;
   width: 450px;
-  padding: 20px;
 }
 
 .title {
@@ -18,28 +14,19 @@
   color: black;
 }
 
-.input {
-  text-align: center;
-}
-
-.inputbutton {
-  text-align: center;
-}
-
 .info {
   display:none;
 }
 
 .slave-selector li {
-  width: 50%;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
   list-style-type: none;
-  position: relative;
+/*  position: relative;*/
   padding: 10px 0px 0px 0px;
 }
 .slave-selector ul {
   padding-left: 0px;
-  /*cursor:default;*/
 }
 .slave-selector ul li a {
   cursor:pointer;
@@ -54,11 +41,9 @@
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
 }
-/*Remove connectors before root*/
  .slave-selector > ul > li::before, .tree > ul > li::after {
   border: 0;
 }
-/*Remove connectors after last child*/
  .slave-selector li:last-child::before {
   height: 30px;
 }
