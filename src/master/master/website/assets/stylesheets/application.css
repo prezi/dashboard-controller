@@ -1,56 +1,41 @@
-body {
-	font-family:verdana;
-  background-color: #FFFFFF;
-  padding-top: 50px;
-}
-
-
-.button {
-
-}
-
 .custom-input-field {
   border-top-left-radius: 6px;
   border-bottom-left-radius: 6px;
 }
 
 .form-box {
-    width: 400px;
-    margin: auto;
-    border: 1px solid black;
-    opacity: 0.8;
-    padding: 1cm;
+  position:absolute;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 20%;
+  width: 450px;
+  padding: 20px;
 }
 
 .title {
-    text-align: center;
-    color: black;
-
+  text-align: center;
+  color: black;
 }
 
-.inputfield {
-    text-align: center;
-    color: red;
+.input {
+  text-align: center;
 }
 
 .inputbutton {
-    text-align: center;
-}
-
-.big-frame {
-	margin-top: 2cm;
+  text-align: center;
 }
 
 .info {
   display:none;
 }
 
-
 .slave-selector li {
-    margin: 0px 0;
-    list-style-type: none;
-    position: relative;
-    padding: 5px 5px 0px 0px;
+  width: 50%;
+  margin: 0 auto;
+  list-style-type: none;
+  position: relative;
+  padding: 10px 0px 0px 0px;
 }
 .slave-selector ul {
   padding-left: 0px;
@@ -60,29 +45,27 @@ body {
   cursor:pointer;
 }
 .slave-selector li a {
-    display: inline-block;
-    border: 1px solid #ccc;
-    padding: 5px 10px;
-    text-decoration: none;
-    color: #666;
-    font-family: arial, verdana, tahoma;
-    font-size: 11px;
-    border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  text-decoration: none;
+  color: #666;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
 }
 /*Remove connectors before root*/
  .slave-selector > ul > li::before, .tree > ul > li::after {
-    border: 0;
+  border: 0;
 }
 /*Remove connectors after last child*/
  .slave-selector li:last-child::before {
-    height: 30px;
+  height: 30px;
 }
 
 .strongSelect {
-    background: #3ACFCF;
-    color: #000;
-    border: 1px solid #94a0b4;
-    border-color: #94a0b4;
+  background: #3ACFCF;
+  color: #000;
+  border: 1px solid #94a0b4;
+  border-color: #94a0b4;
 }
