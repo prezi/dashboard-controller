@@ -2,6 +2,7 @@ package session
 
 import (
 	"github.com/gorilla/securecookie"
+	"master/master"
 	"master/master/website/hash"
 	"net/http"
 )
@@ -10,7 +11,10 @@ var cookieHandler = securecookie.New(
 	securecookie.GenerateRandomKey(64),
 	securecookie.GenerateRandomKey(32))
 
-var userAuthenticationMap = hash.InitializeUserAuthenticationMap()
+var (
+	FILE_PATH_TO_USER_AUTHENTICATION_DATA = master.GetRelativeFilePath("./user_authentication_data.txt")
+	USER_AUTHENTICATION_MAP               = hash.InitializeUserAuthenticationMap(FILE_PATH_TO_USER_AUTHENTICATION_DATA)
+)
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("username")
@@ -18,7 +22,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	redirectTarget := "/"
 
 	if name != "" && password != "" {
-		if hash.IsHashMatchInUserAuthenticationMap(name, password, userAuthenticationMap) {
+		if hash.IsHashMatchInUserAuthenticationMap(name, password, USER_AUTHENTICATION_MAP) {
 			setSession(name, w)
 			redirectTarget = "/internal"
 		}
