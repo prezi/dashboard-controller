@@ -27,7 +27,7 @@ func GetUserNameAndPasswordFromFile(fileContent string) (username, password stri
 func CreateHashFromString(inputString string) (outputHash [16]byte) {
 	data := []byte(inputString)
 	outputHash = md5.Sum(data)
-	return outputHash
+	return
 }
 
 func IsHashMatchInUserAuthenticationMap(inputUsername, inputPassword string, userAuthenticationMap map[string][16]byte) (hashMatch bool) {
