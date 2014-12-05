@@ -1,4 +1,6 @@
-
+body { 
+  padding-bottom: 50px; }
+  
 .form-horizontal {
   position:absolute;
   margin: auto;
