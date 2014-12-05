@@ -1,13 +1,15 @@
 Dashboard Controller 
 ====================
 
-![intro_image](https://raw.githubusercontent.com/prezi/dashboard-controller/master/README_images/webpage.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/prezi/dashboard-controller/master/README_images/giphy.gif" alt="nyan nyan nyan"/>
+</p>
 
 Contents
  - [Introduction](https://github.com/prezi/dashboard-controller#introduction)
  - [Architecture](https://github.com/prezi/dashboard-controller#architecture)
  - [Set Up](https://github.com/prezi/dashboard-controller#set-up)
- - [Posting a URL](https://github.com/prezi/dashboard-controller#posting-a-url)
+ - [Submitting a URL](https://github.com/prezi/dashboard-controller#submitting-a-url)
  - [Tests](https://github.com/prezi/dashboard-controller#tests)
 
 Introduction
@@ -20,6 +22,8 @@ Slave runs on Raspberry Pis or Mac Minis connected to monitors.
 The master runs on one Raspberry Pi or Apple Mac Mini. 
 
 Together, they make a delicious Apple-Raspberry-Pi system. 
+
+For more details, please refer to our [GitHub wiki](https://github.com/prezi/dashboard-controller/wiki).
 
 Architecture
 ------------------
@@ -67,28 +71,8 @@ Optionally, you can specify a port number for the slave and/or master with the -
     
 The slave will automatically map itself to the master and periodically emit heartbeats to the master. If the slave's heartbeats do not reach the master for some period of the time, the master will mark the slave as dead and remove it from the map of available slaves. 
 
-Posting a URL
+Submitting a URL
 ------------------
 
 Access the website running on your localhost. Fill in the text fields, submit, and see your url post on the indicated slave. :) 
 
-Tests
-------------------
-
-In order to run the tests, first install [Go](https://golang.org/)'s [testify](https://godoc.org/github.com/stretchr/testify) package with the command
-
-    dashboard-controller$ go get github.com/stretchr/testify
-
-There are two ways to run the unit tests. In case you wish to run only one test file, then navigate into the directory where the test file is located, and run the tests with 'go test'. For example, in the master directory that contains master.go and master_test.go, run
-
-    dashboard-controller/src/master$ go test 
- 
-You can also run the tests from the root directory by specifying the package name after 'go test'. 
-
-    dashboard-controller$ go test master
- 
-The -cover flag will output the test coverage %. 
-
-    dashboard-controller/src/master$ go test -cover
-
-For more testing options, please see the this [Go blog post](http://blog.golang.org/cover). 
