@@ -14,3 +14,4 @@ start_service.sh
 cover.sh
 src/dashboard-hubot/node_modules
 user_authentication_data.txt
+!src/dashboard-hubot/bin
