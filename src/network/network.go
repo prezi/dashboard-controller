@@ -25,7 +25,6 @@ func GetOS() (OS string) {
 	operatingSystemName := string(operatingSystemBytes)
 
 	var kernel string
-	// fmt.Println("cmd", operatingSystemName)
 
 	if ErrorHandler(err, "Error encountered while reading kernel: %v\n") {
 		kernel = "Unknown"

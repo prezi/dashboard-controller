@@ -3,8 +3,8 @@ package session
 import (
 	"github.com/gorilla/securecookie"
 	"master/master"
-	"master/master/website/hash"
 	"net/http"
+	"website/hash"
 )
 
 var cookieHandler = securecookie.New(

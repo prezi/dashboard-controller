@@ -17,7 +17,7 @@ func ReceiveRequestAndSendToSlave(slaveMap map[string]master.Slave, slaveName, u
 	destinationSlaveAddress := destinationSlaveAddress(slaveName, slaveMap)
 	if destinationSlaveAddress == "" {
 		fmt.Println("Abandoning request.")
-		// fmt.Fprintf(writer, "ERROR: Failed to contact slave. Slave has no URL stored.")
+		// fmt.Fprintf(writer, "ERROR: Failed to contact slave. Slave has no address stored.")
 		return
 	}
 

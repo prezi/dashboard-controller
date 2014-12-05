@@ -4,8 +4,8 @@ import (
 	"log"
 	"master/master"
 	"master/master/slaveMonitor"
-	"master/master/website"
 	"net/http"
+	"website"
 )
 
 func main() {

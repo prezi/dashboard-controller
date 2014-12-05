@@ -7,10 +7,10 @@ import (
 	"html/template"
 	"master/master"
 	"master/master/receiveAndSendRequestToSlave"
-	"master/master/website/session"
 	"net/http"
 	"network"
 	"path"
+	"website/session"
 )
 
 var (

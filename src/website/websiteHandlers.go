@@ -3,8 +3,8 @@ package website
 import (
 	"github.com/gorilla/mux"
 	"master/master"
-	"master/master/website/session"
 	"net/http"
+	"website/session"
 )
 
 func InitiateWebsiteHandlers(slaveMap map[string]master.Slave) {
