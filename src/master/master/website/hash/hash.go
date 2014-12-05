@@ -2,10 +2,11 @@ package hash
 
 import (
 	"crypto/md5"
-	// "fmt"
+	"fmt"
 	"io/ioutil"
 	"master/master"
-	"network"
+	//"network"
+	"os"
 	"reflect"
 	"strings"
 )
@@ -25,8 +26,10 @@ func IsHashMatchInUserAuthenticationMap(inputUsername, inputPassword string, use
 
 func InitializeUserAuthenticationMap() (userAuthenticationMap map[string][16]byte) {
 	content, err := ioutil.ReadFile(FILE_PATH_TO_USER_AUTHENTICATION_DATA)
-	network.ErrorHandler(err, "Error encountered while parsing user authentication data: %v")
-
+	if err != nil {
+		fmt.Println("Error encountered while parsing user authentication data")
+		os.Exit(1)
+	}
 	username, password := GetUserNameAndPasswordFromFile(string(content))
 
 	userAuthenticationMap = make(map[string][16]byte)
