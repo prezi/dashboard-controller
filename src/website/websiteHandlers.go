@@ -5,6 +5,7 @@ import (
 	"master/master"
 	"net/http"
 	"website/session"
+	"sort"
 )
 
 func InitiateWebsiteHandlers(slaveMap map[string]master.Slave) {
@@ -31,5 +32,6 @@ func getSlaveNamesFromMap(slaveMap map[string]master.Slave) (slaveNames []string
 	for k := range slaveMap {
 		slaveNames = append(slaveNames, k)
 	}
+	sort.Strings(slaveNames)
 	return
 }
