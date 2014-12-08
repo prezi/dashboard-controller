@@ -1,6 +1,22 @@
 "use strict";
 
+function getMaxSlaveLabelWidth () {
+    var maxWidth=0;
+    $(".slave-selector a").each(function(index){
+        if ($( this ).width() > maxWidth) {
+        maxWidth = $( this ).width();
+        }
+    });
+    return maxWidth
+}
+
+function setSlaveLabelWidth() {
+    var maxWidth = getMaxSlaveLabelWidth();
+    $(".slave-selector a").width(maxWidth + 1);
+}
+
 $(document).ready(function() {
+    setSlaveLabelWidth();
     $("#mainform").submit(function(e) {
         var selectedSlave = $('.slave-selector a').filter('.strongSelect').html();
         var usrToDisplay = $('.form-control').val();
