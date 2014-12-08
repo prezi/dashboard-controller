@@ -1,5 +1,5 @@
 test:
-	@mocha tests \
+	@mocha spec \
 		--reporter spec \
 		--ui bdd \
 		--compilers coffee:coffee-script/register
