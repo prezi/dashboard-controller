@@ -58,4 +58,11 @@ $(document).ready(function() {
             $(this).addClass('strongSelect');
         }
     });
+    $('#submit-button').tooltip({
+    'show': true,
+        'placement': 'right',
+        'title': "Please remember to select a dashboard."
+    });
+
+    $('#submit-button').tooltip('show');
 });
