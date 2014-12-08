@@ -7,7 +7,7 @@ function getMaxSlaveLabelWidth () {
         maxWidth = $( this ).width();
         }
     });
-    return maxWidth
+    return maxWidth;
 }
 
 function setSlaveLabelWidth() {
@@ -18,6 +18,10 @@ function setSlaveLabelWidth() {
 $(document).ready(function() {
     setSlaveLabelWidth();
     $("#mainform").submit(function(e) {
+        if ($('.slave-selector a.strongSelect').size() == 0) {
+            alert("Please select a slave from the list.");
+            return;
+        } 
         var selectedSlave = $('.slave-selector a').filter('.strongSelect').html();
         var usrToDisplay = $('.form-control').val();
         var postData = {
@@ -59,7 +63,7 @@ $(document).ready(function() {
         }
     });
     $('#submit-button').tooltip({
-    'show': true,
+        'show': true,
         'placement': 'right',
         'title': "Please remember to select a dashboard."
     });
