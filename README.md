@@ -6,7 +6,6 @@ Contents
  - [Architecture](https://github.com/prezi/dashboard-controller#architecture)
  - [Set Up](https://github.com/prezi/dashboard-controller#set-up)
  - [Submitting a URL](https://github.com/prezi/dashboard-controller#submitting-a-url)
- - [Tests](https://github.com/prezi/dashboard-controller#tests)
 
 Introduction
 ------------------
