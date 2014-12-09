@@ -55,7 +55,8 @@ func sendKillSignalToSlave(slaveAddress string) (err error) {
 
 func addNewSlaveToMap(slaveMap map[string]master.Slave, slaveAddress, slaveName string) {
 	fmt.Printf("Slave added with name \"%v\", URL %v.\n\n", slaveName, slaveAddress)
-	slaveMap[slaveName] = master.Slave{URL: slaveAddress, Heartbeat: time.Now()}
+	slaveMap[slaveName] = master.Slave{URL: slaveAddress, Heartbeat: time.Now(), PreviouslyDisplayedURL: "http://google.com", DisplayedURL: "http://google.com"}
+	fmt.Println(slaveMap[slaveName])
 }
 
 func MonitorSlaves(timeInterval int, slaveMap map[string]master.Slave) {

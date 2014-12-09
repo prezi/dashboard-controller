@@ -3,13 +3,18 @@ package receiveAndSendRequestToSlave
 import (
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
-	// "io/ioutil"
 	"master/master"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
+)
+
+const (
+	TEST_SLAVE_NAME = "test slave"
+	TEST_URL_1      = "http://google.com"
+	TEST_URL_2      = "http://placekitten.com"
 )
 
 func InitializeTestSlaveMap() (slaveMap map[string]master.Slave) {
@@ -23,21 +28,30 @@ func TestReceiveRequestAndSendToSlave(t *testing.T) {
 	testSlaveMap := make(map[string]master.Slave)
 	var receivedUrl string
 	testMaster := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		ReceiveRequestAndSendToSlave(testSlaveMap, "testSlaveName", "testURL")
+		ReceiveRequestAndSendToSlave(testSlaveMap, TEST_SLAVE_NAME, TEST_URL_1)
 	}))
 
 	testSlave := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		receivedUrl = request.PostFormValue("url")
 	}))
-	testSlaveMap["testSlaveName"] = master.Slave{testSlave.URL, time.Now(), ""}
+	testSlaveMap[TEST_SLAVE_NAME] = master.Slave{testSlave.URL, time.Now(), TEST_URL_1, TEST_URL_1}
 
-	m := PostURLRequest{"testSlaveName", "testURL"}
+	m := PostURLRequest{TEST_SLAVE_NAME, TEST_URL_1}
 	json_message, _ := json.Marshal(m)
 	client := &http.Client{}
 	_, err := client.Post(testMaster.URL, "application/json", strings.NewReader(string(json_message)))
 
-	assert.Equal(t, "testURL", receivedUrl)
+	assert.Equal(t, TEST_URL_1, receivedUrl)
 	assert.Nil(t, err)
+}
+
+func TestUpdateSlaveDisplayedURL(t *testing.T) {
+	testSlaveMap := InitializeTestSlaveMap()
+	updateSlaveDisplayedURL(testSlaveMap, "slave1", TEST_URL_2)
+	assert.Equal(t, testSlaveMap["slave1"].DisplayedURL, TEST_URL_2)
+	assert.Equal(t, testSlaveMap["slave1"].PreviouslyDisplayedURL, "")
+	assert.Equal(t, testSlaveMap["slave2"].DisplayedURL, "")
+	assert.Equal(t, testSlaveMap["slave2"].PreviouslyDisplayedURL, "")
 }
 
 func TestReceiveRequestAndSendToSlaveWithEmptySlaveAddress(t *testing.T) {
@@ -47,9 +61,9 @@ func TestReceiveRequestAndSendToSlaveWithEmptySlaveAddress(t *testing.T) {
 		ReceiveRequestAndSendToSlave(testSlaveMap, "testSlaveName", "someurl")
 	}))
 
-	testSlaveMap["testSlaveName"] = master.Slave{"", time.Now(), ""}
+	testSlaveMap[TEST_SLAVE_NAME] = master.Slave{"", time.Now(), TEST_URL_1, TEST_URL_1}
 
-	m := PostURLRequest{"testSlaveName", "testURL"}
+	m := PostURLRequest{TEST_SLAVE_NAME, TEST_URL_1}
 	json_message, _ := json.Marshal(m)
 	client := &http.Client{}
 	_, err := client.Post(testMaster.URL, "application/json", strings.NewReader(string(json_message)))
@@ -60,16 +74,16 @@ func TestReceiveRequestAndSendToSlaveWithEmptySlaveAddress(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestDestinationAddressSlave(t *testing.T) {
+func TestGetDestinationAddressSlave(t *testing.T) {
 	slaveMap := InitializeTestSlaveMap()
-	destinationURL := destinationSlaveAddress("slave1", slaveMap)
+	destinationURL := getDestinationSlaveAddress("slave1", slaveMap)
 
 	assert.Equal(t, "http://10.0.0.122:8080", destinationURL)
 }
 
 func TestDestinationAddressSlaveForEmptySlaveMap(t *testing.T) {
 	slaveMap := make(map[string]master.Slave)
-	destinationURL := destinationSlaveAddress("slave2", slaveMap)
+	destinationURL := getDestinationSlaveAddress("slave2", slaveMap)
 
 	assert.Equal(t, "", destinationURL)
 }
