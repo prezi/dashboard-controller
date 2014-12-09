@@ -20,8 +20,7 @@ $(document).ready(function() {
     $("#mainform").submit(function(e) {
         if ($('.slave-selector a.strongSelect').size() == 0) {
             alert("Please select a slave from the list.");
-            return;
-        } 
+        }
         var selectedSlave = $('.slave-selector a').filter('.strongSelect').html();
         var usrToDisplay = $('.form-control').val();
         var postData = {
