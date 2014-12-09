@@ -19,7 +19,14 @@ $(document).ready(function() {
     setSlaveLabelWidth();
     $("#mainform").submit(function(e) {
         if ($('.slave-selector a.strongSelect').size() == 0) {
-            alert("Please select a slave from the list.");
+            $(".info").show("slow");
+            $(".info").html('<div>Slave not selected</br> \
+            Please select at least one slave before hit the submit button!</div>');
+            setTimeout(function() {
+                $(".info").hide("slow");
+            }, 5000);
+            e.preventDefault();
+            return;
         }
         var selectedSlave = $('.slave-selector a').filter('.strongSelect').html();
         var usrToDisplay = $('.form-control').val();
@@ -66,6 +73,5 @@ $(document).ready(function() {
         'placement': 'right',
         'title': "Please remember to select a dashboard."
     });
-
     $('#submit-button').tooltip('show');
 });
