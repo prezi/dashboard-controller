@@ -7,9 +7,10 @@ import (
 )
 
 type Slave struct {
-	URL          string
-	Heartbeat    time.Time
-	DisplayedURL string // TODO: store currently displayed URL for each slave
+	URL                    string
+	Heartbeat              time.Time
+	PreviouslyDisplayedURL string
+	DisplayedURL           string
 }
 
 func SetUp() (slaveMap map[string]Slave) {

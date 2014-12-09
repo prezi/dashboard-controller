@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	TEST_SLAVE_NAME         = "testSlaveName"
-	TEST_SLAVE_PORT         = "0000"
+	TEST_SLAVE_NAME = "testSlaveName"
+	TEST_SLAVE_PORT = "0000"
 )
 
 func TestSetUp(t *testing.T) {
@@ -35,7 +35,7 @@ func TestReceiveSlaveHeartbeat(t *testing.T) {
 	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
 		slaveIP, _, _ := net.SplitHostPort(request.RemoteAddr)
 		slaveURL := "http://" + slaveIP + ":" + TEST_SLAVE_PORT
-		testSlaveMap[TEST_SLAVE_NAME] = master.Slave{slaveURL, beginningOfTime, ""}
+		testSlaveMap[TEST_SLAVE_NAME] = master.Slave{URL: slaveURL, Heartbeat: beginningOfTime}
 		ReceiveSlaveHeartbeat(request, testSlaveMap)
 		changedSlave := testSlaveMap[TEST_SLAVE_NAME]
 		newTime = changedSlave.Heartbeat
@@ -62,7 +62,7 @@ func TestReceiveSlaveHeartbeatsWithDifferentAddress(t *testing.T) {
 	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
 		request.URL.Host = slaveIP
 		slaveURL := "not a URL"
-		testSlaveMap[TEST_SLAVE_NAME] = master.Slave{slaveURL, beginningOfTime, ""}
+		testSlaveMap[TEST_SLAVE_NAME] = master.Slave{URL: slaveURL, Heartbeat: beginningOfTime}
 		ReceiveSlaveHeartbeat(request, testSlaveMap)
 	}))
 
@@ -118,10 +118,10 @@ func TestRemoveDeadSlaves(t *testing.T) {
 	testSlaveMap := make(map[string]master.Slave)
 	longForm := "Jan 2, 2006 at 3:04pm (MST)"
 	beginningOfTime, _ := time.Parse(longForm, "Jan 1, 0000 at 01:01am (PST)")
-	testSlaveMap["slave1"] = master.Slave{"-", beginningOfTime, ""}
-	testSlaveMap["slave2"] = master.Slave{"-", beginningOfTime, ""}
-	testSlaveMap["slave3"] = master.Slave{"-", time.Now(), ""}
-	testSlaveMap["slave4"] = master.Slave{"-", time.Now(), ""}
+	testSlaveMap["slave1"] = master.Slave{URL: "-", Heartbeat: beginningOfTime}
+	testSlaveMap["slave2"] = master.Slave{URL: "-", Heartbeat: beginningOfTime}
+	testSlaveMap["slave3"] = master.Slave{URL: "-", Heartbeat: time.Now()}
+	testSlaveMap["slave4"] = master.Slave{URL: "-", Heartbeat: time.Now()}
 	removeDeadSlaves(3, testSlaveMap)
 	_, sl1 := testSlaveMap["slave1"]
 	_, sl2 := testSlaveMap["slave2"]
@@ -137,8 +137,8 @@ func TestRemoveDeadSlavesRemoveAll(t *testing.T) {
 	testSlaveMap := make(map[string]master.Slave)
 	longForm := "Jan 2, 2006 at 3:04pm (MST)"
 	beginningOfTime, _ := time.Parse(longForm, "Jan 1, 0000 at 01:01am (PST)")
-	testSlaveMap["slave1"] = master.Slave{"-", beginningOfTime, ""}
-	testSlaveMap["slave2"] = master.Slave{"-", beginningOfTime, ""}
+	testSlaveMap["slave1"] = master.Slave{URL: "-", Heartbeat: beginningOfTime}
+	testSlaveMap["slave2"] = master.Slave{URL: "-", Heartbeat: beginningOfTime}
 	removeDeadSlaves(3, testSlaveMap)
 	_, sl1 := testSlaveMap["slave1"]
 	_, sl2 := testSlaveMap["slave2"]
