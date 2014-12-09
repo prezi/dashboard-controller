@@ -16,3 +16,4 @@ src/dashboard-hubot/node_modules
 user_authentication_data.txt
 src/website/hash/user_authentication_data.txt
 !src/dashboard-hubot/bin
+.hubot_history
