@@ -18,7 +18,7 @@ function setSlaveLabelWidth() {
 $(document).ready(function() {
     setSlaveLabelWidth();
     $("#mainform").submit(function(e) {
-        if ($('.slave-selector a.strongSelect').size() == 0) {
+        if ($('.slave-selector a.strongSelect').size() === 0) {
             $(".info").show("slow");
             $(".info").html('<div>Slave not selected</br> \
             Please select at least one slave before hit the submit button!</div>');
@@ -69,9 +69,26 @@ $(document).ready(function() {
         }
     });
     $('#submit-button').tooltip({
-        'show': true,
-        'placement': 'right',
-        'title': "Please remember to select a dashboard."
+        'show': false,
+        'placement': 'right'
     });
-    $('#submit-button').tooltip('show');
+    $('#submit-button').mouseover(function(){
+        var message = "";
+        if (!$('.form-control').val()){
+            message += 'URL input field is empty. Please provide a URL to display!';
+        }
+        if ($('.slave-selector a.strongSelect').size() == 0){
+            message += "No slaves are selected. Please select a slave on which you can display a URL";
+        }
+        if (message !== "") {
+            $('#submit-button').attr('data-original-title', message)
+                               .tooltip('fixTitle')
+                               .tooltip('show');
+        } else {
+            $('#submit-button').attr('data-original-title', '')
+                               .tooltip('fixTitle')
+                               .tooltip('hide');
+        }
+    });
+//    $('#submit-button').tooltip('show');
 });

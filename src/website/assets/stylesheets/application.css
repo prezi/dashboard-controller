@@ -56,3 +56,6 @@ body {
   border: 1px solid #94a0b4;
   border-color: #94a0b4;
 }
+.tooltip-inner {
+white-space:pre-wrap;
+}
