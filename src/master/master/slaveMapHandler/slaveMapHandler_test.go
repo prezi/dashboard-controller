@@ -2,34 +2,43 @@ package slaveMapHandler
 
 import (
 	"github.com/stretchr/testify/assert"
-	"testing"
 	"master/master"
-	"net/http/httptest"
 	"net/http"
-	"io/ioutil"
+	"net/http/httptest"
+	"testing"
+	"github.com/gorilla/mux"
 	"time"
 )
 
+func TestInitiateEmptySlaveMapHandler(t *testing.T) {
+	router := mux.NewRouter()
+	responseRecorder := httptest.NewRecorder()
+
+	slaveMap := make(map[string]master.Slave)
+
+	InitiateSlaveMapHandler(router, slaveMap)
+
+	request, _ := http.NewRequest("GET", "/slavemap", nil)
+
+	router.ServeHTTP(responseRecorder, request)
+
+	assert.Equal(t, 200, responseRecorder.Code)
+	assert.Equal(t, "null", responseRecorder.Body.String())
+}
+
 func TestInitiateNonEmptySlaveMapHandler(t *testing.T) {
+	router := mux.NewRouter()
+	responseRecorder := httptest.NewRecorder()
+
 	slaveMap := make(map[string]master.Slave)
 	slaveMap["slave1"] = master.Slave{URL: "http://10.0.0.122:8080", Heartbeat: time.Now(), PreviouslyDisplayedURL: "http://www.google.com", DisplayedURL: "http://www.prezi.com"}
 
-	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
-		InitiateSlaveMapHandler(slaveMap)
-	}))
-	client := &http.Client{}
-	response, err := client.Get(testMaster.URL)
+	InitiateSlaveMapHandler(router, slaveMap)
 
-//	var slaveMapFromJson []string
-	slaveNames, _ := ioutil.ReadAll(response.Body)
-//	err = json.Unmarshal(slaveNames, &slaveMapFromJson)
-//	if err != nil {
-//		fmt.Println(err)
-//	}
+	request, _ := http.NewRequest("GET", "/slavemap", nil)
 
-	testMaster.CloseClientConnections()
-	testMaster.Close()
+	router.ServeHTTP(responseRecorder, request)
 
-	assert.Equal(t, []string{"slave1"}, slaveNames)
-	assert.Nil(t, err)
+	assert.Equal(t, 200, responseRecorder.Code)
+	assert.Equal(t, "[\"slave1\"]", responseRecorder.Body.String())
 }
