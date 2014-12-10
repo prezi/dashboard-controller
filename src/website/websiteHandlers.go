@@ -20,7 +20,7 @@ func InitiateWebsiteHandlers(slaveMap map[string]master.Slave) {
 	http.Handle("/", router)
 
 	router.HandleFunc("/internal", func(w http.ResponseWriter, r *http.Request) {
-		slaveNames := getSlaveNamesFromMap(slaveMap)
+		slaveNames := GetSlaveNamesFromMap(slaveMap)
 		FormHandler(w, r, slaveNames)
 	})
 	http.HandleFunc("/form-submit", func(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +28,7 @@ func InitiateWebsiteHandlers(slaveMap map[string]master.Slave) {
 	})
 }
 
-func getSlaveNamesFromMap(slaveMap map[string]master.Slave) (slaveNames []string) {
+func GetSlaveNamesFromMap(slaveMap map[string]master.Slave) (slaveNames []string) {
 	for k := range slaveMap {
 		slaveNames = append(slaveNames, k)
 	}
