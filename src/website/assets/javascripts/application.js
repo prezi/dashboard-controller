@@ -77,7 +77,7 @@ $(document).ready(function() {
         if (!$('.form-control').val()){
             message += 'Please provide a URL to display.';
         } else if ($('.slave-selector a.strongSelect').size() == 0){
-            message += "No slaves are selected. Please select a slave on which you can display a URL";
+            message += "No destination selected. Please select where you would like to load this URL.";
         }
         if (message !== "") {
             $('#submit-button').attr('data-original-title', message)
