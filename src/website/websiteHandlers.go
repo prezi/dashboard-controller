@@ -4,8 +4,8 @@ import (
 	"github.com/gorilla/mux"
 	"master/master"
 	"net/http"
-	"sort"
 	"website/session"
+	"sort"
 )
 
 func InitiateWebsiteHandlers(slaveMap map[string]master.Slave, router *mux.Router) {

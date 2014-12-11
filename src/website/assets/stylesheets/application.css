@@ -24,6 +24,7 @@ body {
   margin-left: auto;
   margin-right: auto;
   list-style-type: none;
+/*  position: relative;*/
   padding: 10px 0px 0px 0px;
 }
 .slave-selector ul {
