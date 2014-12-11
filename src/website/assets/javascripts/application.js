@@ -21,7 +21,7 @@ $(document).ready(function() {
         if ($('.slave-selector a.strongSelect').size() === 0) {
             $(".info").show("slow");
             $(".info").html('<div>Slave not selected</br> \
-            Please select at least one slave before hit the submit button!</div>');
+            Please select at least one slave before submitting your URL!</div>');
             setTimeout(function() {
                 $(".info").hide("slow");
             }, 5000);
@@ -75,9 +75,8 @@ $(document).ready(function() {
     $('#submit-button').mouseover(function(){
         var message = "";
         if (!$('.form-control').val()){
-            message += 'URL input field is empty. Please provide a URL to display!';
-        }
-        if ($('.slave-selector a.strongSelect').size() == 0){
+            message += 'Please provide a URL to display.';
+        } else if ($('.slave-selector a.strongSelect').size() == 0){
             message += "No slaves are selected. Please select a slave on which you can display a URL";
         }
         if (message !== "") {
@@ -90,5 +89,4 @@ $(document).ready(function() {
                                .tooltip('hide');
         }
     });
-//    $('#submit-button').tooltip('show');
 });
