@@ -29,13 +29,13 @@ func TestBrowserHandler(t *testing.T) {
 
 func TestKillBrowserOS_X(t *testing.T) {
 	if testBrowser {
-		killBrowser("OS X", browserProcess)
+		killBrowser("OS X")
 	}
 }
 
 func TestKillBrowserLinux(t *testing.T) {
 	if testBrowser {
-		killBrowser("Linux", browserProcess)
+		killBrowser("Linux")
 	}
 }
 
