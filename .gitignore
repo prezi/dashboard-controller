@@ -12,8 +12,8 @@ dashboard-controller.iml
 src/bitbucket.org/
 start_service.sh
 cover.sh
-src/dashboard-hubot/node_modules
+src/hubot/node_modules
 user_authentication_data.txt
 src/website/hash/user_authentication_data.txt
-!src/dashboard-hubot/bin
+!src/hubot/bin
 .hubot_history
