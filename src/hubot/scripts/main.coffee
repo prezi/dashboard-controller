@@ -1,6 +1,7 @@
 module.exports = (robot) ->
 
-  SERVER_URL= "http://localhost:5000"
+  SERVER_URL= "http://10.0.0.210:5000"
+  SLAVE_URL= "http://10.0.0.169:8080"
 
   robot.respond /post (.*) (.*)/i, (msg) ->
     name = msg.match[1]
@@ -9,7 +10,7 @@ module.exports = (robot) ->
 
     data = "url=" + url + "&slave-id=" + name
 
-    robot.http(SERVER_URL + "/form-submit")
+    robot.http(SLAVE_URL + "/form-submit")
     .header("content-length", data.length)
     .header("Content-Type", "application/x-www-form-urlencoded")
     .post(data) (err, res, body) ->
@@ -18,12 +19,11 @@ module.exports = (robot) ->
       catch err
         msg.send "Error while sending POST request: " + err
 
-  robot.respond /\b(h+e+l+l+o+)|(h+i+)|(h+e+l+p+)|(h+e+y+)\b/i, (msg) ->
-    msg.send "Hi! I'm a very friendly robot sending urls to different dashboards around Prezi Office.\n
-    You can get the list of available dashboards by typing info.\n
-    Post on dashboards by:\n
-    @DashboardController post slave_name _url_to_display"
-
+  robot.respond /\b(h+e+l+l+o+)|(h+i+)|(h+e+l+p+m+e)|(h+e+y+)\b/i, (msg) ->
+    msg.send "Hi! I'm a very friendly robot sending urls to different dashboards around Prezi Office."
+    msg.send "You can get the list of available dashboards by typing info."
+    msg.send "Post on dashboards by: "
+    msg.send "@DashboardController post slave_name _url_to_display"
 
   robot.respond /\b(i+n+f+o+)\b/i, (msg) ->
     robot.http(SERVER_URL + "/slavemap")
@@ -36,8 +36,8 @@ module.exports = (robot) ->
         else
           slaveNames = ""
           for slaveName in slaveNameArray
-            slaveNames += (slaveName + " ")
-          msg.send "List of available slaves: " + slaveNames
+            slaveNames += (slaveName + "\n")
+          msg.send "List of available slaves: \n" + slaveNames
       catch err
         msg.send "Error getting slave data: " + err
 
@@ -67,6 +67,6 @@ module.exports = (robot) ->
   robot.hear /d+r+a+c+a+r+y+s/i, (msg) ->
     msg.send msg.random dracarys
 
-  robot.hear /(G+o+T g+r+a+v+e+y+a+r+d)|(g+o+t g+r+a+v+e+y+a+r+d)/i, (msg) ->
+  robot.respond /s+p+o+i+l+e+r/i, (msg) ->
     msg.send "All men must die."
     msg.send "http://www.slate.com/articles/arts/television/2014/04/game_of_thrones_deaths_mourn_dead_characters_at_their_virtual_graveyard.html"

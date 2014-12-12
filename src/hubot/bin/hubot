@@ -7,6 +7,6 @@ export PATH="node_modules/.bin:node_modules/hubot/node_modules/.bin:$PATH"
 export HUBOT_HIPCHAT_ROOMS="${HUBOT_HIPCHAT_ROOMS:-12694_dashboard-test@conf.hipchat.com}"
 export HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE=true
 
-export HUBOT_HIPCHAT_RECONNECT=false
+export HUBOT_HIPCHAT_RECONNECT=true
 
 exec node_modules/.bin/hubot "$@"
