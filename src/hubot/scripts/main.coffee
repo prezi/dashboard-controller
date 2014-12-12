@@ -40,3 +40,33 @@ module.exports = (robot) ->
           msg.send "List of available slaves: " + slaveNames
       catch err
         msg.send "Error getting slave data: " + err
+
+  GoT = [
+    "http://img2.wikia.nocookie.net/__cb20140518100049/gameofthrones/images/4/47/Ygritte-Profile-HD.png",
+    "http://img3.wikia.nocookie.net/__cb20140326175142/gameofthrones/images/e/ed/Charles-Dance-as-Tywin-Lannister_photo-Macall-B.Polay_HBO.jpg",
+    "http://img3.wikia.nocookie.net/__cb20110626030942/gameofthrones/images/9/9c/EddardStark.jpg",
+    "http://img2.wikia.nocookie.net/__cb20140515200719/gameofthrones/images/f/fb/Catelyn-Stark-Profile-HD.png",
+    "http://img3.wikia.nocookie.net/__cb20140515152752/gameofthrones/images/9/90/Oberyn-Martell-Profile-HD.png"
+  ]
+
+  robot.hear /(G+o+T me)|(g+o+t m+e)/i, (msg) ->
+    msg.send msg.random GoT
+
+  robot.hear /(V+a+l+a+r M+o+r+g+h+u+l+i+s)|(v+a+l+a+r m+o+r+g+h+u+l+i+s)/i, (msg) ->
+    msg.send "Valar Dohaeris."
+
+  robot.hear /(W+i+n+t+e+r i+s c+o+m+i+n+g)|(w+i+n+t+e+r i+s c+o+m+i+n+g)/i, (msg) ->
+    msg.send "such winter. oh no. much soon. wow. snow."
+
+  dracarys = [
+    "http://www.majoh.com/art/2d/Dracarys_large.jpg",
+    "http://i.ytimg.com/vi/Nae4VnNC9AE/maxresdefault.jpg",
+    "http://sd.keepcalm-o-matic.co.uk/i/-keep-calm-and-dracarys-.png"
+  ]
+
+  robot.hear /d+r+a+c+a+r+y+s/i, (msg) ->
+    msg.send msg.random dracarys
+
+  robot.hear /(G+o+T g+r+a+v+e+y+a+r+d)|(g+o+t g+r+a+v+e+y+a+r+d)/i, (msg) ->
+    msg.send "All men must die."
+    msg.send "http://www.slate.com/articles/arts/television/2014/04/game_of_thrones_deaths_mourn_dead_characters_at_their_virtual_graveyard.html"
