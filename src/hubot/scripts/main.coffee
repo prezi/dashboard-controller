@@ -1,7 +1,6 @@
 module.exports = (robot) ->
 
   SERVER_URL= "http://10.0.0.210:5000"
-  SLAVE_URL= "http://10.0.0.169:8080"
 
   robot.respond /post (.*) (.*)/i, (msg) ->
     name = msg.match[1]
@@ -10,7 +9,7 @@ module.exports = (robot) ->
 
     data = "url=" + url + "&slave-id=" + name
 
-    robot.http(SLAVE_URL + "/form-submit")
+    robot.http(SERVER_URL= "http://10.0.0.210:5000" + "/form-submit")
     .header("content-length", data.length)
     .header("Content-Type", "application/x-www-form-urlencoded")
     .post(data) (err, res, body) ->
