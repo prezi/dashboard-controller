@@ -10,6 +10,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var (
+	SLAVE_BINARY_PATH = master.GetRelativeFilePath("../../bin/slave")
+)
+
 func main() {
 	slaveMap := master.SetUp()
 	router := mux.NewRouter()
@@ -17,6 +21,10 @@ func main() {
 	router.HandleFunc("/receive_heartbeat", func(_ http.ResponseWriter, r *http.Request) {
 		slaveMap = slaveMonitor.ReceiveSlaveHeartbeat(r, slaveMap)
 	})
+	router.HandleFunc("/get_slave_binary", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w,r,SLAVE_BINARY_PATH)
+	})
+
 	slaveMapHandler.InitiateSlaveMapHandler(router, slaveMap)
 
 	http.Handle("/", router)
