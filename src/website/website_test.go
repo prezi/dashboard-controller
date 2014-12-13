@@ -12,6 +12,16 @@ type PostURLRequest struct {
 	URLToLoadInBrowser   string
 }
 
+func TestIndexPageHandler(t * testing.T) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		IndexPageHandler(w,request)
+	}))
+	client := &http.Client{}
+	resp, _ := client.Get(testServer.URL)
+	assert.Equal(t, 200, resp.StatusCode)
+	assert.Equal(t, "text/plain", resp.Header.Get("Content-type"))
+}
+
 func sendGetToFormHandler(URL string) int {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		request.URL.Path = URL

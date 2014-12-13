@@ -11,6 +11,7 @@ import (
 	"network"
 	"path"
 	"website/session"
+	"io"
 )
 
 var (
@@ -56,22 +57,45 @@ func displayFormPage(responseWriter http.ResponseWriter, slaveNames []string, us
 
 func SubmitHandler(response_writer http.ResponseWriter, request *http.Request, slaveMap map[string]master.Slave) {
 	if request.Method == "POST" {
-		url := request.FormValue("url")
-		slaveName := request.FormValue("slave-id")
-
-		if slaveExistsInSlaveMap(slaveName, slaveMap) == false {
-			statusMessage := slaveName + " is offline. Please refresh your browser to see available destinations screens."
-			sendConfirmationMessageToUser(response_writer, statusMessage)
-		} else {
-			if isURLValid(url) == true {
-				statusMessage := "Success! " + url + " is being displayed on " + slaveName + "."
-				sendConfirmationMessageToUser(response_writer, statusMessage)
-				receiveAndSendRequestToSlave.ReceiveRequestAndSendToSlave(slaveMap, slaveName, url)
-			} else {
-				statusMessage := "Sorry, " + url + " cannot be opened. Try a different one. Sadpanda."
-				sendConfirmationMessageToUser(response_writer, statusMessage)
-			}
+		URLToDisplay, slaveNamesToUpdate, err := parseFromJSON(request.Body)
+		if err != nil {
+			fmt.Println("Error parsing JSON request discarded")
+			sendConfirmationMessageToUser(response_writer, "Failed to parse JSON ")
+			return
 		}
+		if !isURLValid(URLToDisplay) {
+			BadURLStatusMessage := "Sorry, " + URLToDisplay + " cannot be opened. Try a different one. Sadpanda."
+			sendConfirmationMessageToUser(response_writer, BadURLStatusMessage)
+			return
+		}
+		if nonExistentSlave := allSlavesAreConnected(slaveMap, slaveNamesToUpdate); nonExistentSlave != ""{
+			errorMessage := "Sorry, " + nonExistentSlave + ` cannot be reached. Please refresh the page
+			 to see an updated list.`
+			sendConfirmationMessageToUser(response_writer, errorMessage)
+			return
+		}
+		sendURLToSlaves(slaveMap, slaveNamesToUpdate, URLToDisplay)
+		statusMessage := "Slaves are updated"
+		sendConfirmationMessageToUser(response_writer, statusMessage)
+	}
+}
+
+func parseFromJSON(requestBody io.ReadCloser) (URLToDisplay string, slaveNames []string, err error) {
+	type FormData struct {
+		URLToDisplay   string
+		SlaveNames []string
+	}
+	JSONFormData := json.NewDecoder(requestBody)
+	var decodedFormData FormData
+	err = JSONFormData.Decode(&decodedFormData)
+	URLToDisplay = decodedFormData.URLToDisplay
+	slaveNames = decodedFormData.SlaveNames
+	return
+}
+
+func sendURLToSlaves(slaveMap map[string]master.Slave, slaveNames []string, URLToDisplay string) {
+	for _, slaveName := range slaveNames {
+		receiveAndSendRequestToSlave.ReceiveRequestAndSendToSlave(slaveMap, slaveName, URLToDisplay)
 	}
 }
 
@@ -129,4 +153,13 @@ func isURLValid(url string) bool {
 	} else {
 		return true
 	}
+}
+
+func allSlavesAreConnected(slaveMap map[string]master.Slave, slaveNamesToUpdate []string) (nonExistentSlave string) {
+	for _, slaveName := range slaveNamesToUpdate {
+		if _, isExists := slaveMap[slaveName]; !isExists {
+			return slaveName
+		}
+	}
+	return
 }

@@ -28,17 +28,20 @@ $(document).ready(function() {
             e.preventDefault();
             return;
         }
-        var selectedSlave = $('.slave-selector a').filter('.strongSelect').html();
+        var selectedSlaves = [];
+        $('.slave-selector a').filter('.strongSelect').each(function() {
+            selectedSlaves.push($( this ).html());
+        });
         var usrToDisplay = $('.form-control').val();
         var postData = {
-            'url':usrToDisplay,
-            'slave-id': selectedSlave
+            'URLToDisplay':usrToDisplay,
+            'SlaveNames': selectedSlaves
         };
         var formURL = $(this).attr("action");
         $.ajax({
             url: formURL,
             type: "POST",
-            data: postData,
+            data: JSON.stringify(postData),
             timeout: 8000,
             cache: false,
             success: function(data, textStatus, jqXHR) {
@@ -61,12 +64,7 @@ $(document).ready(function() {
         e.preventDefault();
     });
     $('.slave-selector a').on('click', function (e) {
-        if ($(this).hasClass('strongSelect')) {
-            $(this).removeClass('strongSelect');
-        } else {
-            $('.slave-selector a').filter('.strongSelect').removeClass('strongSelect');
-            $(this).addClass('strongSelect');
-        }
+        $(this).toggleClass('strongSelect');
     });
     $('#submit-button').tooltip({
         'show': false,
