@@ -109,7 +109,7 @@ func createConfirmationMessage(statusMessage string) []byte {
 }
 
 func checkStatusCode(urlToDisplay string) int {
-	if len(urlToDisplay) < 4 || string(urlToDisplay[0:4]) != "http" {
+	if (len(urlToDisplay) < 4) || (string(urlToDisplay[0:6]) != "http:/" && string(urlToDisplay[0:7]) != "https:/") {
 		urlToDisplay = "http://" + urlToDisplay
 	}
 
