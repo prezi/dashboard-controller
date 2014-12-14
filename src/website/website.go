@@ -27,7 +27,10 @@ type StatusMessage struct {
 
 func IndexPageHandler(w http.ResponseWriter, r *http.Request) {
 	template, err := template.ParseFiles(path.Join(VIEWS_PATH, "login.html"))
-	network.ErrorHandler(err, "Error encountered while parsing website template files: %v.")
+	if network.ErrorHandler(err, "Error encountered while parsing website template files: %v.") {
+		w.WriteHeader(404)
+		return
+	}
 	template.Execute(w, "Login Error Message Here.")
 }
 
@@ -99,37 +102,29 @@ func sendURLToSlaves(slaveMap map[string]master.Slave, slaveNames []string, URLT
 	}
 }
 
-func slaveExistsInSlaveMap(slaveName string, slaveMap map[string]master.Slave) bool {
-	for slaveNameInMap, _ := range slaveMap {
-		if slaveName == slaveNameInMap {
-			return true
-		}
-	}
-	return false
-}
-
 func sendConfirmationMessageToUser(response_writer http.ResponseWriter, statusMessage string) {
-	confirmationMessage := createConfirmationMessage(statusMessage)
+	confirmationMessage, _ := createConfirmationMessage(statusMessage)
 
 	header := response_writer.Header()
 	header.Set("Content-Type", "application/json")
 	response_writer.Write(confirmationMessage)
 }
 
-func createConfirmationMessage(statusMessage string) []byte {
+func createConfirmationMessage(statusMessage string) (jsonMessage []byte, err error) {
 	t, err := template.ParseFiles(path.Join(VIEWS_PATH, "infobox.html"))
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 
 	buf := new(bytes.Buffer)
 	t.ExecuteTemplate(buf, "T", StatusMessage{statusMessage})
 
-	jsonMessage, err := json.Marshal(StatusMessage{StatusMessage: buf.String()})
+	jsonMessage, err = json.Marshal(StatusMessage{StatusMessage: buf.String()})
 	if err != nil {
 		fmt.Println(err)
 	}
-	return jsonMessage
+	return
 }
 
 func checkStatusCode(urlToDisplay string) int {
@@ -156,10 +151,10 @@ func isURLValid(url string) bool {
 }
 
 func allSlavesAreConnected(slaveMap map[string]master.Slave, slaveNamesToUpdate []string) (nonExistentSlave string) {
-	for _, slaveName := range slaveNamesToUpdate {
-		if _, isExists := slaveMap[slaveName]; !isExists {
-			return slaveName
+	for _, nonExistentSlave = range slaveNamesToUpdate {
+		if _, isExists := slaveMap[nonExistentSlave]; !isExists {
+			return nonExistentSlave
 		}
 	}
-	return
+	return ""
 }

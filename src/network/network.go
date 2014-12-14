@@ -55,7 +55,6 @@ func GetOS() (OS string) {
 func ErrorHandler(err error, message string) (errorOccurred bool) {
 	if err != nil {
 		fmt.Printf(message, err)
-		// os.Exit(1)
 		return true
 	}
 	return false

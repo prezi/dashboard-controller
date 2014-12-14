@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"master/master"
+	"strings"
+	"io/ioutil"
 )
 
 type PostURLRequest struct {
@@ -12,9 +15,32 @@ type PostURLRequest struct {
 	URLToLoadInBrowser   string
 }
 
+func TestIndexPageHandler(t * testing.T) {
+	VIEWS_PATH = master.GetRelativeFilePath("views")
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		IndexPageHandler(w, request)
+	}))
+	client := &http.Client{}
+	resp, _ := client.Get(testServer.URL)
+	assert.Equal(t, 200, resp.StatusCode)
+	assert.Equal(t, "text/html; charset=utf-8", resp.Header.Get("Content-type"))
+}
+
+func TestIndexPageHandlerWithWrongPath(t * testing.T) {
+	VIEWS_PATH = master.GetRelativeFilePath("dummy")
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		IndexPageHandler(w, request)
+	}))
+	client := &http.Client{}
+	resp, _ := client.Get(testServer.URL)
+	assert.Equal(t, 404, resp.StatusCode)
+}
+
 func sendGetToFormHandler(URL string) int {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		request.URL.Path = URL
+		testSlaveNames := []string {"a","b"}
+		FormHandler(w, request, testSlaveNames)
 	}))
 
 	client := &http.Client{}
@@ -24,7 +50,7 @@ func sendGetToFormHandler(URL string) int {
 }
 
 func TestFormHandler(t *testing.T) {
-	assert.Equal(t, 200, sendGetToFormHandler("/"))
+	assert.Equal(t, 302, sendGetToFormHandler("/"))
 }
 
 func TestStatusMessageForAvailableServer(t *testing.T) {
@@ -41,6 +67,36 @@ func TestStatusMessageForUnavailableServer(t *testing.T) {
 	assert.Equal(t, false, statusMessage)
 }
 
+func TestSendConfirmationMessageToUser(t *testing.T) {
+	VIEWS_PATH = master.GetRelativeFilePath("views")
+	testMessage := "testmessage"
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		sendConfirmationMessageToUser(w, testMessage)
+	}))
+
+	client := &http.Client{}
+	resp, _ := client.Get(testServer.URL)
+	respBodyContents, _:= ioutil.ReadAll(resp.Body)
+	respBodyString := string(respBodyContents[:])
+	assert.True(t, strings.Contains(respBodyString, testMessage))
+	assert.Equal(t,"application/json", resp.Header.Get("Content-type"))
+}
+
+func TestCreateConfirmationMessage(t *testing.T) {
+	VIEWS_PATH = master.GetRelativeFilePath("views")
+	msg := "testmessage"
+	confirmationMessageJson, _ := createConfirmationMessage(msg)
+	confirmationMessageJsonString := string(confirmationMessageJson[:])
+	assert.True(t, strings.Contains(confirmationMessageJsonString, msg))
+}
+
+func TestCreateConfirmationMessageWithWrongPath(t *testing.T) {
+	VIEWS_PATH = master.GetRelativeFilePath("dummy")
+	msg := "testmessage"
+	confirmationMessageJson, _ := createConfirmationMessage(msg)
+	assert.Equal(t, len(confirmationMessageJson), 0)
+}
+
 func TestCheckStatusCode(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 	}))
@@ -49,6 +105,14 @@ func TestCheckStatusCode(t *testing.T) {
 	assert.Equal(t, 200, responseStatusCode)
 	responseStatusCode = checkStatusCode("")
 	assert.Equal(t, 0, responseStatusCode)
+}
+
+func TestCheckStatusCodeWithoutHttp(t *testing.T) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+	}))
+
+	responseStatusCode := checkStatusCode(testServer.URL[7:])
+	assert.Equal(t, 200, responseStatusCode)
 }
 
 func TestIfURLIsValid(t *testing.T) {
@@ -60,4 +124,26 @@ func TestIfURLIsValid(t *testing.T) {
 
 func TestIfURLIsInvalid(t *testing.T) {
 	assert.False(t, isURLValid(""))
+}
+
+func TestAllSlavesAreConnected(t *testing.T) {
+	slaveList := []string{"a","b","c"}
+	slaveMap := map[string]master.Slave{
+		"a":master.Slave{},
+		"b":master.Slave{},
+		"c":master.Slave{},
+	}
+	returnValue := allSlavesAreConnected(slaveMap, slaveList)
+	assert.Equal(t, returnValue, "")
+}
+
+func TestAllSlavesAreConnectedWithActualReturn(t *testing.T) {
+	slaveList := []string{"a","b","c","d"}
+	slaveMap := map[string]master.Slave{
+		"a":master.Slave{},
+		"b":master.Slave{},
+		"c":master.Slave{},
+	}
+	returnValue := allSlavesAreConnected(slaveMap, slaveList)
+	assert.Equal(t, returnValue, "d")
 }
