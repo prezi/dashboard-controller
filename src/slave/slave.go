@@ -6,6 +6,8 @@ import (
 	"network"
 	"os"
 	"slave/slave"
+	"slave/slave/LinuxBrowserHandler"
+	"slave/slave/OSXBrowserHandler"
 )
 
 func main() {
@@ -13,7 +15,14 @@ func main() {
 	go slave.Heartbeat(1, slaveName, ownPort, masterURL)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		browserProcess = slave.BrowserHandler(w, r, OS, browserProcess)
+		switch OS {
+			case "Linux":
+				browserProcess = LinuxBrowserHandler.BrowserHandler(w, r, browserProcess)
+
+			case "OS X":
+				browserProcess = OSXBrowserHandler.BrowserHandler(w, r, browserProcess)
+			}
+//		browserProcess = slave.BrowserHandler(w, r, OS, browserProcess)
 	})
 	http.HandleFunc("/receive_killsignal", func(_ http.ResponseWriter, request *http.Request) {
 		if "die" == request.FormValue("message") {
