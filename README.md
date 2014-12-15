@@ -72,6 +72,5 @@ Submitting a URL
 Access the website running on your localhost. Fill in the text fields, submit, and see your url post on the indicated slave. :) 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/prezi/dashboard-controller/master/README_images/giphy.gif?token=AGS9fcFLjeK5AUMqKV0dMrZEMC8ExqqYks5Ujg8bwA%3D%3D" alt="nyan nyan nyan"/>
   <br>Enjoy!</br>
 </p>
