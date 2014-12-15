@@ -1,4 +1,4 @@
-package receiveAndSendRequestToSlave
+package delegateRequestToSlave
 
 import (
 	"fmt"
