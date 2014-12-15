@@ -6,6 +6,7 @@ import (
 	"master/master"
 	"net/http"
 	"network"
+	"strings"
 )
 
 type PostURLRequest struct {
@@ -62,4 +63,14 @@ func sendURLValueMessageToSlave(slaveIPAddress string, urlToDisplay string) (err
 	defer response.Body.Close()
 	fmt.Printf("Slave message: %v\n", (string(body[:])))
 	return
+}
+
+func CheckIfRequestedSlavesAreConnected(slaveMap map[string]master.Slave, slaveNamesToUpdate []string) (string) {
+	offlineSlaveList := make([]string, 0 ,len(slaveNamesToUpdate))
+	for _, nonExistentSlave := range slaveNamesToUpdate {
+		if _, isExists := slaveMap[nonExistentSlave]; !isExists {
+			offlineSlaveList = append(offlineSlaveList, nonExistentSlave)
+		}
+	}
+	return strings.Join(offlineSlaveList,", ")
 }

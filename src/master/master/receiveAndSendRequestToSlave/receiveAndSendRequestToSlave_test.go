@@ -111,3 +111,34 @@ func TestSendURLValueMessageToSlaveSlaveDoesNotRespond(t *testing.T) {
 	err := sendURLValueMessageToSlave(testServer.URL, "http://index.hu")
 	assert.NotNil(t, err)
 }
+
+func TestCheckIfRequestedSlavesAreConnected(t *testing.T) {
+	slaveList := []string{"a","b","c"}
+	slaveMap := map[string]master.Slave{
+		"a":master.Slave{},
+		"b":master.Slave{},
+		"c":master.Slave{},
+	}
+	returnValue := CheckIfRequestedSlavesAreConnected(slaveMap, slaveList)
+	assert.Equal(t, returnValue, "")
+}
+
+func TestCheckIfRequestedSlavesAreConnectedWithOneMissingSlave(t *testing.T) {
+	slaveList := []string{"a","b","c","d"}
+	slaveMap := map[string]master.Slave{
+		"a":master.Slave{},
+		"b":master.Slave{},
+		"c":master.Slave{},
+	}
+	returnValue := CheckIfRequestedSlavesAreConnected(slaveMap, slaveList)
+	assert.Equal(t, returnValue, "d")
+}
+func TestCheckIfRequestedSlavesAreConnectedWithMultipleMissingSlaves(t *testing.T) {
+	slaveList := []string{"a","b","c","d"}
+	slaveMap := map[string]master.Slave{
+		"a":master.Slave{},
+		"b":master.Slave{},
+	}
+	returnValue := CheckIfRequestedSlavesAreConnected(slaveMap, slaveList)
+	assert.Equal(t, returnValue, "c, d")
+}

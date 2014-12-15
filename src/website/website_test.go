@@ -125,25 +125,3 @@ func TestIfURLIsValid(t *testing.T) {
 func TestIfURLIsInvalid(t *testing.T) {
 	assert.False(t, isURLValid(""))
 }
-
-func TestAllSlavesAreConnected(t *testing.T) {
-	slaveList := []string{"a","b","c"}
-	slaveMap := map[string]master.Slave{
-		"a":master.Slave{},
-		"b":master.Slave{},
-		"c":master.Slave{},
-	}
-	returnValue := allSlavesAreConnected(slaveMap, slaveList)
-	assert.Equal(t, returnValue, "")
-}
-
-func TestAllSlavesAreConnectedWithActualReturn(t *testing.T) {
-	slaveList := []string{"a","b","c","d"}
-	slaveMap := map[string]master.Slave{
-		"a":master.Slave{},
-		"b":master.Slave{},
-		"c":master.Slave{},
-	}
-	returnValue := allSlavesAreConnected(slaveMap, slaveList)
-	assert.Equal(t, returnValue, "d")
-}

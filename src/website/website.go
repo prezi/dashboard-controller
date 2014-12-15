@@ -71,8 +71,8 @@ func SubmitHandler(response_writer http.ResponseWriter, request *http.Request, s
 			sendConfirmationMessageToUser(response_writer, BadURLStatusMessage)
 			return
 		}
-		if nonExistentSlave := allSlavesAreConnected(slaveMap, slaveNamesToUpdate); nonExistentSlave != ""{
-			errorMessage := "Sorry, " + nonExistentSlave + ` cannot be reached. Please refresh the page
+		if nonExistentSlaves := receiveAndSendRequestToSlave.CheckIfRequestedSlavesAreConnected(slaveMap, slaveNamesToUpdate); nonExistentSlaves != ""{
+			errorMessage := "Sorry, " + nonExistentSlaves + ` cannot be reached. Please refresh the page
 			 to see an updated list.`
 			sendConfirmationMessageToUser(response_writer, errorMessage)
 			return
@@ -148,13 +148,4 @@ func isURLValid(url string) bool {
 	} else {
 		return true
 	}
-}
-
-func allSlavesAreConnected(slaveMap map[string]master.Slave, slaveNamesToUpdate []string) (nonExistentSlave string) {
-	for _, nonExistentSlave = range slaveNamesToUpdate {
-		if _, isExists := slaveMap[nonExistentSlave]; !isExists {
-			return nonExistentSlave
-		}
-	}
-	return ""
 }
