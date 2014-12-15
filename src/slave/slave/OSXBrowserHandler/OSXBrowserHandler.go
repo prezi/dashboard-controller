@@ -7,13 +7,14 @@ import (
 	"time"
 )
 
-func BrowserHandler(writer http.ResponseWriter, request *http.Request, browserProcess *exec.Cmd) *exec.Cmd {
+func BrowserHandler(writer http.ResponseWriter, request *http.Request) {
 	url := request.PostFormValue("url")
 	killBrowser()
-	browserProcess, _ = openBrowser(url)
+	err := openBrowser(url)
+	if err != nil {
+		fmt.Fprintf(writer, "Error opening the browser %v", err)
+	}
 	fmt.Fprintf(writer, "SUCCESS. \"%v\" has been posted.\n", url)
-
-	return browserProcess
 }
 
 func killBrowser() (err error) {
@@ -44,7 +45,7 @@ func getProcessList() (existingProcess []byte, err error) {
 	return
 }
 
-func openBrowser(url string) (browserProcess *exec.Cmd, err error) {
+func openBrowser(url string) (err error) {
 	fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
 	err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()
 	if err != nil {

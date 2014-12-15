@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"network"
 	"os"
-	"os/exec"
 )
 
 const (
@@ -17,7 +16,7 @@ const (
 
 var err error
 
-func SetUp() (port, slaveName, masterURL, OS string, browserProcess *exec.Cmd) {
+func SetUp() (port, slaveName, masterURL, OS string) {
 	port, slaveName, masterIP, masterPort := configFlags()
 	masterURL = network.AddProtocolAndPortToIP(masterIP, masterPort)
 	OS = network.GetOS()

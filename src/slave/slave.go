@@ -11,16 +11,16 @@ import (
 )
 
 func main() {
-	ownPort, slaveName, masterURL, OS, browserProcess := slave.SetUp()
+	ownPort, slaveName, masterURL, OS := slave.SetUp()
 	go slave.Heartbeat(1, slaveName, ownPort, masterURL)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch OS {
 			case "Linux":
-				browserProcess = LinuxBrowserHandler.BrowserHandler(w, r, browserProcess)
+				LinuxBrowserHandler.BrowserHandler(w, r)
 
 			case "OS X":
-				browserProcess = OSXBrowserHandler.BrowserHandler(w, r, browserProcess)
+				OSXBrowserHandler.BrowserHandler(w, r)
 			}
 //		browserProcess = slave.BrowserHandler(w, r, OS, browserProcess)
 	})

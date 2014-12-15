@@ -1,54 +1,41 @@
 package OSXBrowserHandler
 
+
 import (
-	"fmt"
 	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"os/exec"
-	"time"
+	"testing"
 )
 
-func BrowserHandler(writer http.ResponseWriter, request *http.Request,browserProcess *exec.Cmd) *exec.Cmd {
-	url := request.PostFormValue("url")
-	killBrowser()
-	browserProcess, _ = openBrowser(url)
-	fmt.Fprintf(writer, "SUCCESS. \"%v\" has been posted.\n", url)
+const testURL = "http://www.placekitten.com"
 
-	return browserProcess
+// set testBrowser to true for testing
+const testBrowser = false
+
+var browserProcess *exec.Cmd
+
+// TODO: These tests can be greatly improved.
+func TestBrowserHandler(t *testing.T) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		BrowserHandler(w, r)
+
+	}))
+
+	client := &http.Client{}
+	client.PostForm(testServer.URL, url.Values{"url": {testURL}})
 }
 
-func killBrowser() (err error) {
-	fmt.Println("Executing command: killall 'Google Chrome'")
-	err = exec.Command("killall", "Google Chrome").Start()
-	if err != nil {
-		fmt.Printf("Error killing current browser: %v\n", err)
-	} else {
-		blockWhileBrowserCloses()
+func TestKillBrowserOS_X(t *testing.T) {
+	if testBrowser {
+		killBrowser()
 	}
-	return
 }
 
-func blockWhileBrowserCloses() (err error) {
-	var existingProcess []byte
-	for {
-		time.Sleep(75 * time.Millisecond)
-		existingProcess, err = getProcessList()
-		if len(existingProcess) == 0 {
-			break
-		}
+func TestOpenBrowserOS_X(t *testing.T) {
+	if testBrowser {
+		openBrowser(testURL)
 	}
-	return
 }
 
-func getProcessList() (existingProcess []byte, err error) {
-	existingProcess, err = exec.Command("pgrep", "Google Chrome").CombinedOutput()
-	return
-}
-
-func openBrowser(url string) (browserProcess *exec.Cmd, err error) {
-	fmt.Printf("Executing command: open -a 'Google Chrome' --args --kiosk %v\n", url)
-	err = exec.Command("open", "-a", "Google Chrome", "--args", "--kiosk", url).Run()
-	if err != nil {
-		fmt.Printf("Error opening URL: %v\n", err)
-	}
-	return
-}
