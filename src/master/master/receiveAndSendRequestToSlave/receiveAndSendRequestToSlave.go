@@ -14,17 +14,18 @@ type PostURLRequest struct {
 	URLToLoadInBrowser   string
 }
 
-func ReceiveRequestAndSendToSlave(slaveMap map[string]master.Slave, slaveName, urlToLoadInBrowser string) {
-	destinationSlaveAddress := getDestinationSlaveAddress(slaveName, slaveMap)
-	if destinationSlaveAddress == "" {
-		fmt.Println("Abandoning request.")
-		// fmt.Fprintf(writer, "ERROR: Failed to contact slave. Slave has no address stored.")
-		return
-	}
+func ReceiveRequestAndSendToSlave(slaveMap map[string]master.Slave, slaveNames []string, urlToLoadInBrowser string) {
+	for _, slaveName := range slaveNames {
+		destinationSlaveAddress := getDestinationSlaveAddress(slaveName, slaveMap)
+		if destinationSlaveAddress == "" {
+			fmt.Println("Abandoning request.")
+			return
+		}
 
-	fmt.Printf("\nSending %v to %v at %v\n", urlToLoadInBrowser, slaveName, destinationSlaveAddress)
-	sendURLValueMessageToSlave(destinationSlaveAddress, urlToLoadInBrowser)
-	updateSlaveDisplayedURL(slaveMap, slaveName, urlToLoadInBrowser)
+		fmt.Printf("\nSending %v to %v at %v\n", urlToLoadInBrowser, slaveName, destinationSlaveAddress)
+		sendURLValueMessageToSlave(destinationSlaveAddress, urlToLoadInBrowser)
+		updateSlaveDisplayedURL(slaveMap, slaveName, urlToLoadInBrowser)
+	}
 }
 
 func updateSlaveDisplayedURL(slaveMap map[string]master.Slave, slaveName, urlToLoadInBrowser string) {

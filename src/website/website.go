@@ -77,7 +77,7 @@ func SubmitHandler(response_writer http.ResponseWriter, request *http.Request, s
 			sendConfirmationMessageToUser(response_writer, errorMessage)
 			return
 		}
-		sendURLToSlaves(slaveMap, slaveNamesToUpdate, URLToDisplay)
+		receiveAndSendRequestToSlave.ReceiveRequestAndSendToSlave(slaveMap, slaveNamesToUpdate, URLToDisplay)
 		statusMessage := "Slaves are updated"
 		sendConfirmationMessageToUser(response_writer, statusMessage)
 	}
@@ -94,12 +94,6 @@ func parseFromJSON(requestBody io.ReadCloser) (URLToDisplay string, slaveNames [
 	URLToDisplay = decodedFormData.URLToDisplay
 	slaveNames = decodedFormData.SlaveNames
 	return
-}
-
-func sendURLToSlaves(slaveMap map[string]master.Slave, slaveNames []string, URLToDisplay string) {
-	for _, slaveName := range slaveNames {
-		receiveAndSendRequestToSlave.ReceiveRequestAndSendToSlave(slaveMap, slaveName, URLToDisplay)
-	}
 }
 
 func sendConfirmationMessageToUser(response_writer http.ResponseWriter, statusMessage string) {
