@@ -16,4 +16,5 @@ src/hubot/node_modules
 user_authentication_data.txt
 src/website/hash/user_authentication_data.txt
 !src/hubot/bin
-.hubot_history
+.hubot_historyautotest.sh
+autotest.sh
