@@ -14,11 +14,12 @@ module.exports = (robot) ->
     .header("Content-Type", "application/x-www-form-urlencoded")
     .post(data) (err, res, body) ->
       try
-        msg.send "SUCCESS!!!"
+        msg.send "Success!"
       catch err
-        msg.send "Error while sending POST request: " + err
+        msg.send "Error while sending POST request."
+        msg.send err
 
-  robot.respond /\b(h+e+l+l+o+)|(h+i+)|(h+e+l+p+m+e)|(h+e+y+)\b/i, (msg) ->
+  robot.respond /\b(h+e+l+l+o+)|(h+i+)|(help\s*(.*)?$)|(h+e+y+)\b/i, (msg) ->
     msg.send "Hi! I'm a very friendly robot sending urls to different dashboards around Prezi Office."
     msg.send "You can get the list of available dashboards by typing info."
     msg.send "Post on dashboards by: "
