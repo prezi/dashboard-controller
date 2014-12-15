@@ -18,7 +18,7 @@ var browserProcess *exec.Cmd
 // TODO: These tests can be greatly improved.
 func TestBrowserHandler(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		BrowserHandler(w, r, browserProcess)
+		BrowserHandler(w, r)
 
 	}))
 
