@@ -13,7 +13,7 @@ type Slave struct {
 	DisplayedURL           string
 }
 
-func SetUp() (slaveMap map[string]Slave) {
+func GetSlaveMap() (slaveMap map[string]Slave) {
 	slaveMap = make(map[string]Slave)
 	return
 }

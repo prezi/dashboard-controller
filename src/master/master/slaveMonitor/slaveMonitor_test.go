@@ -19,7 +19,7 @@ const (
 )
 
 func TestSetUp(t *testing.T) {
-	slaveMap := master.SetUp()
+	slaveMap := master.GetSlaveMap()
 	assert.Equal(t, 0, len(slaveMap))
 }
 

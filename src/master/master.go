@@ -15,7 +15,7 @@ var (
 )
 
 func main() {
-	slaveMap := master.SetUp()
+	slaveMap := master.GetSlaveMap()
 	router := mux.NewRouter()
 	website.InitiateWebsiteHandlers(slaveMap, router)
 	router.HandleFunc("/receive_heartbeat", func(_ http.ResponseWriter, r *http.Request) {
