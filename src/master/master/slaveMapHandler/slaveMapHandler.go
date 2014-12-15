@@ -6,7 +6,6 @@ import (
 	"github.com/gorilla/mux"
 	"master/master"
 	"net/http"
-	"website"
 )
 
 type SlaveMap struct {
@@ -20,7 +19,7 @@ func InitiateSlaveMapHandler(router *mux.Router, slaveMap map[string]master.Slav
 }
 
 func slavemapHandler(responseWriter http.ResponseWriter, _ *http.Request, slaveMap map[string]master.Slave) {
-	slaveNames := website.GetSlaveNamesFromMap(slaveMap)
+	slaveNames := master.GetSlaveNamesFromMap(slaveMap)
 	responseWriter.Header().Set("Content-Type", "application/json")
 
 	slaveNameJson, error := json.Marshal(slaveNames)
