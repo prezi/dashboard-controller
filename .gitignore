@@ -17,5 +17,4 @@ user_authentication_data.txt
 src/website/hash/user_authentication_data.txt
 !src/hubot/bin
 .hubot_historyautotest.sh
-src/hubot/.hubot_history
 autotest.sh
