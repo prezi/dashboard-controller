@@ -4,6 +4,7 @@ import (
 	"path"
 	"runtime"
 	"time"
+	"sort"
 )
 
 type Slave struct {
@@ -13,8 +14,16 @@ type Slave struct {
 	DisplayedURL           string
 }
 
-func SetUp() (slaveMap map[string]Slave) {
+func GetSlaveMap() (slaveMap map[string]Slave) {
 	slaveMap = make(map[string]Slave)
+	return
+}
+
+func GetSlaveNamesFromMap(slaveMap map[string]Slave) (slaveNames []string) {
+	for index := range slaveMap {
+		slaveNames = append(slaveNames, index)
+	}
+	sort.Strings(slaveNames)
 	return
 }
 
