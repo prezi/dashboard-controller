@@ -3,7 +3,6 @@ package website
 import (
 	"github.com/gorilla/mux"
 	"master/master"
-	"master/master/slaveMapHandler"
 	"net/http"
 	"website/session"
 )
@@ -18,7 +17,7 @@ func InitiateWebsiteHandlers(slaveMap map[string]master.Slave, router *mux.Route
 	router.HandleFunc("/logout", session.LogoutHandler).Methods("POST")
 
 	router.HandleFunc("/internal", func(w http.ResponseWriter, r *http.Request) {
-		slaveNames := slaveMapHandler.GetSlaveNamesFromMap(slaveMap)
+		slaveNames := master.GetSlaveNamesFromMap(slaveMap)
 		FormHandler(w, r, slaveNames)
 	})
 	router.HandleFunc("/form-submit", func(w http.ResponseWriter, r *http.Request) {

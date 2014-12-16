@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"master/master"
-	"master/master/slaveMapHandler"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -20,7 +19,7 @@ const (
 )
 
 func TestSetUp(t *testing.T) {
-	slaveMap := slaveMapHandler.GetSlaveMap()
+	slaveMap := master.GetSlaveMap()
 	assert.Equal(t, 0, len(slaveMap))
 }
 

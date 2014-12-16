@@ -15,10 +15,10 @@ import (
 )
 
 var (
-	IMAGES_PATH      = network.GetRelativeFilePath("assets/images")
-	JAVASCRIPTS_PATH = network.GetRelativeFilePath("assets/javascripts")
-	STYLESHEETS_PATH = network.GetRelativeFilePath("assets/stylesheets")
-	VIEWS_PATH       = network.GetRelativeFilePath("views")
+	IMAGES_PATH      = master.GetRelativeFilePath("assets/images")
+	JAVASCRIPTS_PATH = master.GetRelativeFilePath("assets/javascripts")
+	STYLESHEETS_PATH = master.GetRelativeFilePath("assets/stylesheets")
+	VIEWS_PATH       = master.GetRelativeFilePath("views")
 )
 
 type StatusMessage struct {
@@ -66,7 +66,7 @@ func SubmitHandler(response_writer http.ResponseWriter, request *http.Request, s
 			sendConfirmationMessageToUser(response_writer, "Failed to parse JSON ")
 			return
 		}
-		if !delegateRequestToSlave.IsURLValid(URLToDisplay) {
+		if !master.IsURLValid(URLToDisplay) {
 			BadURLStatusMessage := "Sorry, " + URLToDisplay + " cannot be opened. Try a different one. Sadpanda."
 			sendConfirmationMessageToUser(response_writer, BadURLStatusMessage)
 			return

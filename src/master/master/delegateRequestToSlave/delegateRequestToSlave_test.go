@@ -114,32 +114,3 @@ func TestCheckIfRequestedSlavesAreConnectedWithMultipleMissingSlaves(t *testing.
 	returnValue := CheckIfRequestedSlavesAreConnected(slaveMap, slaveList)
 	assert.Equal(t, returnValue, "c, d")
 }
-
-func TestIfURLIsValid(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-	}))
-
-	assert.True(t, IsURLValid(testServer.URL))
-}
-
-func TestIfURLIsInvalid(t *testing.T) {
-	assert.False(t, IsURLValid(""))
-}
-
-func TestCheckStatusCode(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-	}))
-
-	responseStatusCode := checkStatusCode(testServer.URL)
-	assert.Equal(t, 200, responseStatusCode)
-	responseStatusCode = checkStatusCode("")
-	assert.Equal(t, 0, responseStatusCode)
-}
-
-func TestCheckStatusCodeWithoutHttp(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-	}))
-
-	responseStatusCode := checkStatusCode(testServer.URL[7:])
-	assert.Equal(t, 200, responseStatusCode)
-}

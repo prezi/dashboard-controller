@@ -3,8 +3,6 @@ package network
 import (
 	"fmt"
 	"net/url"
-	"path"
-	"runtime"
 )
 
 const (
@@ -26,11 +24,5 @@ func CreateFormWithInitialValues(formEntries map[string]string) (form url.Values
 	for key, value := range formEntries {
 		form.Set(key, value)
 	}
-	return
-}
-
-func GetRelativeFilePath(relativeFileName string) (filePath string) {
-	_, filename, _, _ := runtime.Caller(1)
-	filePath = path.Join(path.Dir(filename), relativeFileName)
 	return
 }
