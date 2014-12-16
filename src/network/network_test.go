@@ -18,3 +18,8 @@ func TestCreateFormWithInitialValues(t *testing.T) {
 	form := CreateFormWithInitialValues(map[string]string{"url": urlToDisplay})
 	assert.Equal(t, form, url.Values{"url": []string{"some valid url"}})
 }
+
+func TestGetRelativeFilePath(t *testing.T) {
+	filepath := GetRelativeFilePath("assets/images")
+	assert.IsType(t, "some/filepath", filepath)
+}

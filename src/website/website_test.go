@@ -5,9 +5,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"master/master"
 	"strings"
 	"io/ioutil"
+	"master/master/delegateRequestToSlave"
+	"network"
 )
 
 type PostURLRequest struct {
@@ -16,7 +17,7 @@ type PostURLRequest struct {
 }
 
 func TestIndexPageHandler(t * testing.T) {
-	VIEWS_PATH = master.GetRelativeFilePath("views")
+	VIEWS_PATH = network.GetRelativeFilePath("views")
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		IndexPageHandler(w, request)
 	}))
@@ -27,7 +28,7 @@ func TestIndexPageHandler(t * testing.T) {
 }
 
 func TestIndexPageHandlerWithWrongPath(t * testing.T) {
-	VIEWS_PATH = master.GetRelativeFilePath("dummy")
+	VIEWS_PATH = network.GetRelativeFilePath("dummy")
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		IndexPageHandler(w, request)
 	}))
@@ -56,19 +57,19 @@ func TestFormHandler(t *testing.T) {
 func TestStatusMessageForAvailableServer(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 	}))
-	statusMessage := master.IsURLValid(testServer.URL)
+	statusMessage := delegateRequestToSlave.IsURLValid(testServer.URL)
 
 	assert.Equal(t, true, statusMessage)
 }
 
 func TestStatusMessageForUnavailableServer(t *testing.T) {
-	statusMessage := master.IsURLValid("")
+	statusMessage := delegateRequestToSlave.IsURLValid("")
 
 	assert.Equal(t, false, statusMessage)
 }
 
 func TestSendConfirmationMessageToUser(t *testing.T) {
-	VIEWS_PATH = master.GetRelativeFilePath("views")
+	VIEWS_PATH = network.GetRelativeFilePath("views")
 	testMessage := "testmessage"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		sendConfirmationMessageToUser(w, testMessage)
@@ -83,7 +84,7 @@ func TestSendConfirmationMessageToUser(t *testing.T) {
 }
 
 func TestCreateConfirmationMessage(t *testing.T) {
-	VIEWS_PATH = master.GetRelativeFilePath("views")
+	VIEWS_PATH = network.GetRelativeFilePath("views")
 	msg := "testmessage"
 	confirmationMessageJson, _ := createConfirmationMessage(msg)
 	confirmationMessageJsonString := string(confirmationMessageJson[:])
@@ -91,7 +92,7 @@ func TestCreateConfirmationMessage(t *testing.T) {
 }
 
 func TestCreateConfirmationMessageWithWrongPath(t *testing.T) {
-	VIEWS_PATH = master.GetRelativeFilePath("dummy")
+	VIEWS_PATH = network.GetRelativeFilePath("dummy")
 	msg := "testmessage"
 	confirmationMessageJson, _ := createConfirmationMessage(msg)
 	assert.Equal(t, len(confirmationMessageJson), 0)

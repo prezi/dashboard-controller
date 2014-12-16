@@ -75,3 +75,27 @@ func CheckIfRequestedSlavesAreConnected(slaveMap map[string]master.Slave, slaveN
 	}
 	return strings.Join(offlineSlaveList,", ")
 }
+
+
+func IsURLValid(url string) bool {
+	if 400 <= checkStatusCode(url) || checkStatusCode(url) == 0 {
+		return false
+	} else {
+		return true
+	}
+}
+
+func checkStatusCode(urlToDisplay string) int {
+	if (len(urlToDisplay) <= 6) {
+		urlToDisplay = "http://" + urlToDisplay
+	} else if (string(urlToDisplay[0:6]) != "http:/" && string(urlToDisplay[0:6]) != "https:") {
+		urlToDisplay = "http://" + urlToDisplay
+	}
+
+	response, err := http.Head(urlToDisplay)
+	if err != nil {
+		return 0
+	} else {
+		return response.StatusCode
+	}
+}

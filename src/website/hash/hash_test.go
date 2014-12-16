@@ -2,12 +2,12 @@ package hash
 
 import (
 	"github.com/stretchr/testify/assert"
-	"master/master"
 	"reflect"
 	"testing"
+	"network"
 )
 
-var FILE_PATH_TO_USER_AUTHENTICATION_DATA = master.GetRelativeFilePath("./user_authentication_data_for_testing.txt")
+var FILE_PATH_TO_USER_AUTHENTICATION_DATA = network.GetRelativeFilePath("./user_authentication_data_for_testing.txt")
 
 func TestInitializeUserAuthenticationMap(t *testing.T) {
 	result := InitializeUserAuthenticationMap(FILE_PATH_TO_USER_AUTHENTICATION_DATA)

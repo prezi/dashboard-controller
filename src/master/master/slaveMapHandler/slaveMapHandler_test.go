@@ -16,7 +16,7 @@ func TestInitiateEmptySlaveMapHandler(t *testing.T) {
 
 	slaveMap := make(map[string]master.Slave)
 
-	InitiateSlaveMapHandler(router, slaveMap)
+	InitiateSlaveMapHandler(slaveMap, router)
 
 	request, _ := http.NewRequest("GET", "/slavemap", nil)
 
@@ -33,7 +33,7 @@ func TestInitiateNonEmptySlaveMapHandler(t *testing.T) {
 	slaveMap := make(map[string]master.Slave)
 	slaveMap["slave1"] = master.Slave{URL: "http://10.0.0.122:8080", Heartbeat: time.Now(), PreviouslyDisplayedURL: "http://www.google.com", DisplayedURL: "http://www.prezi.com"}
 
-	InitiateSlaveMapHandler(router, slaveMap)
+	InitiateSlaveMapHandler(slaveMap, router)
 
 	request, _ := http.NewRequest("GET", "/slavemap", nil)
 

@@ -2,7 +2,7 @@ package session
 
 import (
 	"github.com/gorilla/securecookie"
-	"master/master"
+	"network"
 	"net/http"
 	"website/hash"
 )
@@ -12,7 +12,7 @@ var cookieHandler = securecookie.New(
 	securecookie.GenerateRandomKey(32))
 
 var (
-	FILE_PATH_TO_USER_AUTHENTICATION_DATA = master.GetRelativeFilePath("./../hash/user_authentication_data.txt")
+	FILE_PATH_TO_USER_AUTHENTICATION_DATA = network.GetRelativeFilePath("./../hash/user_authentication_data.txt")
 	USER_AUTHENTICATION_MAP               = hash.InitializeUserAuthenticationMap(FILE_PATH_TO_USER_AUTHENTICATION_DATA)
 )
 
