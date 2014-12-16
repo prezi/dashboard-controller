@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"master/master"
-	"master/master/receiveAndSendRequestToSlave"
+	"master/master/delegateRequestToSlave"
 	"net/http"
 	"network"
 	"path"
@@ -71,13 +71,13 @@ func SubmitHandler(response_writer http.ResponseWriter, request *http.Request, s
 			sendConfirmationMessageToUser(response_writer, BadURLStatusMessage)
 			return
 		}
-		if nonExistentSlaves := receiveAndSendRequestToSlave.CheckIfRequestedSlavesAreConnected(slaveMap, slaveNamesToUpdate); nonExistentSlaves != ""{
+		if nonExistentSlaves := delegateRequestToSlave.CheckIfRequestedSlavesAreConnected(slaveMap, slaveNamesToUpdate); nonExistentSlaves != ""{
 			errorMessage := "Sorry, " + nonExistentSlaves + ` cannot be reached. Please refresh the page
 			 to see an updated list.`
 			sendConfirmationMessageToUser(response_writer, errorMessage)
 			return
 		}
-		sendURLToSlaves(slaveMap, slaveNamesToUpdate, URLToDisplay)
+		delegateRequestToSlave.ReceiveRequestAndSendToSlave(slaveMap, slaveNamesToUpdate, URLToDisplay)
 		statusMessage := "Slaves are updated"
 		sendConfirmationMessageToUser(response_writer, statusMessage)
 	}
@@ -94,12 +94,6 @@ func parseFromJSON(requestBody io.ReadCloser) (URLToDisplay string, slaveNames [
 	URLToDisplay = decodedFormData.URLToDisplay
 	slaveNames = decodedFormData.SlaveNames
 	return
-}
-
-func sendURLToSlaves(slaveMap map[string]master.Slave, slaveNames []string, URLToDisplay string) {
-	for _, slaveName := range slaveNames {
-		receiveAndSendRequestToSlave.ReceiveRequestAndSendToSlave(slaveMap, slaveName, URLToDisplay)
-	}
 }
 
 func sendConfirmationMessageToUser(response_writer http.ResponseWriter, statusMessage string) {
