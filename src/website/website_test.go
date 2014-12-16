@@ -56,13 +56,13 @@ func TestFormHandler(t *testing.T) {
 func TestStatusMessageForAvailableServer(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 	}))
-	statusMessage := isURLValid(testServer.URL)
+	statusMessage := master.IsURLValid(testServer.URL)
 
 	assert.Equal(t, true, statusMessage)
 }
 
 func TestStatusMessageForUnavailableServer(t *testing.T) {
-	statusMessage := isURLValid("")
+	statusMessage := master.IsURLValid("")
 
 	assert.Equal(t, false, statusMessage)
 }
@@ -95,33 +95,4 @@ func TestCreateConfirmationMessageWithWrongPath(t *testing.T) {
 	msg := "testmessage"
 	confirmationMessageJson, _ := createConfirmationMessage(msg)
 	assert.Equal(t, len(confirmationMessageJson), 0)
-}
-
-func TestCheckStatusCode(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-	}))
-
-	responseStatusCode := checkStatusCode(testServer.URL)
-	assert.Equal(t, 200, responseStatusCode)
-	responseStatusCode = checkStatusCode("")
-	assert.Equal(t, 0, responseStatusCode)
-}
-
-func TestCheckStatusCodeWithoutHttp(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-	}))
-
-	responseStatusCode := checkStatusCode(testServer.URL[7:])
-	assert.Equal(t, 200, responseStatusCode)
-}
-
-func TestIfURLIsValid(t *testing.T) {
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
-	}))
-
-	assert.True(t, isURLValid(testServer.URL))
-}
-
-func TestIfURLIsInvalid(t *testing.T) {
-	assert.False(t, isURLValid(""))
 }

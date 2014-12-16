@@ -66,7 +66,7 @@ func SubmitHandler(response_writer http.ResponseWriter, request *http.Request, s
 			sendConfirmationMessageToUser(response_writer, "Failed to parse JSON ")
 			return
 		}
-		if !isURLValid(URLToDisplay) {
+		if !master.IsURLValid(URLToDisplay) {
 			BadURLStatusMessage := "Sorry, " + URLToDisplay + " cannot be opened. Try a different one. Sadpanda."
 			sendConfirmationMessageToUser(response_writer, BadURLStatusMessage)
 			return
@@ -119,27 +119,4 @@ func createConfirmationMessage(statusMessage string) (jsonMessage []byte, err er
 		fmt.Println(err)
 	}
 	return
-}
-
-func checkStatusCode(urlToDisplay string) int {
-	if (len(urlToDisplay) <= 6) {
-		urlToDisplay = "http://" + urlToDisplay
-	} else if (string(urlToDisplay[0:6]) != "http:/" && string(urlToDisplay[0:6]) != "https:") {
-		urlToDisplay = "http://" + urlToDisplay
-	}
-
-	response, err := http.Head(urlToDisplay)
-	if err != nil {
-		return 0
-	} else {
-		return response.StatusCode
-	}
-}
-
-func isURLValid(url string) bool {
-	if 400 <= checkStatusCode(url) || checkStatusCode(url) == 0 {
-		return false
-	} else {
-		return true
-	}
 }
