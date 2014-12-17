@@ -13,7 +13,6 @@ var cookieHandler = securecookie.New(
 
 var (
 	FILE_PATH_TO_USER_AUTHENTICATION_DATA = master.GetRelativeFilePath("./../hash/user_authentication_data.txt")
-	USER_AUTHENTICATION_MAP               = hash.InitializeUserAuthenticationMap(FILE_PATH_TO_USER_AUTHENTICATION_DATA)
 )
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +21,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	redirectTarget := "/"
 
 	if name != "" && password != "" {
-		if hash.IsHashMatchInUserAuthenticationMap(name, password, USER_AUTHENTICATION_MAP) {
+		if hash.IsHashMatchInUserAuthenticationMap(name, password, hash.InitializeUserAuthenticationMap(FILE_PATH_TO_USER_AUTHENTICATION_DATA)) {
 			setSession(name, w)
 			redirectTarget = "/internal"
 		}
