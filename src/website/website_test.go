@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 )
 
+var FILE_PATH_TO_USER_AUTHENTICATION_DATA = master.GetRelativeFilePath("./user_authentication_data_for_testing.txt")
+
 type PostURLRequest struct {
 	DestinationSlaveName string
 	URLToLoadInBrowser   string

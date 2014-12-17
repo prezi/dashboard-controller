@@ -19,7 +19,6 @@ var (
 	JAVASCRIPTS_PATH = master.GetRelativeFilePath("assets/javascripts")
 	STYLESHEETS_PATH = master.GetRelativeFilePath("assets/stylesheets")
 	VIEWS_PATH       = master.GetRelativeFilePath("views")
-	FILE_PATH_TO_USER_AUTHENTICATION_DATA = master.GetRelativeFilePath("./hash/user_authentication_data.txt")
 )
 
 type StatusMessage struct {

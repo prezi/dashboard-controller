@@ -7,10 +7,10 @@ import (
 	"testing"
 )
 
-var FILE_PATH_TO_USER_AUTHENTICATION_DATA = master.GetRelativeFilePath("./user_authentication_data_for_testing.txt")
+var TEST_USER_AUTHENTICATION_DATA_PATH = master.GetRelativeFilePath("./user_authentication_data_for_testing.txt")
 
 func TestInitializeUserAuthenticationMap(t *testing.T) {
-	result := InitializeUserAuthenticationMap(FILE_PATH_TO_USER_AUTHENTICATION_DATA)
+	result := InitializeUserAuthenticationMap(TEST_USER_AUTHENTICATION_DATA_PATH)
 	expectedResult := map[string][16]byte{"lilo": CreateHashFromString("poke")}
 	assert.Equal(t, true, reflect.DeepEqual(result, expectedResult))
 }
