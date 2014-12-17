@@ -1,0 +1,19 @@
+#!/usr/bin/env false
+# -*- mode: sh -*-
+# this script is not to be run directly.
+
+# Jenkins script that initializes common shell variables and commands. #build#tests#deploy#idoc
+
+case $OSTYPE in
+    darwin*)
+        which greadlink >/dev/null || brew install coreutils
+        readlink=greadlink
+        mktemp=gmktemp
+        ;;
+    *)
+        readlink=readlink
+        mktemp=mktemp
+        ;;
+esac
+
+root=$($readlink -f $0 | xargs dirname | xargs dirname)
