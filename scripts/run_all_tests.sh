@@ -2,7 +2,6 @@
 
 set -xe
 
-for i in master slave network; do go test $i/...; done
-#website is not included here
+for i in master slave network website; do go test $i/...; done
 
 echo " !!SUCCESS!! tests are done"
