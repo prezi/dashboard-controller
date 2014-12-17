@@ -56,15 +56,12 @@ func TestFormHandler(t *testing.T) {
 func TestStatusMessageForAvailableServer(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 	}))
-	statusMessage := master.IsURLValid(testServer.URL)
 
-	assert.Equal(t, true, statusMessage)
+	assert.Equal(t, true, master.IsURLValid(testServer.URL))
 }
 
 func TestStatusMessageForUnavailableServer(t *testing.T) {
-	statusMessage := master.IsURLValid("")
-
-	assert.Equal(t, false, statusMessage)
+	assert.Equal(t, false, master.IsURLValid(""))
 }
 
 func TestSendConfirmationMessageToUser(t *testing.T) {

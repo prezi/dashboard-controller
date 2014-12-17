@@ -61,7 +61,7 @@ func getOS() (OS string) {
 	} else {
 		kernel = strings.Split(operatingSystemName, " ")[0]
 	}
-	fmt.Println("\nKernel detected: ", kernel)
+	fmt.Println("Kernel detected: ", kernel)
 
 	switch kernel {
 	case "Linux":
@@ -76,8 +76,8 @@ func getOS() (OS string) {
 		fmt.Println("ERROR: Failed to detect operating system.")
 		fmt.Println("Aborting program.")
 		os.Exit(1)
-	} else {
-		fmt.Printf("Operating system detected: %v\n", OS)
 	}
+
+	fmt.Printf("Operating system detected: %v\n", OS)
 	return OS
 }

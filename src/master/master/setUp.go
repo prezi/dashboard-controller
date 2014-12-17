@@ -50,9 +50,6 @@ func checkStatusCode(urlToDisplay string) int {
 }
 
 func IsURLValid(url string) bool {
-	if 400 <= checkStatusCode(url) || checkStatusCode(url) == 0 {
-		return false
-	} else {
-		return true
-	}
+	if 400 <= checkStatusCode(url) || checkStatusCode(url) == 0 { return false }
+	return true
 }
