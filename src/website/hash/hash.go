@@ -2,15 +2,19 @@ package hash
 
 import (
 	"crypto/md5"
+	"fmt"
 	"io/ioutil"
-	"network"
+	"os"
 	"reflect"
 	"strings"
 )
 
 func InitializeUserAuthenticationMap(filePathToUserAuthenticationTxt string) (userAuthenticationMap map[string][16]byte) {
 	content, err := ioutil.ReadFile(filePathToUserAuthenticationTxt)
-	network.ErrorHandler(err, "Error encountered while parsing user authentication data: %v")
+	if err != nil {
+		fmt.Println("User authentication data not found.\n", err)
+		os.Exit(1)
+	}
 	username, password := GetUserNameAndPasswordFromFile(string(content))
 	userAuthenticationMap = make(map[string][16]byte)
 	userAuthenticationMap[username] = CreateHashFromString(password)
