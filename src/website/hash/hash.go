@@ -10,6 +10,7 @@ import (
 )
 
 func InitializeUserAuthenticationMap(filePathToUserAuthenticationTxt string) (userAuthenticationMap map[string][16]byte) {
+	fmt.Println(filePathToUserAuthenticationTxt)
 	content, err := ioutil.ReadFile(filePathToUserAuthenticationTxt)
 	if err != nil {
 		fmt.Println("User authentication data not found.\n", err)
