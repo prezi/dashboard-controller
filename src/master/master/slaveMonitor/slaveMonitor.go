@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"network"
 	"time"
+	"os/exec"
 )
 
 func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]master.Slave) (updatedSlaveMap map[string]master.Slave) {
@@ -16,6 +17,7 @@ func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]master.Sla
 		updateSlaveHeartbeat(slaveMap, slaveAddress, slaveName)
 	} else {
 		addNewSlaveToMap(slaveMap, slaveAddress, slaveName)
+		if (network.GetOS() == "Linux") { addNewSlaveToIPTables(slaveAddress) }
 	}
 	return slaveMap
 }
@@ -57,6 +59,16 @@ func addNewSlaveToMap(slaveMap map[string]master.Slave, slaveAddress, slaveName 
 	fmt.Printf("Slave added with name \"%v\", URL %v.\n\n", slaveName, slaveAddress)
 	slaveMap[slaveName] = master.Slave{URL: slaveAddress, Heartbeat: time.Now(), PreviouslyDisplayedURL: "http://google.com", DisplayedURL: "http://google.com"}
 	fmt.Println(slaveMap[slaveName])
+}
+
+var addNewSlaveToIPTables = func(slaveAddress string) {
+	proxyPort := master.GetProxyPort()
+
+	err := exec.Command("sudo", "iptables", "-A", "INPUT", "-s", slaveAddress, "-j", "ACCEPT", "-m", "tcp", "-p", "tcp", "--dport", proxyPort).Run()
+	if err != nil {
+	fmt.Printf("Error adding slave to iptables: %v\n", err)
+	}
+	fmt.Println("Slave added to proxy IP tables.")
 }
 
 func MonitorSlaves(timeInterval int, slaveMap map[string]master.Slave) {

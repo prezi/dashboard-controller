@@ -17,8 +17,3 @@ func TestSetUp(t *testing.T) {
 func TestAddProtocolAndPortToIP(t *testing.T) {
 	assert.Equal(t, "http://10.0.0.126:1234", addProtocolAndPortToIP("10.0.0.126", "1234"))
 }
-
-func TestGetOS(t *testing.T) {
-	OS := getOS()
-	assert.IsType(t, "Some OS Name", OS)
-}

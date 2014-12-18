@@ -22,7 +22,6 @@ func main() {
 			case "OS X":
 				OSXBrowserHandler.BrowserHandler(w, r)
 			}
-//		browserProcess = slave.BrowserHandler(w, r, OS, browserProcess)
 	})
 	http.HandleFunc("/receive_killsignal", func(_ http.ResponseWriter, request *http.Request) {
 		if "die" == request.FormValue("message") {
