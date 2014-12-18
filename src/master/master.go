@@ -15,6 +15,8 @@ var (
 )
 
 func main() {
+	_, _ = master.SetUpProxy()
+
 	slaveMap := master.GetSlaveMap()
 	router := mux.NewRouter()
 	website.InitiateWebsiteHandlers(slaveMap, router)
