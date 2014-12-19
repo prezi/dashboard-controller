@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"website"
 	"github.com/gorilla/mux"
-	"network"
 )
 
 var (
@@ -16,10 +15,7 @@ var (
 )
 
 func main() {
-	if (network.GetOS() == "Linux") {
-		master.FlushIPTables()
-		master.AcceptResponseFromDNSServer()
-	}
+	slaveMonitor.InitializeIPTables()
 	slaveMap := master.GetSlaveMap()
 	router := mux.NewRouter()
 	website.InitiateWebsiteHandlers(slaveMap, router)
