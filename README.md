@@ -1,4 +1,4 @@
-Dashboard Controller 
+Astapor
 ====================
 
 Contents
@@ -10,18 +10,20 @@ Contents
 Introduction
 ------------------
 
-Use the Dashboard Controller program to remotely open urls on browser windows.
+Use the [Astapor](http://gameofthrones.wikia.com/wiki/Astapor) program to remotely open urls on browser windows.
 
-Our implemented system uses [Google Chrome](http://www.google.com/chrome/) web browser. 
-Slave runs on Raspberry Pis or Mac Minis connected to monitors. 
+Slave runs on Raspberry Pis or Apple Mac Minis connected to monitors. 
 The master runs on one Raspberry Pi or Apple Mac Mini. 
-
 Together, they make a delicious Apple-Raspberry-Pi system. 
 
 For more details, please refer to our [GitHub wiki](https://github.com/prezi/dashboard-controller/wiki).
 
 Architecture
 ------------------
+
+<p align="center">
+  <img src="../master/README_images/master_slave_architecture.png?raw=true)"/>
+</p>
 
  - slave 
   - Receives url from master and loads url in a browser. 
@@ -30,6 +32,13 @@ Architecture
   - Receives JSON from the user input.
   - Parses the input and passes JSON to proper slave. 
   - Compatible with OS X. 
+
+Alternatively, the slave can be extended with a proxy to open sites that require user authentication. 
+
+
+<p align="center">
+  <img src="../master/README_images/proxy_architecture.png?raw=true)"/>
+</p>
 
 Set Up
 ------------------
@@ -72,5 +81,6 @@ Submitting a URL
 Access the website running on your localhost. Fill in the text fields, submit, and see your url post on the indicated slave. :) 
 
 <p align="center">
+  <img src="../master/README_images/giphy.gif?raw=true" alt="nyan nyan nyan"/>
   <br>Enjoy!</br>
 </p>
