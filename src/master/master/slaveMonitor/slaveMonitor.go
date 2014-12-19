@@ -8,6 +8,7 @@ import (
 	"network"
 	"time"
 	"os/exec"
+	"strings"
 )
 
 func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]master.Slave) (updatedSlaveMap map[string]master.Slave) {
@@ -17,7 +18,7 @@ func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]master.Sla
 		updateSlaveHeartbeat(slaveMap, slaveAddress, slaveName)
 	} else {
 		addNewSlaveToMap(slaveMap, slaveAddress, slaveName)
-		if (network.GetOS() == "Linux") { addNewSlaveToIPTables(slaveAddress) }
+		if (network.GetOS() == "Linux") { addNewSlaveToIPTables(splitProtocolAndPortFromIP(slaveAddress)) }
 	}
 	return slaveMap
 }
@@ -61,15 +62,23 @@ func addNewSlaveToMap(slaveMap map[string]master.Slave, slaveAddress, slaveName 
 	fmt.Println(slaveMap[slaveName])
 }
 
-var addNewSlaveToIPTables = func(slaveAddress string) {
+var addNewSlaveToIPTables = func(slaveIP string) (error error) {
 	proxyPort := master.GetProxyPort()
 
-	err := exec.Command("sudo", "iptables", "-A", "INPUT", "-s", slaveAddress, "-j", "ACCEPT", "-m", "tcp", "-p", "tcp", "--dport", proxyPort).Run()
-	if err != nil {
-	fmt.Printf("Error adding slave to iptables: %v\n", err)
+	error = exec.Command("sudo", "iptables", "-A", "INPUT", "-s", slaveIP, "-j", "ACCEPT", "-m", "tcp", "-p", "tcp", "--dport", proxyPort).Run()
+	if error != nil {
+	fmt.Printf("Error adding slave to iptables: %v\n", error)
 	}
 	fmt.Println("Slave added to proxy IP tables.")
+	return
 }
+
+func splitProtocolAndPortFromIP(address string) (ip string) {
+	host, _, _ := net.SplitHostPort(address)
+	ip = strings.TrimPrefix(host, "http://")
+	return
+}
+
 
 func MonitorSlaves(timeInterval int, slaveMap map[string]master.Slave) {
 	timer := time.Tick(time.Duration(timeInterval) * time.Second)
@@ -83,6 +92,7 @@ func removeDeadSlaves(deadTime int, slaveMap map[string]master.Slave) {
 	if len(slavesToRemove) > 0 {
 		fmt.Printf("\nREMOVING DEAD SLAVES: %v\n", slavesToRemove)
 		for _, deadSlaveName := range slavesToRemove {
+			if (network.GetOS() == "Linux") { removeDeadSlaveFromIPTables(splitProtocolAndPortFromIP(slaveMap[deadSlaveName].URL)) }
 			delete(slaveMap, deadSlaveName)
 		}
 		printSlaveNamesInMap(slaveMap)
@@ -98,6 +108,17 @@ func getDeadSlaves(deadTime int, slaveMap map[string]master.Slave) (deadSlaves [
 			deadSlaves = append(deadSlaves, slaveName)
 		}
 	}
+	return
+}
+
+func removeDeadSlaveFromIPTables(slaveIP string) (error error) {
+	proxyPort := master.GetProxyPort()
+
+	error = exec.Command("sudo", "iptables", "-D", "INPUT", "-s", slaveIP, "-j", "ACCEPT", "-m", "tcp", "-p", "tcp", "--dport", proxyPort).Run()
+	if error != nil {
+		fmt.Printf("Error deleting slave from iptables: %v\n", error)
+	}
+	fmt.Println("Slave deleted from iptables.")
 	return
 }
 
