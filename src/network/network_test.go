@@ -18,3 +18,7 @@ func TestCreateFormWithInitialValues(t *testing.T) {
 	form := CreateFormWithInitialValues(map[string]string{"url": urlToDisplay})
 	assert.Equal(t, form, url.Values{"url": []string{"some valid url"}})
 }
+
+func TestGetOS(t *testing.T) {
+	assert.IsType(t, "Some OS Name", GetOS())
+}

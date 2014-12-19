@@ -6,6 +6,8 @@ import (
 	"time"
 	"sort"
 	"net/http"
+	"fmt"
+	"flag"
 )
 
 type Slave struct {
@@ -52,4 +54,16 @@ func checkStatusCode(urlToDisplay string) int {
 func IsURLValid(url string) bool {
 	if 400 <= checkStatusCode(url) || checkStatusCode(url) == 0 { return false }
 	return true
+}
+
+func GetProxyPort() (proxyPort string) {
+	proxyPort = configFlags()
+	fmt.Printf("Registered proxy on port: %v\n", proxyPort)
+	return
+}
+
+func configFlags() (proxyPort string) {
+	flag.StringVar(&proxyPort, "proxyPort", "8080", "proxy port")
+	flag.Parse()
+	return
 }

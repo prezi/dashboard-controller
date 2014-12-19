@@ -15,6 +15,7 @@ var (
 )
 
 func main() {
+	slaveMonitor.InitializeIPTables()
 	slaveMap := master.GetSlaveMap()
 	router := mux.NewRouter()
 	website.InitiateWebsiteHandlers(slaveMap, router)
