@@ -6,7 +6,7 @@
 
 case $OSTYPE in
     darwin*)
-        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        export PATH=$PATH:/usr/local/bin
         which greadlink >/dev/null || brew install coreutils
         readlink=greadlink
         mktemp=gmktemp
