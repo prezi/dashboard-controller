@@ -43,10 +43,6 @@ Alternatively, the slave can be extended with a proxy to open sites that require
   - If request is for a domain that requires authentication, attaches a authentication header to the request.
   - Sends website content back to slave. 
 
-<p align="center">
-  <img src="../master/README_images/proxy_architecture.png?raw=true)"/>
-</p>
-
 Alternatively, the slave can be extended with a proxy to open sites that require user authentication. 
 
 
