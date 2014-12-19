@@ -6,7 +6,7 @@
 
 case $OSTYPE in
     darwin*)
-        export PATH=$PATH:/usr/local/bin
+        export PATH=$PATH:/usr/local/bin:/usr/local/go/bin
         which greadlink >/dev/null || brew install coreutils
         readlink=greadlink
         mktemp=gmktemp
