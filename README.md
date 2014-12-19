@@ -25,13 +25,27 @@ Architecture
   <img src="../master/README_images/master_slave_architecture.png?raw=true)"/>
 </p>
 
+ - website and HipChat bot
+  - Sends user input as JSON in a POST request to master.
+ - master
+  - Receives JSON from the website or HipChat bot. 
+  - Parses the input and passes JSON to proper slave. 
+  - Compatible with OS X. 
  - slave 
   - Receives url from master and loads url in a browser. 
   - Compatible with OS X and Linux operating systems with Google Chrome installed. 
- - master
-  - Receives JSON from the user input.
-  - Parses the input and passes JSON to proper slave. 
-  - Compatible with OS X. 
+
+
+Alternatively, the slave can be extended with a proxy to open sites that require user authentication. 
+
+ - proxy ([mitmproxy](https://mitmproxy.org/))
+  - Receives and forwards GET request from slave. 
+  - If request is for a domain that requires authentication, attaches a authentication header to the request.
+  - Sends website content back to slave. 
+
+<p align="center">
+  <img src="../master/README_images/proxy_architecture.png?raw=true)"/>
+</p>
 
 Alternatively, the slave can be extended with a proxy to open sites that require user authentication. 
 
