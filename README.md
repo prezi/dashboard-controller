@@ -1,6 +1,10 @@
 Astapor
 ====================
 
+<p align="center">
+  <img src="../master/README_images/Astapor_webpage.png?raw=true)"/>
+</p>
+
 Contents
  - [Introduction](https://github.com/prezi/dashboard-controller#introduction)
  - [Architecture](https://github.com/prezi/dashboard-controller#architecture)
@@ -10,7 +14,7 @@ Contents
 Introduction
 ------------------
 
-Use the [Astapor](http://gameofthrones.wikia.com/wiki/Astapor) program to remotely open urls on browser windows.
+Use the Astapor program to remotely open URLs on browser windows.
 
 Slave runs on Raspberry Pis or Apple Mac Minis connected to monitors. 
 The master runs on one Raspberry Pi or Apple Mac Mini. 
@@ -25,25 +29,23 @@ Architecture
   <img src="../master/README_images/master_slave_architecture.png?raw=true)"/>
 </p>
 
- - website and HipChat bot
+ - website and/or HipChat bot
   - Sends user input as JSON in a POST request to master.
  - master
   - Receives JSON from the website or HipChat bot. 
   - Parses the input and passes JSON to proper slave. 
   - Compatible with OS X. 
  - slave 
-  - Receives url from master and loads url in a browser. 
+  - Receives URL from master and loads URL in a browser. 
   - Compatible with OS X and Linux operating systems with Google Chrome installed. 
 
 
 Alternatively, the slave can be extended with a proxy to open sites that require user authentication. 
 
  - proxy ([mitmproxy](https://mitmproxy.org/))
-  - Receives and forwards GET request from slave. 
-  - If request is for a domain that requires authentication, attaches a authentication header to the request.
+  - Receives and forwards all GET requests from slave. 
+  - If request is for a domain that requires authentication, attaches the proper authentication header to the request.
   - Sends website content back to slave. 
-
-Alternatively, the slave can be extended with a proxy to open sites that require user authentication. 
 
 
 <p align="center">
@@ -88,7 +90,7 @@ The slave will automatically map itself to the master and periodically emit hear
 Submitting a URL
 ------------------
 
-Access the website running on your localhost. Fill in the text fields, submit, and see your url post on the indicated slave. :) 
+Access the website running on your localhost. Fill in the text fields, submit, and see your URL post on the indicated slave. :) 
 
 <p align="center">
   <img src="../master/README_images/giphy.gif?raw=true" alt="nyan nyan nyan"/>

@@ -3,9 +3,9 @@ package slave
 import (
 	"flag"
 	"fmt"
-	"os"
 	"net"
 	"network"
+	"os"
 )
 
 const (
