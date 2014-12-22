@@ -67,7 +67,7 @@ func TestStatusMessageForUnavailableServer(t *testing.T) {
 }
 
 func TestSubmitHandlerWithEmptyREsponse(t *testing.T) {
-	VIEWS_PATH = master.GetRelativeFilePath("views")
+	VIEWS_PATH = network.GetRelativeFilePath("views")
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		SubmitHandler(w, request, map[string]master.Slave{})
 	}))
@@ -98,7 +98,7 @@ func TestSubmitHandlerWithWrongHttp(t *testing.T) {
 		SlaveNames []string
 	}
 
-	VIEWS_PATH = master.GetRelativeFilePath("views")
+	VIEWS_PATH = network.GetRelativeFilePath("views")
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		SubmitHandler(w, request, map[string]master.Slave{})
 	}))
@@ -124,7 +124,7 @@ func TestSubmitHandlerWithNonExistentSlave(t *testing.T) {
 		SlaveNames []string
 	}
 
-	VIEWS_PATH = master.GetRelativeFilePath("views")
+	VIEWS_PATH = network.GetRelativeFilePath("views")
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		SubmitHandler(w, request, map[string]master.Slave{})
 	}))
@@ -156,7 +156,7 @@ func TestSubmitHandler(t *testing.T) {
 		receivedUrl = request.PostFormValue("url")
 	}))
 
-	VIEWS_PATH = master.GetRelativeFilePath("views")
+	VIEWS_PATH = network.GetRelativeFilePath("views")
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		SubmitHandler(w, request, map[string]master.Slave{"a":master.Slave{
 			URL : testSlave.URL,
