@@ -76,7 +76,6 @@ func TestReceiveSlaveHeartbeatsWithDifferentAddress(t *testing.T) {
 func TestReceiveSlaveHeartbeatsNewSlaveName(t *testing.T) {
 	testSlaveMap := make(map[string]master.Slave)
 	exists := false
-	addNewSlaveToIPTables = func(slaveIP string) (error error) { return }
 
 	testMaster := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, request *http.Request) {
 		ReceiveSlaveHeartbeat(request, testSlaveMap)

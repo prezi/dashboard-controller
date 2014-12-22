@@ -1,13 +1,14 @@
 package main
 
 import (
+	"github.com/gorilla/mux"
 	"log"
 	"master/master"
-	"master/master/slaveMonitor"
 	"master/master/slaveMapHandler"
+	"master/master/slaveMonitor"
 	"net/http"
+	"proxy"
 	"website"
-	"github.com/gorilla/mux"
 )
 
 var (
@@ -15,7 +16,7 @@ var (
 )
 
 func main() {
-	slaveMonitor.InitializeIPTables()
+	proxy.InitializeIPTables()
 	slaveMap := master.GetSlaveMap()
 	router := mux.NewRouter()
 	website.InitiateWebsiteHandlers(slaveMap, router)
@@ -23,7 +24,7 @@ func main() {
 		slaveMap = slaveMonitor.ReceiveSlaveHeartbeat(r, slaveMap)
 	})
 	router.HandleFunc("/get_slave_binary", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w,r,SLAVE_BINARY_PATH)
+		http.ServeFile(w, r, SLAVE_BINARY_PATH)
 	})
 
 	slaveMapHandler.InitiateSlaveMapHandler(router, slaveMap)
