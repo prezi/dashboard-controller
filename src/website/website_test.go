@@ -8,6 +8,8 @@ import (
 	"master/master"
 	"strings"
 	"io/ioutil"
+	"encoding/json"
+	"bytes"
 )
 
 var FILE_PATH_TO_USER_AUTHENTICATION_DATA = master.GetRelativeFilePath("./user_authentication_data_for_testing.txt")
@@ -64,6 +66,21 @@ func TestStatusMessageForAvailableServer(t *testing.T) {
 
 func TestStatusMessageForUnavailableServer(t *testing.T) {
 	assert.Equal(t, false, master.IsURLValid(""))
+}
+
+func TestParseFromJSON(t *testing.T) {
+	type FormData struct {
+		URLToDisplay   string
+		SlaveNames []string
+	}
+	testSlaveList := []string{"a", "b", "c"}
+	testFormData := FormData{"testurl", testSlaveList}
+	testJSON, err := json.Marshal(testFormData)
+
+	returnedURL, returnedSlaveList, err := parseFromJSON(ioutil.NopCloser(bytes.NewReader(testJSON)))
+	assert.Equal(t, "testurl", returnedURL)
+	assert.Equal(t, []string{"a", "b", "c"}, returnedSlaveList)
+	assert.Nil(t, err)
 }
 
 func TestSendConfirmationMessageToUser(t *testing.T) {
