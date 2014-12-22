@@ -3,8 +3,10 @@ package network
 import (
 	"fmt"
 	"net/url"
-	"os/exec"
 	"os"
+	"os/exec"
+	"path"
+	"runtime"
 	"strings"
 )
 
@@ -20,6 +22,12 @@ func ErrorHandler(err error, message string) (errorOccurred bool) {
 		return true
 	}
 	return false
+}
+
+func GetRelativeFilePath(relativeFileName string) (filePath string) {
+	_, filename, _, _ := runtime.Caller(1)
+	filePath = path.Join(path.Dir(filename), relativeFileName)
+	return
 }
 
 func CreateFormWithInitialValues(formEntries map[string]string) (form url.Values) {

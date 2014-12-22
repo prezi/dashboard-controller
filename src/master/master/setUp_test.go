@@ -2,16 +2,10 @@ package master
 
 import (
 	"github.com/stretchr/testify/assert"
-	"testing"
 	"net/http"
 	"net/http/httptest"
+	"testing"
 )
-
-func TestGetRelativeFilePath(t *testing.T) {
-	filepath := GetRelativeFilePath("assets/images")
-	assert.IsType(t, "some/filepath", filepath)
-}
-
 
 func TestCheckStatusCode(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {

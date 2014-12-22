@@ -5,20 +5,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"master/master"
 	"master/master/delegateRequestToSlave"
 	"net/http"
 	"network"
 	"path"
 	"website/session"
-	"io"
 )
 
 var (
-	IMAGES_PATH      = master.GetRelativeFilePath("assets/images")
-	JAVASCRIPTS_PATH = master.GetRelativeFilePath("assets/javascripts")
-	STYLESHEETS_PATH = master.GetRelativeFilePath("assets/stylesheets")
-	VIEWS_PATH       = master.GetRelativeFilePath("views")
+	IMAGES_PATH      = network.GetRelativeFilePath("assets/images")
+	JAVASCRIPTS_PATH = network.GetRelativeFilePath("assets/javascripts")
+	STYLESHEETS_PATH = network.GetRelativeFilePath("assets/stylesheets")
+	VIEWS_PATH       = network.GetRelativeFilePath("views")
 )
 
 type StatusMessage struct {
@@ -71,7 +71,7 @@ func SubmitHandler(response_writer http.ResponseWriter, request *http.Request, s
 			sendConfirmationMessageToUser(response_writer, BadURLStatusMessage)
 			return
 		}
-		if nonExistentSlaves := delegateRequestToSlave.CheckIfRequestedSlavesAreConnected(slaveMap, slaveNamesToUpdate); nonExistentSlaves != ""{
+		if nonExistentSlaves := delegateRequestToSlave.CheckIfRequestedSlavesAreConnected(slaveMap, slaveNamesToUpdate); nonExistentSlaves != "" {
 			errorMessage := "Sorry, " + nonExistentSlaves + ` cannot be reached. Please refresh the page
 			 to see an updated list.`
 			sendConfirmationMessageToUser(response_writer, errorMessage)
@@ -85,8 +85,8 @@ func SubmitHandler(response_writer http.ResponseWriter, request *http.Request, s
 
 func parseFromJSON(requestBody io.ReadCloser) (URLToDisplay string, slaveNames []string, err error) {
 	type FormData struct {
-		URLToDisplay   string
-		SlaveNames []string
+		URLToDisplay string
+		SlaveNames   []string
 	}
 	JSONFormData := json.NewDecoder(requestBody)
 	var decodedFormData FormData

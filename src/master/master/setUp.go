@@ -1,13 +1,11 @@
 package master
 
 import (
-	"path"
-	"runtime"
-	"time"
-	"sort"
-	"net/http"
-	"fmt"
 	"flag"
+	"fmt"
+	"net/http"
+	"sort"
+	"time"
 )
 
 type Slave struct {
@@ -30,16 +28,10 @@ func GetSlaveNamesFromMap(slaveMap map[string]Slave) (slaveNames []string) {
 	return
 }
 
-func GetRelativeFilePath(relativeFileName string) (filePath string) {
-	_, filename, _, _ := runtime.Caller(1)
-	filePath = path.Join(path.Dir(filename), relativeFileName)
-	return
-}
-
 func checkStatusCode(urlToDisplay string) int {
-	if (len(urlToDisplay) <= 6) {
+	if len(urlToDisplay) <= 6 {
 		urlToDisplay = "http://" + urlToDisplay
-	} else if (string(urlToDisplay[0:6]) != "http:/" && string(urlToDisplay[0:6]) != "https:") {
+	} else if string(urlToDisplay[0:6]) != "http:/" && string(urlToDisplay[0:6]) != "https:" {
 		urlToDisplay = "http://" + urlToDisplay
 	}
 
@@ -52,7 +44,9 @@ func checkStatusCode(urlToDisplay string) int {
 }
 
 func IsURLValid(url string) bool {
-	if 400 <= checkStatusCode(url) || checkStatusCode(url) == 0 { return false }
+	if 400 <= checkStatusCode(url) || checkStatusCode(url) == 0 {
+		return false
+	}
 	return true
 }
 

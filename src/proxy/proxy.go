@@ -14,6 +14,11 @@ var (
 	PROXY_PORT = master.GetProxyPort()
 )
 
+func StartProxy() {
+	err := exec.Command("mitmproxy", "-s", "proxyConfig.py").Run()
+	network.ErrorHandler(err, "Error starting mitmproxy: %v\n")
+}
+
 func InitializeIPTables() {
 	if OS == "Linux" {
 		FlushIPTables()

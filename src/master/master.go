@@ -7,12 +7,13 @@ import (
 	"master/master/slaveMapHandler"
 	"master/master/slaveMonitor"
 	"net/http"
+	"network"
 	"proxy"
 	"website"
 )
 
 var (
-	SLAVE_BINARY_PATH = master.GetRelativeFilePath("../../bin/slave")
+	SLAVE_BINARY_PATH = network.GetRelativeFilePath("../../bin/slave")
 )
 
 func main() {

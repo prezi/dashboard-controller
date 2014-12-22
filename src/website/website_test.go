@@ -1,26 +1,24 @@
 package website
 
 import (
+	"bytes"
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"master/master"
 	"net/http"
 	"net/http/httptest"
-	"testing"
-	"master/master"
+	"network"
 	"strings"
-	"io/ioutil"
-	"encoding/json"
-	"bytes"
+	"testing"
 )
-
-var FILE_PATH_TO_USER_AUTHENTICATION_DATA = master.GetRelativeFilePath("./user_authentication_data_for_testing.txt")
 
 type PostURLRequest struct {
 	DestinationSlaveName string
 	URLToLoadInBrowser   string
 }
 
-func TestIndexPageHandler(t * testing.T) {
-	VIEWS_PATH = master.GetRelativeFilePath("views")
+func TestIndexPageHandler(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		IndexPageHandler(w, request)
 	}))
@@ -30,8 +28,8 @@ func TestIndexPageHandler(t * testing.T) {
 	assert.Equal(t, "text/html; charset=utf-8", resp.Header.Get("Content-type"))
 }
 
-func TestIndexPageHandlerWithWrongPath(t * testing.T) {
-	VIEWS_PATH = master.GetRelativeFilePath("dummy")
+func TestIndexPageHandlerWithWrongPath(t *testing.T) {
+	VIEWS_PATH = network.GetRelativeFilePath("dummy")
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		IndexPageHandler(w, request)
 	}))
@@ -43,7 +41,7 @@ func TestIndexPageHandlerWithWrongPath(t * testing.T) {
 func sendGetToFormHandler(URL string) int {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		request.URL.Path = URL
-		testSlaveNames := []string {"a","b"}
+		testSlaveNames := []string{"a", "b"}
 		FormHandler(w, request, testSlaveNames)
 	}))
 
@@ -70,8 +68,8 @@ func TestStatusMessageForUnavailableServer(t *testing.T) {
 
 func TestParseFromJSON(t *testing.T) {
 	type FormData struct {
-		URLToDisplay   string
-		SlaveNames []string
+		URLToDisplay string
+		SlaveNames   []string
 	}
 	testSlaveList := []string{"a", "b", "c"}
 	testFormData := FormData{"testurl", testSlaveList}
@@ -84,7 +82,7 @@ func TestParseFromJSON(t *testing.T) {
 }
 
 func TestSendConfirmationMessageToUser(t *testing.T) {
-	VIEWS_PATH = master.GetRelativeFilePath("views")
+	VIEWS_PATH = network.GetRelativeFilePath("views")
 	testMessage := "testmessage"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		sendConfirmationMessageToUser(w, testMessage)
@@ -92,14 +90,13 @@ func TestSendConfirmationMessageToUser(t *testing.T) {
 
 	client := &http.Client{}
 	resp, _ := client.Get(testServer.URL)
-	respBodyContents, _:= ioutil.ReadAll(resp.Body)
+	respBodyContents, _ := ioutil.ReadAll(resp.Body)
 	respBodyString := string(respBodyContents[:])
 	assert.True(t, strings.Contains(respBodyString, testMessage))
-	assert.Equal(t,"application/json", resp.Header.Get("Content-type"))
+	assert.Equal(t, "application/json", resp.Header.Get("Content-type"))
 }
 
 func TestCreateConfirmationMessage(t *testing.T) {
-	VIEWS_PATH = master.GetRelativeFilePath("views")
 	msg := "testmessage"
 	confirmationMessageJson, _ := createConfirmationMessage(msg)
 	confirmationMessageJsonString := string(confirmationMessageJson[:])
@@ -107,7 +104,7 @@ func TestCreateConfirmationMessage(t *testing.T) {
 }
 
 func TestCreateConfirmationMessageWithWrongPath(t *testing.T) {
-	VIEWS_PATH = master.GetRelativeFilePath("dummy")
+	VIEWS_PATH = network.GetRelativeFilePath("dummy")
 	msg := "testmessage"
 	confirmationMessageJson, _ := createConfirmationMessage(msg)
 	assert.Equal(t, len(confirmationMessageJson), 0)
