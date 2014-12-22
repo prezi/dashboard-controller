@@ -15,6 +15,11 @@ type Slave struct {
 	DisplayedURL           string
 }
 
+const (
+	DEFAULT_PROXY_IP_ADDRESS = "localhost"
+	DEFAULT_PROXY_PORT       = "8080"
+)
+
 func GetSlaveMap() (slaveMap map[string]Slave) {
 	slaveMap = make(map[string]Slave)
 	return
@@ -50,14 +55,16 @@ func IsURLValid(url string) bool {
 	return true
 }
 
-func GetProxyPort() (proxyPort string) {
-	proxyPort = configFlags()
-	fmt.Printf("Registered proxy on port: %v\n", proxyPort)
-	return
+func GetProxyURL() (proxyURL string) {
+	proxyIP, proxyPort := configFlags()
+	proxyURL = "http://" + proxyIP + ":" + proxyPort
+	fmt.Printf("Proxy registered at %v", proxyURL)
+	return proxyURL
 }
 
-func configFlags() (proxyPort string) {
-	flag.StringVar(&proxyPort, "proxyPort", "8080", "proxy port")
+func configFlags() (proxyIP, proxyPort string) {
+	flag.StringVar(&proxyIP, "proxyIP", DEFAULT_PROXY_IP_ADDRESS, "proxy address")
+	flag.StringVar(&proxyPort, "proxyPort", DEFAULT_PROXY_PORT, "proxy port")
 	flag.Parse()
 	return
 }

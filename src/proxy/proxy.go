@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"fmt"
-	"master/master"
 	"network"
 	"os/exec"
 )
@@ -11,15 +10,16 @@ import (
 
 var (
 	OS         = network.GetOS() // TODO: make all these switch cases, if we ever program for OS X platform
-	PROXY_PORT = master.GetProxyPort()
+	PROXY_PORT = "8080"          // mitmproxy runs on port 8080
 )
 
-func StartProxy() {
+func Start() {
 	err := exec.Command("mitmproxy", "-s", "proxyConfig.py").Run()
 	network.ErrorHandler(err, "Error starting mitmproxy: %v\n")
+	initializeIPTables()
 }
 
-func InitializeIPTables() {
+func initializeIPTables() {
 	if OS == "Linux" {
 		FlushIPTables()
 		AcceptResponseFromDNSServer()

@@ -36,6 +36,6 @@ func TestIfURLIsInvalid(t *testing.T) {
 	assert.False(t, IsURLValid(""))
 }
 
-func TestDefaultProxyPort(t *testing.T) {
-	assert.Equal(t, "8080", GetProxyPort())
+func TestDefaultGetProxyURL(t *testing.T) {
+	assert.Equal(t, "http://localhost:8080", GetProxyURL())
 }

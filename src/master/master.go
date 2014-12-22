@@ -17,7 +17,7 @@ var (
 )
 
 func main() {
-	proxy.InitializeIPTables()
+	proxy.Start()
 	slaveMap := master.GetSlaveMap()
 	router := mux.NewRouter()
 	website.InitiateWebsiteHandlers(slaveMap, router)
