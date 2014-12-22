@@ -3,6 +3,7 @@ package slaveMonitor
 import (
 	"fmt"
 	"master/master"
+	"master/master/proxyMonitor"
 	"net"
 	"net/http"
 	"network"
@@ -11,12 +12,6 @@ import (
 	"time"
 )
 
-// TODO: Check if proxyIP flag is given by user.
-// Assume there is a proxy if user specifies proxyIP. If not, assume no proxy.
-// Alternatively, have proxy send heartbeats to master. Then IS_USING_PROXY will be a var.
-
-const IS_USING_PROXY = true
-
 func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]master.Slave) (updatedSlaveMap map[string]master.Slave) {
 	slaveName, slaveAddress := processSlaveHeartbeatRequest(request)
 
@@ -24,7 +19,7 @@ func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]master.Sla
 		updateSlaveHeartbeat(slaveMap, slaveAddress, slaveName)
 	} else {
 		addNewSlaveToMap(slaveMap, slaveAddress, slaveName)
-		if IS_USING_PROXY {
+		if proxyMonitor.IS_USING_PROXY {
 			manageIPTables.AddNewSlaveToIPTables(splitProtocolAndPortFromIP(slaveAddress))
 		}
 	}
@@ -88,7 +83,7 @@ func removeDeadSlaves(deadTime int, slaveMap map[string]master.Slave) {
 	if len(slavesToRemove) > 0 {
 		fmt.Printf("\nREMOVING DEAD SLAVES: %v\n", slavesToRemove)
 		for _, deadSlaveName := range slavesToRemove {
-			if IS_USING_PROXY {
+			if proxyMonitor.IS_USING_PROXY {
 				manageIPTables.RemoveDeadSlaveFromIPTables(splitProtocolAndPortFromIP(slaveMap[deadSlaveName].URL))
 			}
 			delete(slaveMap, deadSlaveName)
