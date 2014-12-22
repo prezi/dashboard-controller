@@ -8,16 +8,15 @@ import (
 	"master/master/slaveMonitor"
 	"net/http"
 	"network"
-	"proxy"
 	"website"
 )
 
 var (
 	SLAVE_BINARY_PATH = network.GetRelativeFilePath("../../bin/slave")
+	MASTER_PORT       = "5000"
 )
 
 func main() {
-	proxy.Start()
 	slaveMap := master.GetSlaveMap()
 	router := mux.NewRouter()
 	website.InitiateWebsiteHandlers(slaveMap, router)
@@ -32,5 +31,5 @@ func main() {
 
 	http.Handle("/", router)
 	go slaveMonitor.MonitorSlaves(3, slaveMap)
-	log.Fatal(http.ListenAndServe(":5000", nil))
+	log.Fatal(http.ListenAndServe(":"+MASTER_PORT, nil))
 }

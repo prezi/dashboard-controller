@@ -1,74 +1,15 @@
-package proxy
+package main
 
 import (
-	"fmt"
+	"net/http"
 	"network"
-	"os/exec"
+	"proxy/proxy"
 )
 
-// TODO: proxy independent from master - send requests to proxy's IP address; proxy will run relevant command-line executions
-
-var (
-	OS         = network.GetOS() // TODO: make all these switch cases, if we ever program for OS X platform
-	PROXY_PORT = "8080"          // mitmproxy runs on port 8080
-)
-
-func Start() {
-	err := exec.Command("mitmproxy", "-s", "proxyConfig.py").Run()
-	network.ErrorHandler(err, "Error starting mitmproxy: %v\n")
-	initializeIPTables()
-}
-
-func initializeIPTables() {
-	if OS == "Linux" {
-		FlushIPTables()
-		AcceptResponseFromDNSServer()
-		AcceptRequestsOnMasterPort()
-	}
-}
-
-func FlushIPTables() (error error) {
-	error = exec.Command("sudo", "iptables", "-F").Run()
-	if error != nil {
-		fmt.Printf("Error flushing iptables: %v\n", error)
-	}
-	return
-}
-
-func AcceptResponseFromDNSServer() (error error) {
-	error = exec.Command("sudo", "iptables", "-A", "INPUT", "-m", "conntrack", "--ctstate", "RELATED,ESTABLISHED", "-j", "ACCEPT").Run()
-	if error != nil {
-		fmt.Printf("Error setting rule for accepting responses from DNS server: %v\n", error)
-	}
-	return
-}
-
-func AcceptRequestsOnMasterPort() (error error) {
-	error = exec.Command("sudo", "iptables", "-A", "INPUT", "-j", "ACCEPT", "-m", "tcp", "-p", "tcp", "--dport", "5000").Run()
-	if error != nil {
-		fmt.Printf("Error setting rule for accepting responses from DNS server: %v\n", error)
-	}
-	return
-}
-
-func AddNewSlaveToIPTables(slaveIP string) (error error) {
-	if OS == "Linux" {
-		error = exec.Command("sudo", "iptables", "-A", "INPUT", "-s", slaveIP, "-j", "ACCEPT", "-m", "tcp", "-p", "tcp", "--dport", PROXY_PORT).Run()
-		if error != nil {
-			fmt.Printf("Error adding slave to iptables: %v\n", error)
-		}
-		fmt.Println("Slave added to proxy IP tables.")
-	}
-	return
-}
-
-func RemoveDeadSlaveFromIPTables(slaveIP string) (error error) {
-	if OS == "Linux" {
-		error = exec.Command("sudo", "iptables", "-D", "INPUT", "-s", slaveIP, "-j", "ACCEPT", "-m", "tcp", "-p", "tcp", "--dport", PROXY_PORT).Run()
-		if error != nil {
-			fmt.Printf("Error deleting slave from iptables: %v\n", error)
-		}
-		fmt.Println("Slave deleted from iptables.")
-	}
-	return
+// run the proxy in a separate terminal window
+func main() {
+	proxy.Start()
+	// TODO: Is mitmproxy still alive even after the Go program ends? Do we need to have a function here to keep the Go process alive?
+	err := http.ListenAndServe(":6980", nil)
+	network.ErrorHandler(err, "Error starting HTTP server: %v\n")
 }
