@@ -66,6 +66,119 @@ func TestStatusMessageForUnavailableServer(t *testing.T) {
 	assert.Equal(t, false, master.IsURLValid(""))
 }
 
+func TestSubmitHandlerWithEmptyREsponse(t *testing.T) {
+	VIEWS_PATH = master.GetRelativeFilePath("views")
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		SubmitHandler(w, request, map[string]master.Slave{})
+	}))
+
+	client := &http.Client{}
+	resp, _ := client.Post(testServer.URL, "application/json", ioutil.NopCloser(strings.NewReader("")))
+	byteContent, _ := ioutil.ReadAll(resp.Body)
+	assert.True(t, strings.Contains(string(byteContent), "Failed"))
+}
+
+func TestDisplayFormPage(t *testing.T) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		displayFormPage(w, []string{"foo", "bar", "baz"}, "testUser")
+	}))
+	resp, _ := http.Get(testServer.URL)
+
+	defer resp.Body.Close()
+	byteContent, _ := ioutil.ReadAll(resp.Body)
+	assert.True(t, strings.Contains(string(byteContent), "foo"))
+	assert.True(t, strings.Contains(string(byteContent), "bar"))
+	assert.True(t, strings.Contains(string(byteContent), "baz"))
+	assert.True(t, strings.Contains(string(byteContent), "testUser"))
+}
+
+func TestSubmitHandlerWithWrongHttp(t *testing.T) {
+	type FormData struct {
+		URLToDisplay   string
+		SlaveNames []string
+	}
+
+	VIEWS_PATH = master.GetRelativeFilePath("views")
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		SubmitHandler(w, request, map[string]master.Slave{})
+	}))
+	form := FormData{"dummy",[]string{"a", "b"}}
+	b, err := json.Marshal(form)
+
+	req, err := http.NewRequest("POST", testServer.URL, bytes.NewBuffer(b))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	byteContent, _ := ioutil.ReadAll(resp.Body)
+	assert.True(t, strings.Contains(string(byteContent), "Sadpanda"))
+}
+
+func TestSubmitHandlerWithNonExistentSlave(t *testing.T) {
+	type FormData struct {
+		URLToDisplay   string
+		SlaveNames []string
+	}
+
+	VIEWS_PATH = master.GetRelativeFilePath("views")
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		SubmitHandler(w, request, map[string]master.Slave{})
+	}))
+	form := FormData{"http://www.google.com",[]string{"a", "b"}}
+	b, err := json.Marshal(form)
+
+	req, err := http.NewRequest("POST", testServer.URL, bytes.NewBuffer(b))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	byteContent, _ := ioutil.ReadAll(resp.Body)
+	assert.True(t, strings.Contains(string(byteContent), "refresh"))
+}
+
+func TestSubmitHandler(t *testing.T) {
+	type FormData struct {
+		URLToDisplay   string
+		SlaveNames []string
+	}
+
+	var receivedUrl string
+
+	testSlave := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		receivedUrl = request.PostFormValue("url")
+	}))
+
+	VIEWS_PATH = master.GetRelativeFilePath("views")
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		SubmitHandler(w, request, map[string]master.Slave{"a":master.Slave{
+			URL : testSlave.URL,
+			PreviouslyDisplayedURL: "",
+			DisplayedURL : "",
+		}})
+	}))
+	form := FormData{"http://www.google.com", []string{"a"}}
+	b, _ := json.Marshal(form)
+
+	req, _ := http.NewRequest("POST", testServer.URL, bytes.NewBuffer(b))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, _ := client.Do(req)
+
+	defer resp.Body.Close()
+	byteContent, _ := ioutil.ReadAll(resp.Body)
+	assert.True(t, strings.Contains(string(byteContent), "Slaves are updated"))
+	assert.Equal(t, receivedUrl, "http://www.google.com")
+}
+
 func TestParseFromJSON(t *testing.T) {
 	type FormData struct {
 		URLToDisplay string
