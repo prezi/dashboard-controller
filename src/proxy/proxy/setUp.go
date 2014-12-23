@@ -11,7 +11,7 @@ import (
 
 var (
 	OS                       = network.GetOS() // TODO: make all these switch cases, if we ever program for OS X platform
-	PROXY_PORT               = "8080"          // mitmproxy runs on port 8080
+	PROXY_PORT               = "7878"          // mitmproxy runs on port 8080; HTTP server for managing iptables will be this
 	PROXY_CONFIGURATION_FILE = network.GetRelativeFilePath("proxyConfig.py")
 	DEFAULT_MASTER_IP        = "localhost"
 	DEFAULT_MASTER_PORT      = "5000"

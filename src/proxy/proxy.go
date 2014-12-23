@@ -1,16 +1,21 @@
 package main
 
 import (
+	"log"
 	"net/http"
-	"network"
+	"proxy/manageIPTables"
 	"proxy/proxy"
 )
 
-// run the proxy in a separate terminal window
+var PROXY_HTTP_SERVER_PORT = "7878"
+
 func main() {
 	masterURL := proxy.SetUp()
 	go proxy.Heartbeat(1, masterURL)
-	// TODO: Is mitmproxy still alive even after the Go program ends? Do we need to have a function here to keep the Go process alive?
-	err := http.ListenAndServe(":6980", nil)
-	network.ErrorHandler(err, "Error starting HTTP server: %v\n")
+
+	http.HandleFunc("/update_iptables", func(_ http.ResponseWriter, r *http.Request) {
+		manageIPTables.UpdateIPTables(r)
+	})
+
+	log.Fatal(http.ListenAndServe(":"+PROXY_HTTP_SERVER_PORT, nil))
 }

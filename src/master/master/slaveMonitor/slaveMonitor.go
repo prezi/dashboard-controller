@@ -7,7 +7,6 @@ import (
 	"net"
 	"net/http"
 	"network"
-	"proxy/manageIPTables"
 	"strings"
 	"time"
 )
@@ -20,12 +19,13 @@ func ReceiveSlaveHeartbeat(request *http.Request, slaveMap map[string]master.Sla
 	} else {
 		addNewSlaveToMap(slaveMap, slaveAddress, slaveName)
 		if proxyMonitor.IS_USING_PROXY {
-			manageIPTables.AddNewSlaveToIPTables(splitProtocolAndPortFromIP(slaveAddress))
+			proxyMonitor.RequestProxyToAddNewSlaveToIPTables(proxyMonitor.PROXY_URL, splitProtocolAndPortFromIP(slaveAddress))
 		}
 	}
 	return slaveMap
 }
 
+// TODO: change slaveAddress to slaveURL
 func processSlaveHeartbeatRequest(request *http.Request) (slaveName, slaveAddress string) {
 	slaveName = request.PostFormValue("slaveName")
 	slavePort := request.PostFormValue("slavePort")
@@ -84,7 +84,7 @@ func removeDeadSlaves(deadTime int, slaveMap map[string]master.Slave) {
 		fmt.Printf("\nREMOVING DEAD SLAVES: %v\n", slavesToRemove)
 		for _, deadSlaveName := range slavesToRemove {
 			if proxyMonitor.IS_USING_PROXY {
-				manageIPTables.RemoveDeadSlaveFromIPTables(splitProtocolAndPortFromIP(slaveMap[deadSlaveName].URL))
+				proxyMonitor.RequestProxyToRemoveDeadSlaveFromIPTables(proxyMonitor.PROXY_URL, splitProtocolAndPortFromIP(slaveMap[deadSlaveName].URL))
 			}
 			delete(slaveMap, deadSlaveName)
 		}

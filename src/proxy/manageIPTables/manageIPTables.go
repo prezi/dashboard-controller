@@ -2,12 +2,24 @@ package manageIPTables
 
 import (
 	"fmt"
+	"net/http"
 	"network"
 	"os/exec"
 	"proxy/proxy"
 )
 
-func AddNewSlaveToIPTables(slaveIP string) (err error) {
+func UpdateIPTables(request *http.Request) {
+	IPAddressToAdd := request.PostFormValue("IPAddressToAdd")
+	IPAddressToDelete := request.PostFormValue("IPAddressToDelete")
+	if IPAddressToAdd != "" {
+		addNewSlaveToIPTables(IPAddressToAdd)
+	}
+	if IPAddressToDelete != "" {
+		removeDeadSlaveFromIPTables(IPAddressToDelete)
+	}
+}
+
+func addNewSlaveToIPTables(slaveIP string) (err error) {
 	if proxy.OS == "Linux" {
 		err = exec.Command("sudo", "iptables", "-A", "INPUT", "-s", slaveIP, "-j", "ACCEPT", "-m", "tcp", "-p", "tcp", "--dport", proxy.PROXY_PORT).Run()
 		if !network.ErrorHandler(err, "Error adding slave to iptables: %v\n") {
@@ -17,7 +29,7 @@ func AddNewSlaveToIPTables(slaveIP string) (err error) {
 	return
 }
 
-func RemoveDeadSlaveFromIPTables(slaveIP string) (err error) {
+func removeDeadSlaveFromIPTables(slaveIP string) (err error) {
 	if proxy.OS == "Linux" {
 		err = exec.Command("sudo", "iptables", "-D", "INPUT", "-s", slaveIP, "-j", "ACCEPT", "-m", "tcp", "-p", "tcp", "--dport", proxy.PROXY_PORT).Run()
 		if !network.ErrorHandler(err, "Error deleting slave from iptables: %v\n") {

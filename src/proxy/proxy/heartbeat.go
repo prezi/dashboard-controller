@@ -12,7 +12,7 @@ func Heartbeat(heartbeatInterval int, masterURL string) (err error) {
 	beat := time.Tick(time.Duration(heartbeatInterval) * time.Second)
 
 	client := &http.Client{}
-	form := network.CreateFormWithInitialValues(map[string]string{})
+	form := network.CreateFormWithInitialValues(map[string]string{"ProxyHTTPServerPort": PROXY_PORT})
 
 	for _ = range beat {
 		_, err = client.PostForm(masterURLForHeartbeat, form)

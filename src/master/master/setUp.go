@@ -1,8 +1,6 @@
 package master
 
 import (
-	"flag"
-	"fmt"
 	"net/http"
 	"sort"
 	"time"
@@ -53,18 +51,4 @@ func IsURLValid(url string) bool {
 		return false
 	}
 	return true
-}
-
-func GetProxyURL() (proxyURL string) {
-	proxyIP, proxyPort := configFlags()
-	proxyURL = "http://" + proxyIP + ":" + proxyPort
-	fmt.Printf("Proxy registered at %v", proxyURL)
-	return proxyURL
-}
-
-func configFlags() (proxyIP, proxyPort string) {
-	flag.StringVar(&proxyIP, "proxyIP", DEFAULT_PROXY_IP_ADDRESS, "proxy address")
-	flag.StringVar(&proxyPort, "proxyPort", DEFAULT_PROXY_PORT, "proxy port")
-	flag.Parse()
-	return
 }

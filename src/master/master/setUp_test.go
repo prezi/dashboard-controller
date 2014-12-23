@@ -35,7 +35,3 @@ func TestIfURLIsValid(t *testing.T) {
 func TestIfURLIsInvalid(t *testing.T) {
 	assert.False(t, IsURLValid(""))
 }
-
-func TestDefaultGetProxyURL(t *testing.T) {
-	assert.Equal(t, "http://localhost:8080", GetProxyURL())
-}
