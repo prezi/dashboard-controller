@@ -3,7 +3,6 @@ package slave
 import (
 	"flag"
 	"fmt"
-	"net"
 	"network"
 	"os"
 )
@@ -19,7 +18,7 @@ var err error
 
 func SetUp() (port, slaveName, masterURL, OS string) {
 	port, slaveName, masterIP, masterPort := configFlags()
-	masterURL = addProtocolAndPortToIP(masterIP, masterPort)
+	masterURL = "http://" + masterIP + ":" + masterPort
 	OS = network.GetOS()
 	// :0.0 indicates the first screen attached to the first display in localhost
 	err = os.Setenv("DISPLAY", ":0.0")
@@ -41,9 +40,4 @@ func configFlags() (port, slaveName, masterIP, masterPort string) {
 	flag.StringVar(&masterPort, "masterPort", DEFAULT_MASTER_PORT, "master port number")
 	flag.Parse()
 	return port, slaveName, masterIP, masterPort
-}
-
-func addProtocolAndPortToIP(IPAddress, port string) (url string) {
-	hostIPWithPort := net.JoinHostPort(IPAddress, port)
-	return "http://" + hostIPWithPort
 }

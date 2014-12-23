@@ -1,8 +1,6 @@
 package master
 
 import (
-	"flag"
-	"fmt"
 	"net/http"
 	"sort"
 	"time"
@@ -14,6 +12,11 @@ type Slave struct {
 	PreviouslyDisplayedURL string
 	DisplayedURL           string
 }
+
+const (
+	DEFAULT_PROXY_IP_ADDRESS = "localhost"
+	DEFAULT_PROXY_PORT       = "8080"
+)
 
 func GetSlaveMap() (slaveMap map[string]Slave) {
 	slaveMap = make(map[string]Slave)
@@ -48,16 +51,4 @@ func IsURLValid(url string) bool {
 		return false
 	}
 	return true
-}
-
-func GetProxyPort() (proxyPort string) {
-	proxyPort = configFlags()
-	fmt.Printf("Registered proxy on port: %v\n", proxyPort)
-	return
-}
-
-func configFlags() (proxyPort string) {
-	flag.StringVar(&proxyPort, "proxyPort", "8080", "proxy port")
-	flag.Parse()
-	return
 }
