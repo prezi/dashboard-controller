@@ -1,18 +1,22 @@
 module.exports = (robot) ->
 
-  SERVER_URL= "http://10.0.0.210:5000"
+  SERVER_URL= "http://10.0.1.214:5000"
 
   robot.respond /post (.*) (.*)/i, (msg) ->
     name = msg.match[1]
     url = msg.match[2]
     msg.send "Posting #{url} to #{name}"
 
-    data = "url=" + url + "&slave-id=" + name
+    postData =
+      URLToDisplay: url
+      SlaveNames: [name]
 
-    robot.http(SERVER_URL= "http://10.0.0.210:5000" + "/form-submit")
-    .header("content-length", data.length)
+    jsonData = JSON.stringify postData
+
+    robot.http(SERVER_URL + "/form-submit")
+    .header("content-length", jsonData.length)
     .header("Content-Type", "application/x-www-form-urlencoded")
-    .post(data) (err, res, body) ->
+    .post(jsonData) (err, res, body) ->
       try
         msg.send "Success!"
       catch err
