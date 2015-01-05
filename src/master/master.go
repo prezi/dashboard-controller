@@ -35,6 +35,6 @@ func main() {
 
 	http.Handle("/", router)
 	go slaveMonitor.MonitorSlaves(3, slaveMap)
-	go proxyMonitor.MonitorProxy(3)
+	go proxyMonitor.MonitorProxy(10)
 	log.Fatal(http.ListenAndServe(":"+MASTER_PORT, nil))
 }

@@ -7,8 +7,6 @@ import (
 	"os/exec"
 )
 
-// TODO: proxy independent from master - send requests to proxy's IP address; proxy will run relevant command-line executions
-
 var (
 	OS                       = network.GetOS() // TODO: make all these switch cases, if we ever program for OS X platform
 	PROXY_PORT               = "7878"          // mitmproxy runs on port 8080; HTTP server for managing iptables will be this
