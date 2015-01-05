@@ -2,6 +2,6 @@
 
 set -xe
 
-for i in master slave network website; do go test $i/...; done
+for i in master network proxy slave website; do go test $i/...; done
 
 echo " !!SUCCESS!! Tests are done. "
