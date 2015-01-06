@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/url"
 	"testing"
+	"strings"
 )
 
 const (
@@ -17,11 +18,6 @@ func TestErrorHandler(t *testing.T) {
 	assert.Equal(t, true, ErrorHandler(err, "%v"))
 }
 
-func TestGetRelativeFilePath(t *testing.T) {
-	filepath := GetRelativeFilePath("assets/images")
-	assert.IsType(t, "some/filepath", filepath)
-}
-
 func TestCreateFormWithInitialValues(t *testing.T) {
 	form := CreateFormWithInitialValues(map[string]string{"url": TEST_URL})
 	assert.Equal(t, form, url.Values{"url": []string{TEST_URL}})
@@ -29,4 +25,10 @@ func TestCreateFormWithInitialValues(t *testing.T) {
 
 func TestGetOS(t *testing.T) {
 	assert.IsType(t, "Some OS Name", GetOS())
+}
+
+func TestGetProjectRoot(t *testing.T) {
+	projectPath := getProjectRoot()
+	projectName := "dashboard-controller"
+	assert.True(t, strings.Contains(projectPath, projectName))
 }

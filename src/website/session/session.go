@@ -12,7 +12,7 @@ var cookieHandler = securecookie.New(
 	securecookie.GenerateRandomKey(32))
 
 var (
-	FILE_PATH_TO_USER_AUTHENTICATION_DATA = network.GetRelativeFilePath("./../hash/user_authentication_data.txt")
+	FILE_PATH_TO_USER_AUTHENTICATION_DATA = network.PROJECT_ROOT + "/src/website/hash/user_authentication_data.txt"
 )
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
