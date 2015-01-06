@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-var TEST_USER_AUTHENTICATION_FILE = network.GetRelativeFilePath("./user_authentication_data_for_testing.txt")
+var TEST_USER_AUTHENTICATION_FILE = network.PROJECT_ROOT + "/src/website/hash/user_authentication_data_for_testing.txt"
 
 func TestInitializeUserAuthenticationMap(t *testing.T) {
 	result := InitializeUserAuthenticationMap(TEST_USER_AUTHENTICATION_FILE)

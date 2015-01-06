@@ -8,10 +8,11 @@ import (
 	"master/master"
 	"net/http"
 	"net/http/httptest"
-	"network"
 	"strings"
 	"testing"
+	"network"
 )
+
 
 type PostURLRequest struct {
 	DestinationSlaveName string
@@ -29,13 +30,14 @@ func TestIndexPageHandler(t *testing.T) {
 }
 
 func TestIndexPageHandlerWithWrongPath(t *testing.T) {
-	VIEWS_PATH = network.GetRelativeFilePath("dummy")
+	VIEWS_PATH = "dummy"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		IndexPageHandler(w, request)
 	}))
 	client := &http.Client{}
 	resp, _ := client.Get(testServer.URL)
 	assert.Equal(t, 404, resp.StatusCode)
+	VIEWS_PATH = network.PROJECT_ROOT + "/src/website/views"
 }
 
 func sendGetToFormHandler(URL string) int {
@@ -67,7 +69,6 @@ func TestStatusMessageForUnavailableServer(t *testing.T) {
 }
 
 func TestSubmitHandlerWithEmptyREsponse(t *testing.T) {
-	VIEWS_PATH = network.GetRelativeFilePath("views")
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		SubmitHandler(w, request, map[string]master.Slave{})
 	}))
@@ -97,8 +98,6 @@ func TestSubmitHandlerWithWrongHttp(t *testing.T) {
 		URLToDisplay   string
 		SlaveNames []string
 	}
-
-	VIEWS_PATH = network.GetRelativeFilePath("views")
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		SubmitHandler(w, request, map[string]master.Slave{})
 	}))
@@ -124,7 +123,6 @@ func TestSubmitHandlerWithNonExistentSlave(t *testing.T) {
 		SlaveNames []string
 	}
 
-	VIEWS_PATH = network.GetRelativeFilePath("views")
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		SubmitHandler(w, request, map[string]master.Slave{})
 	}))
@@ -156,7 +154,6 @@ func TestSubmitHandler(t *testing.T) {
 		receivedUrl = request.PostFormValue("url")
 	}))
 
-	VIEWS_PATH = network.GetRelativeFilePath("views")
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		SubmitHandler(w, request, map[string]master.Slave{"a":master.Slave{
 			URL : testSlave.URL,
@@ -195,7 +192,6 @@ func TestParseFromJSON(t *testing.T) {
 }
 
 func TestSendConfirmationMessageToUser(t *testing.T) {
-	VIEWS_PATH = network.GetRelativeFilePath("views")
 	testMessage := "testmessage"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		sendConfirmationMessageToUser(w, testMessage)
@@ -217,8 +213,9 @@ func TestCreateConfirmationMessage(t *testing.T) {
 }
 
 func TestCreateConfirmationMessageWithWrongPath(t *testing.T) {
-	VIEWS_PATH = network.GetRelativeFilePath("dummy")
+	VIEWS_PATH = "dummy"
 	msg := "testmessage"
 	confirmationMessageJson, _ := createConfirmationMessage(msg)
 	assert.Equal(t, len(confirmationMessageJson), 0)
+	VIEWS_PATH = network.PROJECT_ROOT + "/src/website/views"
 }

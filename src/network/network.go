@@ -5,8 +5,6 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"path"
-	"runtime"
 	"strings"
 )
 
@@ -16,18 +14,16 @@ const (
 	DEFAULT_MASTER_PORT       = "5000"
 )
 
+var (
+	PROJECT_ROOT	 = getProjectRoot()
+)
+
 func ErrorHandler(err error, message string) (errorOccurred bool) {
 	if err != nil {
 		fmt.Printf(message, err)
 		return true
 	}
 	return false
-}
-
-func GetRelativeFilePath(relativeFileName string) (filePath string) {
-	_, filename, _, _ := runtime.Caller(1)
-	filePath = path.Join(path.Dir(filename), relativeFileName)
-	return
 }
 
 func CreateFormWithInitialValues(formEntries map[string]string) (form url.Values) {
@@ -68,4 +64,9 @@ func GetOS() (OS string) {
 
 	fmt.Printf("Operating system detected: %v\n", OS)
 	return OS
+}
+
+func getProjectRoot() (projectRootPath string){
+	projectRootPath = os.Getenv("GOPATH")
+	return
 }

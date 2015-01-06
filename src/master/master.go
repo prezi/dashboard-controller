@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	SLAVE_BINARY_PATH = network.GetRelativeFilePath("../../bin/slave")
+	SLAVE_BINARY_PATH = network.PROJECT_ROOT + "/bin/slave"
 	MASTER_PORT       = "5000"
 )
 

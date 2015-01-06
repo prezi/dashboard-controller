@@ -15,10 +15,10 @@ import (
 )
 
 var (
-	IMAGES_PATH      = network.GetRelativeFilePath("assets/images")
-	JAVASCRIPTS_PATH = network.GetRelativeFilePath("assets/javascripts")
-	STYLESHEETS_PATH = network.GetRelativeFilePath("assets/stylesheets")
-	VIEWS_PATH       = network.GetRelativeFilePath("views")
+	IMAGES_PATH      = network.PROJECT_ROOT + "/src/website/assets/images"
+	JAVASCRIPTS_PATH = network.PROJECT_ROOT + "/src/website/assets/javascripts"
+	STYLESHEETS_PATH = network.PROJECT_ROOT + "/src/website/assets/stylesheets"
+	VIEWS_PATH       = network.PROJECT_ROOT + "/src/website/views"
 )
 
 type StatusMessage struct {
