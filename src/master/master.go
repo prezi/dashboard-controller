@@ -25,7 +25,7 @@ func main() {
 		slaveMap = slaveMonitor.ReceiveSlaveHeartbeat(r, slaveMap)
 	})
 	router.HandleFunc("/receive_proxy_heartbeat", func(_ http.ResponseWriter, r *http.Request) {
-		proxyMonitor.ReceiveProxyHeartbeat(r)
+		proxyMonitor.ReceiveProxyHeartbeat(r, slaveMap)
 	})
 	router.HandleFunc("/get_slave_binary", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, SLAVE_BINARY_PATH)
