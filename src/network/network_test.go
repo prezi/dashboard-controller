@@ -4,8 +4,8 @@ import (
 	"errors"
 	"github.com/stretchr/testify/assert"
 	"net/url"
-	"testing"
 	"strings"
+	"testing"
 )
 
 const (
@@ -29,6 +29,6 @@ func TestGetOS(t *testing.T) {
 
 func TestGetProjectRoot(t *testing.T) {
 	projectPath := getProjectRoot()
-	projectName := "dashboard-controller"
+	projectName := "dashboard-controller" // TODO: this should not be a constant
 	assert.True(t, strings.Contains(projectPath, projectName))
 }

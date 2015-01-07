@@ -17,8 +17,9 @@ var (
 
 func SetUp() (masterURL string) {
 	masterIP, masterPort := configFlags()
+	masterURL = getMasterURL(masterIP, masterPort)
 	initializeIPTables(masterIP)
-	return getMasterURL(masterIP, masterPort)
+	return masterURL
 }
 
 // TODO: mitmproxy does not persist after StartProxy function completes. Must run `mitmproxy -s proxyConfig.py` manually in a separate shell.
