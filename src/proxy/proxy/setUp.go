@@ -16,15 +16,15 @@ var (
 )
 
 func SetUp() (masterURL string) {
-	startProxy()
 	masterIP, masterPort := configFlags()
 	initializeIPTables(masterIP)
 	return getMasterURL(masterIP, masterPort)
 }
 
-func startProxy() {
+// TODO: mitmproxy does not persist after StartProxy function completes. Must run `mitmproxy -s proxyConfig.py` manually in a separate shell.
+func StartProxy() {
 	fmt.Println("Starting mitmproxy with command: mitmproxy -s ", PROXY_CONFIGURATION_FILE)
-	err := exec.Command("mitmproxy", "-s", PROXY_CONFIGURATION_FILE).Run()
+	err := exec.Command("mitmproxy", "-s", PROXY_CONFIGURATION_FILE).Start()
 	network.ErrorHandler(err, "Error starting mitmproxy: %v\n")
 }
 
