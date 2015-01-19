@@ -13,11 +13,6 @@ type Slave struct {
 	DisplayedURL           string
 }
 
-const (
-	DEFAULT_PROXY_IP_ADDRESS = "localhost"
-	DEFAULT_PROXY_PORT       = "8080"
-)
-
 func GetSlaveMap() (slaveMap map[string]Slave) {
 	slaveMap = make(map[string]Slave)
 	return

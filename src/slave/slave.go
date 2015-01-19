@@ -11,17 +11,17 @@ import (
 )
 
 func main() {
-	ownPort, slaveName, masterURL, OS := slave.SetUp()
+	ownPort, slaveName, masterURL, proxyURL, OS := slave.SetUp()
 	go slave.Heartbeat(1, slaveName, ownPort, masterURL)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch OS {
-			case "Linux":
-				LinuxBrowserHandler.BrowserHandler(w, r)
+		case "Linux":
+			LinuxBrowserHandler.BrowserHandler(w, r, proxyURL)
 
-			case "OS X":
-				OSXBrowserHandler.BrowserHandler(w, r)
-			}
+		case "OS X":
+			OSXBrowserHandler.BrowserHandler(w, r)
+		}
 	})
 	http.HandleFunc("/receive_killsignal", func(_ http.ResponseWriter, request *http.Request) {
 		if "die" == request.FormValue("message") {

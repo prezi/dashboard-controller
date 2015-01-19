@@ -19,11 +19,10 @@ var browserProcess *exec.Cmd
 func TestBrowserHandler(t *testing.T) {
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if testBrowser {
-			BrowserHandler(w, r)
+			BrowserHandler(w, r, "")
 		}
 
 	}))
-
 
 	client := &http.Client{}
 	client.PostForm(testServer.URL, url.Values{"url": {testURL}})
@@ -37,6 +36,6 @@ func TestKillBrowserLinux(t *testing.T) {
 
 func TestOpenBrowserLinux(t *testing.T) {
 	if testBrowser {
-		openBrowser(testURL)
+		openBrowser(testURL, "")
 	}
 }

@@ -7,10 +7,10 @@ import (
 	"time"
 )
 
-func BrowserHandler(writer http.ResponseWriter, request *http.Request) {
+func BrowserHandler(writer http.ResponseWriter, request *http.Request, proxyURL string) {
 	url := request.PostFormValue("url")
 	killBrowser()
-	err := openBrowser(url)
+	err := openBrowser(url, proxyURL)
 	if err != nil {
 		fmt.Fprintf(writer, "Error opening the browser %v", err)
 	}
@@ -45,11 +45,15 @@ func getProcessList() (existingProcess []byte, err error) {
 	return
 }
 
-func openBrowser(url string) (err error) {
-	fmt.Printf("Executing command: chromium --incognito --kiosk %v\n", url)
-	go exec.Command("chromium", "--incognito", "--kiosk", url).Run()
-	if err != nil {
-		fmt.Printf("Error opening URL: %v\n", err)
+func openBrowser(url, proxyURL string) (err error) {
+
+	if proxyURL == "" {
+		fmt.Printf("Executing command: chromium --incognito --kiosk %v\n", url)
+		go exec.Command("chromium", "--incognito", "--kiosk", url).Run()
+	} else {
+		proxyURLArg := "--proxy-server=" + proxyURL
+		fmt.Printf("Executing command: chromium --incognito --kiosk %v %v\n", proxyURLArg, url)
+		go exec.Command("chromium", "--incognito", "--kiosk", proxyURLArg, url).Run()
 	}
 	return
 }
