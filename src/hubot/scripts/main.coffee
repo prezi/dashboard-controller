@@ -1,6 +1,6 @@
 module.exports = (robot) ->
 
-  SERVER_URL= "http://10.0.1.214:5000"
+  SERVER_URL= "http://10.0.0.60:5000"
 
   robot.respond /post (.*) (.*)/i, (msg) ->
     name = msg.match[1]
